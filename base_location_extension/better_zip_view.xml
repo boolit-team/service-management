@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+    
+    <record id="better_zip_form" model="ir.ui.view">
+        <field name="name">res.better.zip.form.2</field>
+        <field name="model">res.better.zip</field>
+        <field name="inherit_id" ref="base_location.better_zip_form"/>
+        <field name="arch" type="xml">
+            <field name="priority" position="replace"/>
+            <field name="city" position="replace">
+                <field name="city_id" on_change="onchange_city_id(city_id)"/>
+                <field name="house_no"/>
+                <field name="apartment_no"/>
+            </field>
+            <field name="name" position="after">
+                <field name="street_id" on_change="onchange_street_id(street_id)"/>
+            </field>
+        </field>
+    </record>
+    
+    <record model="ir.ui.view" id="better_zip_tree">
+        <field name="name">res.better.zip.tree.2</field>
+        <field name="model">res.better.zip</field>
+        <field name="inherit_id" ref="base_location.better_zip_tree"/>
+        <field name="arch" type="xml">
+            <field name="priority" position="replace"/>
+            <field name="city" position="replace">
+                <field name="city_id"/>
+                <field name="street_id"/>
+                <field name="house_no"/>
+                <field name="state_id"/>
+            </field>
+            <field name="code" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>        
+        </field>
+    </record>
+    
+		<record id="view_better_zip_filter" model="ir.ui.view">
+		    <field name="name">Better Zip - Search</field>
+		    <field name="model">res.better.zip</field>
+		    <field name="arch" type="xml">
+		        <search string="Search Addresses">
+		            <field name="name" string="ZIP" filter_domain="[('name','ilike',self)]"/>
+		            <field name="city_id" string="City" filter_domain="[('city_id', 'ilike', self)]"/>
+		            <field name="street_id" string="Street" filter_domain="[('street_id', 'ilike', self)]"/>
+		            <field name="state_id" string="State" filter_domain="[('state_id', 'ilike', self)]"/>		            
+		            <field name="house_no" string="House No." filter_domain="[('house_no', 'ilike', self)]"/>
+		            <separator/>
+		        </search>
+		    </field>		
+		</record>    
+
+    </data>
+</openerp>
+
+

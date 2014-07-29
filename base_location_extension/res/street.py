@@ -1,9 +1,8 @@
-# -*- encoding: utf-8 -*-
+# -*- coding: utf-8 -*-
 ##############################################################################
 #    
-#    Odoo, Open Source Management Solution
-#
-#    Author: Andrius Laukavičius. Copyright: JSC NOD Baltic
+#    OpenERP, Open Source Management Solution
+#    Copyright (C) 2004-2009 Tiny SPRL (<http://tiny.be>).
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as
@@ -20,36 +19,14 @@
 #
 ##############################################################################
 
+from openerp.osv import fields, orm
+    
+class Street(orm.Model):
+    _name = 'res.country.state.city.street'
+    _description = 'Street'
+    _inherit = 'base.localization'
+    _columns = {
+        'city_id': fields.many2one('res.country.state.city', 'City', require=True),
+    }
+    
 
-{
-    'name': 'Name',
-    'version': '1.0',
-    'category': 'Base',
-    'sequence': 2,
-    'summary': 'Summary',
-    'description': """
-	Description
-	""",
-    'author': 'Andrius Laukavičius',
-    'website': '',
-    'depends': [
-        'hr_contract', 'base_location_extension',      
-    ],
-    'data': [
-        #'security/ir.model.access.csv',
-        'views/hr_contract_view.xml',
-        'views/hr_view.xml',
-        #'data/,        
-
-    ],
-    'demo': [
-    ],
-    'test': [
-
-    ],
-    'installable': True,
-    'application': True,
-    'auto_install': False,
-    'images': [],
-}
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

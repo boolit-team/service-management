@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="view_employee_form_inherit1" model="ir.ui.view">
+            <field name="name">HR Employee Form - Inherit</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_form"/>
+            <field name="arch" type="xml">
+                <field name="address_home_id" position="after">
+                    <field name="address_lt_id"
+                        domain="[('country_id.code', '=', 'LT')]"
+                    />
+                    <field name="address_uk_id"
+                        domain="[('country_id.code', '=', 'GB')]"
+                        />
+                </field>                                  
+            </field>
+        </record>     
+    </data>
+</openerp>        

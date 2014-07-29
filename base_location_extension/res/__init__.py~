@@ -1,0 +1,4 @@
+import res_city
+import res_street
+import res_partner
+import res_company

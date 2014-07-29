@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="1">
+    
+    <record id="city_id_1" model="res.country.state.city">
+        <field name="name">Vilnius</field>
+        <field name="code">VLN</field>
+        <field name="state_id" ref="state_id_9"/>
+    </record>
+    
+    <record id="city_id_2" model="res.country.state.city">
+        <field name="name">Kaunas</field>
+        <field name="code">KNS</field>
+        <field name="state_id" ref="state_id_1"/>
+    </record>
+    
+    <record id="city_id_3" model="res.country.state.city">
+        <field name="name">Klaipėda</field>
+        <field name="code">KLP</field>
+        <field name="state_id" ref="state_id_2"/>
+    </record>        
+    
+    
+    </data>
+</openerp>

@@ -1,9 +1,9 @@
 # -*- encoding: utf-8 -*-
 ##############################################################################
 #    
-#    Odoo, Open Source Management Solution
+#    OpenERP, Open Source Management Solution
 #
-#    Author: Andrius Laukavičius. Copyright: JSC NOD Baltic
+#    Author: Andrius Laukavičius
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as
@@ -22,27 +22,34 @@
 
 
 {
-    'name': 'Name',
+    'name': 'Base Localization',
     'version': '1.0',
     'category': 'Base',
     'sequence': 2,
-    'summary': 'Summary',
+    'summary': 'Cities, Streets management',
     'description': """
-	Description
-	""",
+This module updates current localization for countries and Fed. States. It adds cities, and street and extends base_location module.
+""",
     'author': 'Andrius Laukavičius',
     'website': '',
-    'depends': [
-        'hr_contract', 'base_location_extension',      
+    'depends': [      
+       'base_location',
     ],
     'data': [
-        #'security/ir.model.access.csv',
-        'views/hr_contract_view.xml',
-        'views/hr_view.xml',
-        #'data/,        
-
+        'res/city_view.xml',
+        'res/street_view.xml',
+        'res/partner_view.xml',       
+        'res/company_view.xml',
+        'res/state_view.xml',
+        'better_zip_view.xml',
+        'security/ir.model.access.csv',
+        'data/res.country.state.csv',
     ],
     'demo': [
+        'demo/res_country_state_city.xml',
+        'demo/res_country_state_city_street.xml',                
+        'demo/demo_addresses.xml',        
+
     ],
     'test': [
 

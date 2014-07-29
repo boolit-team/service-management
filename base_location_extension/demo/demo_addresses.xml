@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="1">
+    
+        <record id="demo_address_id_1" model="res.better.zip">
+            <field name="name">LT-0251</field>
+            <field name="street_id" ref="street_id_1"/>
+            <field name="city_id" ref="city_id_1"/>
+            <field name="state_id" ref="state_id_9"/>
+            <field name="country_id" ref="base.lt"/>
+        </record>    
+    
+    </data>
+</openerp>    

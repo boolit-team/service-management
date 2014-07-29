@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+        <record id="view_partner_form" model="ir.ui.view">
+            <field name="name">res.partner.zip_id.3</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base_location.view_partner_form"/>
+            <field name="arch" type="xml">
+            <field name="zip_id" position="replace"/>
+                <field name="street" position="before">
+                    <field name="zip_id"
+                        on_change="onchange_zip_id(zip_id)"
+                        placeholder="Address completion"
+                        attrs="{'invisible': [('use_parent_address','=',True)]}"
+                    />
+                </field>
+                <field name="street" placeholder="Street..." position="replace">
+                    <div class="address_format">
+                        <field name="street" placeholder="Street..." attrs="{'readonly': [('use_parent_address','=',True)]}" style="width: 53%%"/>
+                        <field name="house_no" style="width: 22%%"/>
+                        <field name="apartment_no" style="width: 22%%"/>
+                    </div>
+                </field>                
+            </field>
+        </record>
+    </data>
+</openerp>
