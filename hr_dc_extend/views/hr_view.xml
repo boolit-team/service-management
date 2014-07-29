@@ -6,14 +6,29 @@
             <field name="model">hr.employee</field>
             <field name="inherit_id" ref="hr.view_employee_form"/>
             <field name="arch" type="xml">
+                <field name="identification_id" position="after">
+                    <field name="id_copy" />
+                    <field name="nin"/>
+                </field>
+                <field name="bank_account_id" position="after">
+                    <field name="sort_code"/>                    
+                </field>
                 <field name="address_home_id" position="after">
                     <field name="address_lt_id"
                         domain="[('country_id.code', '=', 'LT')]"
                     />
+                    <field name="phone_lt"/>
                     <field name="address_uk_id"
                         domain="[('country_id.code', '=', 'GB')]"
                         />
-                </field>                                  
+                </field>  
+                <group string="Birth" position="after">
+                    <group string="Emergency">
+                        <field name="relatives"/>
+                        <field name="relative_name"/>
+                        <field name="contact_info"/>
+                    </group>
+                </group>                                                
             </field>
         </record>     
     </data>

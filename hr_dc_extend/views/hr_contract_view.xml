@@ -7,8 +7,15 @@
             <field name="inherit_id" ref="hr_contract.hr_contract_view_form"/>
             <field name="arch" type="xml">
                 <field name="wage" position="after">
-                    <field name="salary_per_h"/>
-                </field>                                  
+                    <field name="salary_per_h"/>                    
+                </field>
+                <separator string="Notes" position="before">
+                    <group string="Arrive to UK">
+                        <field name="arrive_to_uk"/>
+                        <field name="start_work_uk"/>
+                        <field name="end_work_uk"/>
+                    </group>
+                </separator>                                  
             </field>
         </record>     
     </data>
