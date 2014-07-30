@@ -3,7 +3,7 @@
 #    
 #    Odoo, Open Source Management Solution
 #
-#    Author: Andrius Laukavičius. Copyright: JSC NOD Baltic
+#    Author: Andrius Laukavičius. Copyright: Andrius Laukavičius
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as
@@ -19,22 +19,36 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.     
 #
 ##############################################################################
-from openerp import models, fields
 
-class hr_employee(models.Model):
-    _name = 'hr.employee'
-    _inherit = 'hr.employee'
 
-    #fields
-    address_lt_id = fields.Many2one('res.better.zip',string="Home Address in LT")
-    phone_lt = fields.Char(string='Phone number in LT')
-    address_uk_id = fields.Many2one('res.better.zip',string="Home Address in UK")
-    #id_copy_fname = fields.Char('ID Copy Fname', readonly=True) - Temp. disabled
-    id_copy = fields.Binary('ID Copy')
-    sort_code = fields.Char('Sort Code', size=8)
-    nin = fields.Char('NIN', size=9)
-    driving_licence = fields.Binary('Driving Licence')
-    relatives = fields.Char('Relatives')
-    relative_name = fields.Char('Relative Name')
-    contact_info = fields.Text('Contact Info')
+{
+    'name': 'CRM - Domestic Cleanin',
+    'version': '1.0',
+    'category': 'Base',
+    'sequence': 2,
+    'summary': 'CRM Extension for Domestic Cleaning',
+    'description': """
+	Description
+	""",
+    'author': 'Andrius Laukavičius',
+    'website': '',
+    'depends': [
+        'crm', 'sale'      
+    ],
+    'data': [
+        #'security/ir.model.access.csv',
+        'views/res_partner_view.xml',
+        #'data/',        
 
+    ],
+    'demo': [
+    ],
+    'test': [
+
+    ],
+    'installable': True,
+    'application': True,
+    'auto_install': False,
+    'images': [],
+}
+# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

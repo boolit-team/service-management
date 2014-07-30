@@ -22,7 +22,7 @@
 
 
 {
-    'name': 'Name',
+    'name': 'HR - Extension',
     'version': '1.0',
     'category': 'Base',
     'sequence': 2,

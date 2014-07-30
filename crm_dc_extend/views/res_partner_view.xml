@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="view_partner_form_inherit" model="ir.ui.view">
+            <field name="name">Partner Form - Inherit</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+                <field name="title" position="after">
+                    <field name="nationality_id" 
+                        attrs="{'invisible': [('is_company', '=', True)]}"
+                    />
+                </field>                                              
+            </field>
+        </record>     
+    </data>
+</openerp>        
