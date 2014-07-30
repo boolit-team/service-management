@@ -36,7 +36,7 @@
         'crm', 'sale'      
     ],
     'data': [
-        #'security/ir.model.access.csv',
+        'security/ir.model.access.csv',
         'views/res_partner_view.xml',
         #'data/',        
 

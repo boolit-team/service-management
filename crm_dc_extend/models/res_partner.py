@@ -41,4 +41,5 @@ class res_partner(models.Model):
     #fields
     nationality_id = fields.Many2one('res.country', 'Nationality')
     attention = fields.Text('Attention')
+    address_description = fields.Char('Description')
     address_archive_ids = fields.One2many('res.partner.address_archive', 'partner_id', 'Addresses Archive')
