@@ -1,6 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
+        <!-- res.partner.address_archive -->
+        <record id="view_partner_address_archive_tree" model="ir.ui.view">
+            <field name="name">res.partner.address_archive.tree</field>
+            <field name="model">res.partner.address_archive</field>
+            <field name="arch" type="xml">
+                <tree string="Addresses">
+                    <field name="name"/>
+                    <field name="street"/>
+                    <field name="city"/>
+                    <field name="country_id"/>
+                    <field name="create_date"/>
+                </tree>
+            </field>
+        </record>  
+
+        <record id="view_partner_address_archive_form" model="ir.ui.view">
+            <field name="name">res.partner.address_archive.form</field>
+            <field name="model">res.partner.address_archive</field>
+            <field name="arch" type="xml">
+                <form string="Addresses">
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="street"/>
+                            <field name="city"/>
+                            <field name="state_id"/>
+                            <field name="country_id"/>                           
+                        </group>
+                        <group>
+                            <field name="current"/>
+                            <field name="create_date"/> 
+                        </group>
+                    </group>
+                </form>
+            </field>
+        </record>  
+
+        <record id="action_partner_address_archive_form" model="ir.actions.act_window">
+            <field name="name">Addresses</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.partner.address_archive</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>      
+
+        <record id="action_partner_address_archive_form_view" model="ir.actions.act_window.view">
+            <field eval="2" name="sequence"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_partner_address_archive_form"/>
+            <field name="act_window_id" ref="action_partner_address_archive_form"/>
+        </record>    
+
+        <!-- res.partner -->                          
         <record id="view_partner_form_inherit" model="ir.ui.view">
             <field name="name">Partner Form - Inherit</field>
             <field name="model">res.partner</field>
@@ -14,8 +67,24 @@
                     <span style="color:red">
                         <field name="attention"/>
                     </span>
-                </field>                                              
+                </field>
+                <page string="Accounting" position="before">
+                    <page String="Addresses Archive">
+                    <field name="address_archive_ids">
+                        <tree string="Addresses" editable="bottom">
+                            <field name="name"/>
+                            <field name="street"/>
+                            <field name="city"/>
+                            <field name="state_id"/>
+                            <field name="country_id"/>  
+                            <field name="current"/>
+                            <field name="create_date" readonly="1"/>                                                         
+                        </tree>                    
+                    </field>
+                    </page>
+                </page>                                              
             </field>
-        </record>     
+        </record>  
+
     </data>
 </openerp>        
