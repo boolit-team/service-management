@@ -27,3 +27,4 @@ class res_partner(models.Model):
 
     #fields
     nationality_id = fields.Many2one('res.country', 'Nationality')
+    attention = fields.Text('Attention')
