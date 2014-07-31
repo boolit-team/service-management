@@ -20,7 +20,7 @@
 #
 ##############################################################################
 from openerp import models, fields
-
+from openerp.api import multi, one
 class res_partner_address_archive(models.Model):
     _name = 'res.partner.address_archive'
     _description = 'Partner Addresses Archive'
@@ -39,7 +39,7 @@ class res_partner_address_archive(models.Model):
     current = fields.Boolean('Current')
     partner_id = fields.Many2one('res.partner', 'Partner')
 
-    _sql_constraints = [('unique_current', 'unique(current)', 'Only One Address can be Current!')]
+    #_sql_constraints = [('unique_current', 'unique(current)', 'Only One Address can be Current!')]
 
 class res_partner(models.Model):
     _name = 'res.partner'
@@ -52,3 +52,22 @@ class res_partner(models.Model):
     house_name = fields.Char('House Name')
     address_description = fields.Char('Description')
     address_archive_ids = fields.One2many('res.partner.address_archive', 'partner_id', 'Addresses Archive')
+
+    #methods
+    @one
+    def init_archive(self):
+        arch_addr_model = self.env['res.partner.address_archive']
+        if not self.address_archive_ids:
+            arch_addr_model.create({'current': True, 'partner_id': self.id})
+
+
+    '''
+    @multi
+    def write(self, vals):
+        super(res_partner, self).write(vals)
+        
+        for rec in self:
+            if not rec.address_archive_ids:
+                arch_addr_model = self.env['res.partner.address_archive']
+                arch_addr_model.create({'current': True, 'partner_id': rec.id})
+    ''' 
