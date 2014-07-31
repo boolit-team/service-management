@@ -29,7 +29,13 @@ class res_partner_address_archive(models.Model):
     state_id = fields.Many2one('res.country.state', 'State')
     city = fields.Char('City')
     name = fields.Char('Post Code', size=24)
+    eyre = fields.Char('Eyre')
+    apartment_complex = fields.Char('Apart. Complex')
+    house_name = fields.Char('House Name')
     street = fields.Char('Street')
+    street2 = fields.Char('Ent. Street')
+    house_no = fields.Char('House No.', size=64)
+    apartment_no = fields.Char('Apartment No.', size=64)
     current = fields.Boolean('Current')
     partner_id = fields.Many2one('res.partner', 'Partner')
 
@@ -41,5 +47,8 @@ class res_partner(models.Model):
     #fields
     nationality_id = fields.Many2one('res.country', 'Nationality')
     attention = fields.Text('Attention')
+    eyre = fields.Char('Eyre')
+    apartment_complex = fields.Char('Apartment Complex')
+    house_name = fields.Char('House Name')
     address_description = fields.Char('Description')
     address_archive_ids = fields.One2many('res.partner.address_archive', 'partner_id', 'Addresses Archive')

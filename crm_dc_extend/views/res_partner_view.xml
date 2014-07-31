@@ -11,6 +11,7 @@
                     <field name="street"/>
                     <field name="city"/>
                     <field name="country_id"/>
+                    <field name="current"/>
                     <field name="create_date"/>
                 </tree>
             </field>
@@ -21,6 +22,7 @@
             <field name="model">res.partner.address_archive</field>
             <field name="arch" type="xml">
                 <form string="Addresses">
+                    <separator string="Address"/>
                     <group>
                         <group>
                             <field name="name"/>
@@ -30,8 +32,15 @@
                             <field name="country_id"/>                           
                         </group>
                         <group>
+                            <field name="eyre"/>
+                            <field name="apartment_complex"/>
+                            <field name="house_name"/>
+                            <field name="house_no"/>
+                            <field name="apartment_no"/>
+                        </group>
+                        <group string="Status">
                             <field name="current"/>
-                            <field name="create_date"/> 
+                            <field name="create_date" readonly="1"/> 
                         </group>
                     </group>
                 </form>
@@ -71,6 +80,19 @@
                         <field name="attention"/>
                     </span>
                 </field>
+                <field name="street2" position="after">
+                    <div class="oe_inline">
+                        <field name="eyre" style="width: 35%%"
+                            placeholder="Eyre"
+                        />
+                        <field name="apartment_complex" style="width: 35%%"
+                            placeholder="Apt. Complx."
+                        />
+                        <field name="house_name" style="width: 30%%"
+                            placeholder="HS Name"
+                        />
+                    </div>
+                </field>
                 <field name="country_id" position="after">
                     <field name="address_description"
                         placeholder="Address Description"
@@ -78,7 +100,8 @@
                 </field>
                 <page string="Accounting" position="before">
                     <page String="Addresses Archive">
-                    <field name="address_archive_ids">
+                        <field name="address_archive_ids"/>
+                    <!--
                         <tree string="Addresses" editable="bottom">
                             <field name="name"/>
                             <field name="street"/>
@@ -88,7 +111,7 @@
                             <field name="current"/>
                             <field name="create_date" readonly="1"/>                                                         
                         </tree>                    
-                    </field>
+                    </field> -->
                     </page>
                 </page>                                              
             </field>
