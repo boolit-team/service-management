@@ -37,9 +37,10 @@
                             <field name="house_name"/>
                             <field name="house_no"/>
                             <field name="apartment_no"/>
+                            <field name="address_description"/>
                         </group>
                         <group string="Status">
-                            <field name="current"/>
+                            <field name="current" onchange="onchange_current()"/>
                             <field name="create_date" readonly="1"/> 
                         </group>
                     </group>
@@ -103,6 +104,9 @@
                         <button name="init_archive" string="Init Archive" 
                             type="object" class="oe_highlight"
                         />
+                        <button name="update_address" string="Update Address" 
+                            type="object" class="oe_highlight"
+                        />                        
                         <field name="address_archive_ids"/>
                     <!--
                         <tree string="Addresses" editable="bottom">

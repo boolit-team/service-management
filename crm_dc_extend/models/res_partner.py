@@ -20,7 +20,7 @@
 #
 ##############################################################################
 from openerp import models, fields
-from openerp.api import multi, one
+from openerp.api import multi, one, onchange
 class res_partner_address_archive(models.Model):
     _name = 'res.partner.address_archive'
     _description = 'Partner Addresses Archive'
@@ -37,10 +37,53 @@ class res_partner_address_archive(models.Model):
     house_no = fields.Char('House No.', size=64)
     apartment_no = fields.Char('Apartment No.', size=64)
     current = fields.Boolean('Current')
+    address_description = fields.Char('Address Description')
     partner_id = fields.Many2one('res.partner', 'Partner')
 
-    #_sql_constraints = [('unique_current', 'unique(current)', 'Only One Address can be Current!')]
+    #methods    
+    @one
+    def get_address_data(self):
+        vals = {
+            'country_id': self.country_id and self.country_id.id or False,
+            'state_id': self.state_id and self.state_id.id or False,            
+            'city': self.city or None, 
+            'name': self.zip or None, 
+            'eyre': self.eyre or None,  
+            'apartment_complex': self.apartment_complex or None, 
+            'house_name': self.house_name or None, 
+            'street': self.street or None, 
+            'street2': self.street2 or None, 
+            'house_no': self.house_no or None,
+            'apartment_no': self.apartment_no or None,
+            'address_description': self.address_description or None,         
+        } 
+        return vals        
 
+    def create(self, cr, uid, vals, context=None):
+        if vals.get('partner_id') and vals.get('current'):
+            address_ids = self.search(cr, uid, [('partner_id', '=', vals['partner_id'])], context=context)
+            for address in self.browse(cr, uid, address_ids):
+                if address.current:
+                    address.write({'current': False})
+        return super(res_partner_address_archive, self).create(cr, uid, vals, context=context)
+    '''
+    @onchange('current')
+    def onchange_current(self):
+        if self.current:
+            print 'self.current', self.current            
+            self.city = 'test'
+    '''
+    @multi
+    def write(self, vals):
+        for rec in self:
+            if self.partner_id and vals.get('current'):                
+                archive_addresses = self.env['res.partner.address_archive'].search(
+                    [('id', '!=', self.id), ('partner_id', '=', self.partner_id.id)])
+                for other_address in archive_addresses: ## TODO - FIX IT <---------------------<                   
+                    if other_address.current:
+                        other_address.write({'current': False})
+        return super(res_partner_address_archive, self).write(vals)
+    
 class res_partner(models.Model):
     _name = 'res.partner'
     _inherit = 'res.partner'
@@ -56,18 +99,72 @@ class res_partner(models.Model):
     #methods
     @one
     def init_archive(self):
-        arch_addr_model = self.env['res.partner.address_archive']
+        vals = {
+            'country_id': self.country_id and self.country_id.id or False,
+            'state_id': self.state_id and self.state_id.id or False,            
+            'city': self.city or None, 
+            'name': self.zip or None, 
+            'eyre': self.eyre or None,  
+            'apartment_complex': self.apartment_complex or None, 
+            'house_name': self.house_name or None, 
+            'street': self.street or None, 
+            'street2': self.street2 or None, 
+            'house_no': self.house_no or None,
+            'apartment_no': self.apartment_no or None,
+            'address_description': self.address_description or None,         
+        }        
         if not self.address_archive_ids:
-            arch_addr_model.create({'current': True, 'partner_id': self.id})
+            arch_addr_model = self.env['res.partner.address_archive']
+            vals['current'] = True
+            vals['partner_id'] = self.id
+            arch_addr_model.create(vals)
+        else:
+            for address in self.address_archive_ids:
+                if address.current:
+                    address.write(vals)
 
+    @one
+    def update_address(self, context=None): #TODO FIX - unexpected keyword argument 'context'
+        address = self.env['res.partner.address_archive'].search(
+            [('partner_id', '=', self.id), ('current', '=', True)])
+        if address:
+            vals = {
+                'country_id': address.country_id and address.country_id.id or False,
+                'state_id': address.state_id and address.state_id.id or False,            
+                'city': address.city or None, 
+                'zip': address.name or None, 
+                'eyre': address.eyre or None,  
+                'apartment_complex': address.apartment_complex or None, 
+                'house_name': address.house_name or None, 
+                'street': address.street or None, 
+                'street2': address.street2 or None, 
+                'house_no': address.house_no or None,
+                'apartment_no': address.apartment_no or None,
+                'address_description': address.address_description or None,        
+            }
+            self.write(vals)
 
-    '''
+    ''' - Temp. disabled.
     @multi
     def write(self, vals):
-        super(res_partner, self).write(vals)
-        
         for rec in self:
             if not rec.address_archive_ids:
-                arch_addr_model = self.env['res.partner.address_archive']
-                arch_addr_model.create({'current': True, 'partner_id': rec.id})
-    ''' 
+                address_vals = {
+                    'country_id': self.country_id and self.country_id.id or False,
+                    'state_id': self.state_id and self.state_id.id or False,            
+                    'city': self.city or None, 
+                    'name': self.zip or None, 
+                    'eyre': self.eyre or None,  
+                    'apartment_complex': self.apartment_complex or None, 
+                    'house_name': self.house_name or None, 
+                    'street': self.street or None, 
+                    'street2': self.street2 or None, 
+                    'house_no': self.house_no or None,
+                    'apartment_no': self.apartment_no or None,
+                    'address_description': self.address_description or None,                
+                } 
+                print address_vals  
+        return super(res_partner, self).write(vals)
+    '''
+
+    
