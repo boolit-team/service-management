@@ -26,7 +26,7 @@ class ResPartner(orm.Model):
     _inherit = "res.partner"
     _columns = {
         'house_no': fields.char('House No.', size=64, help="House No."),
-        'apartment_no': fields.char('Apartment No.', size=64),        
+        'apartment_no': fields.char('Apartment No.', size=64, help="Apartment No."),        
     }
 
     def onchange_zip_id(self, cursor, uid, ids, zip_id, context=None):
