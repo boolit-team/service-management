@@ -20,29 +20,24 @@
 #
 ##############################################################################
 from openerp import models, fields
-from openerp.api import multi, one
-WEEK_DAYS = [
-    ('saturday', 'Saturday'),
-    ('monday', 'Monday'),
-    ('tuesday', 'Tuesday'),
-    ('wednesday', 'Wednesday'),
-    ('thursday', 'Thursday'),
-    ('friday', 'Friday'),
-]
-class crm_lead_cleaning_calendar(models.Model):
-    _name = 'crm.lead.cleaning_calendar'
-    _description = 'Lead/Opp. Cleaning Calendar'
-    #fields
-    cleaning_day = fields.Selection(WEEK_DAYS, 'Week Day', required=True)
-    clean_time_from = fields.Float('From', required=True)
-    clean_time_to = fields.Float('To', required=True)
-    lead_id = fields.Many2one('crm.lead', 'Lead/Opportunity')    
-
+from openerp.api import onchange
 
 class crm_lead(models.Model):
     _name = 'crm.lead'
     _inherit = 'crm.lead'
     #fields
-    product_id = fields.Many2one('product.product', 'Type of Service', domain=[('type', '=', 'service')])
-    cleaning_calendar_ids = fields.One2many('crm.lead.cleaning_calendar', 'lead_id', 'Cleaning Time')
-    desirable_duration = fields.Float('Cleaning Time', help="Desirable Cleanng Time")
+    zip_id = fields.Many2one('res.better.zip', 'Address Completion')
+    house_no = fields.Char('House No.', size=64, help="House No.")
+    apartment_no = fields.Char('Apartment No.', size=64, help="Apartment No.")
+
+    #methods
+    @onchange('zip_id')
+    def onchange_zip_id(self):
+        if self.zip_id:
+            self.street = self.zip_id.street_id and self.zip_id.street_id.name or False
+            self.city = self.zip_id.city or False
+            self.country_id = self.zip_id.country_id and self.zip_id.country_id.id or False
+            self.state_id = self.zip_id.state_id and self.zip_id.state_id.id or False
+            self.house_no = self.zip_id.house_no or False
+            self.apartment_no = self.zip_id.apartment_no or False
+           

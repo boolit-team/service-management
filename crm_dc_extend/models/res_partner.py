@@ -107,7 +107,7 @@ class res_partner(models.Model):
                     address.write(vals)
 
     @one
-    def update_address(self, context=None): #TODO FIX - unexpected keyword argument 'context'
+    def update_address(self, context=None):
         address = self.env['res.partner.address_archive'].search(
             [('partner_id', '=', self.id), ('current', '=', True)])
         if address:

@@ -22,7 +22,7 @@
 
 
 {
-    'name': 'HR - Extension',
+    'name': 'Name',
     'version': '1.0',
     'category': 'Base',
     'sequence': 2,
@@ -33,12 +33,11 @@
     'author': 'OERP',
     'website': 'www.oerp.eu',
     'depends': [
-        'hr_contract', 'base_location_extension',      
+        'base_location_extension', 'crm'      
     ],
     'data': [
         #'security/ir.model.access.csv',
-        'views/hr_contract_view.xml',
-        'views/hr_view.xml',
+        'views/crm_lead_view.xml',
         #'data/,        
 
     ],

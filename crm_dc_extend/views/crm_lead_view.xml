@@ -9,7 +9,12 @@
                 <page string="Internal Notes" position="after">
                     <page string="Cleaning Info">
                         <group>
-                            <field name="product_id" style="width: 30%%"/>                            
+                            <group>
+                                <field name="product_id"/>                            
+                            </group>
+                            <group>
+                                <field name="desirable_duration" widget="float_time"/>
+                            </group>
                         </group>
                         <group>
                             <field name="cleaning_calendar_ids">
@@ -33,7 +38,12 @@
                 <page string="Internal Notes" position="after">
                     <page string="Cleaning Info">
                         <group>
-                            <field name="product_id" style="width: 30%%"/>                            
+                            <group>
+                                <field name="product_id"/>                            
+                            </group>
+                            <group>
+                                <field name="desirable_duration" widget="float_time"/>
+                            </group>
                         </group>
                         <group>
                             <field name="cleaning_calendar_ids">

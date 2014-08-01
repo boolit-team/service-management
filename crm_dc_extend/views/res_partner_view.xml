@@ -40,7 +40,7 @@
                             <field name="address_description"/>
                         </group>
                         <group string="Status">
-                            <field name="current" onchange="onchange_current()"/>
+                            <field name="current"/>
                             <field name="create_date" readonly="1"/> 
                         </group>
                     </group>

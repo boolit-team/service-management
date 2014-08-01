@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>   
+        <record id="crm_case_form_view_leads_inherit" model="ir.ui.view">
+            <field name="name">CRM Lead Form - Inherit</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm.crm_case_form_view_leads"/>
+            <field name="arch" type="xml">
+                <field name="street" position="replace">
+                    <field name="zip_id"
+                        onchange="onchange_zip_id()"
+                        placeholder="Address Completion"
+                        attrs="{'invisible': [('partner_id','!=',False)]}"
+                    />
+                    <div class="address_format">
+                        <field name="street" placeholder="Street..." style="width: 51%%"/>
+                        <field name="house_no" style="width: 23%%"/>
+                        <field name="apartment_no" style="width: 23%%"/>                    
+                    </div>
+                </field>
+            </field>
+        </record> 
+        <!--
+        <record id="crm_case_form_view_oppor_inherit" model="ir.ui.view">
+            <field name="name">CRM Opportunity Form - Inherit</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm.crm_case_form_view_oppor"/>
+            <field name="arch" type="xml">
+            </field>
+        </record>           
+        -->
+    </data>
+</openerp>        
