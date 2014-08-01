@@ -6,6 +6,9 @@
             <field name="model">crm.lead</field>
             <field name="inherit_id" ref="crm.crm_case_form_view_leads"/>
             <field name="arch" type="xml">
+                <field name="partner_id" position="attributes">
+                    <attribute name="context">{'default_name': contact_name, 'default_street': street, 'default_city': city, 'default_state_id': state_id, 'default_zip': zip, 'default_country_id': country_id, 'default_function': function, 'default_phone': phone, 'default_mobile': mobile, 'default_fax': fax, 'default_email': email_from, 'default_user_id': user_id, 'default_section_id': section_id, 'default_house_no': house_no, 'default_apartment_no': apartment_no}</attribute>
+                </field>               
                 <field name="street" position="replace">
                     <field name="zip_id"
                         onchange="onchange_zip_id()"
