@@ -57,7 +57,7 @@ class crm_lead(models.Model):
     def _lead_create_contact(self, cr, uid, lead, name, is_company, parent_id=False, context=None):
         """
         Extends original method to also add:
-          house_no, apartment_no, eyre, house_name, apartment_complex, address_description 
+          house_no, apartment_no, eyre, house_name, apartment_complex, address_description, nationality_id 
           fields data
         """
         partner = self.pool.get('res.partner')
@@ -86,6 +86,7 @@ class crm_lead(models.Model):
             'house_name': lead.house_name,
             'apartment_complex': lead.apartment_complex,
             'address_description': lead.address_description,
+            'nationality_id': not is_company and lead.nationality_id and lead.nationality_id.id or False
         }
         partner = partner.create(cr, uid, vals, context=context)
         return partner    
