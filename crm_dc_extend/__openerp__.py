@@ -22,7 +22,7 @@
 
 
 {
-    'name': 'CRM - Domestic Cleanin',
+    'name': 'CRM - Domestic Cleaning',
     'version': '1.0',
     'category': 'Base',
     'sequence': 2,
@@ -33,7 +33,8 @@
     'author': 'OERP',
     'website': 'www.oerp.eu',
     'depends': [
-        'crm', 'sale'      
+        'crm_location_extension', 
+        'sale',              
     ],
     'data': [
         'security/ir.model.access.csv',

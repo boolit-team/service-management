@@ -1,3 +1,5 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_res_partner_address_archive_user,res.partner.address_archive user,model_res_partner_address_archive,base.group_sale_salesman,1,1,1,0
 access_res_partner_address_archive_manager,res.partner.address_archive manager,model_res_partner_address_archive,base.group_sale_manager,1,1,1,1
+access_crm_lead_cleaning_calendar_user,crm.lead.cleaning_calendar user,model_crm_lead_cleaning_calendar,base.group_sale_salesman,1,1,1,0
+access_crm_lead_cleaning_calendar_manager,crm.lead.cleaning_calendar manager,model_crm_lead_cleaning_calendar,base.group_sale_manager,1,1,1,1
