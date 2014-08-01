@@ -46,3 +46,8 @@ class crm_lead(models.Model):
     product_id = fields.Many2one('product.product', 'Type of Service', domain=[('type', '=', 'service')])
     cleaning_calendar_ids = fields.One2many('crm.lead.cleaning_calendar', 'lead_id', 'Cleaning Time')
     desirable_duration = fields.Float('Cleaning Time', help="Desirable Cleanng Time")
+    eyre = fields.Char('Eyre')
+    apartment_complex = fields.Char('Apart. Complex')
+    house_name = fields.Char('House Name')
+    address_description = fields.Char('Address Description')
+    nationality_id = fields.Many2one('res.country', 'Nationality')        

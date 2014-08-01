@@ -69,18 +69,6 @@
             <field name="model">res.partner</field>
             <field name="inherit_id" ref="base.view_partner_form"/>
             <field name="arch" type="xml">
-                <field name="zip" position="attributes">
-                    <attribute name="placeholder">Post Code</attribute>
-                </field>
-                <field name="title" position="after">
-                    <field name="nationality_id" 
-                        attrs="{'invisible': [('is_company', '=', True)]}"
-                    />
-                    <label for="attention"/>
-                    <span style="color:red">
-                        <field name="attention"/>
-                    </span>
-                </field>
                 <field name="street2" position="after">
                     <div class="oe_inline">
                         <field name="eyre" style="width: 35%%"
@@ -94,11 +82,23 @@
                         />
                     </div>
                 </field>
+                <field name="zip" position="attributes">
+                    <attribute name="placeholder">Post Code</attribute>
+                </field>                
                 <field name="country_id" position="after">
                     <field name="address_description"
                         placeholder="Address Description"
                     />
                 </field>
+                <field name="title" position="after">
+                    <field name="nationality_id" 
+                        attrs="{'invisible': [('is_company', '=', True)]}"
+                    />
+                    <label for="attention"/>
+                    <span style="color:red">
+                        <field name="attention"/>
+                    </span>
+                </field>                
                 <page string="Accounting" position="before">
                     <page string="House Info">
                         <group>

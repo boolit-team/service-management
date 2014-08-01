@@ -21,14 +21,17 @@
                 </field>
             </field>
         </record> 
-        <!--
         <record id="crm_case_form_view_oppor_inherit" model="ir.ui.view">
             <field name="name">CRM Opportunity Form - Inherit</field>
             <field name="model">crm.lead</field>
             <field name="inherit_id" ref="crm.crm_case_form_view_oppor"/>
             <field name="arch" type="xml">
+                <field name="street" position="replace">
+                        <field name="street" placeholder="Street..." style="width: 51%%"/>
+                        <field name="house_no" style="width: 23%%"/>
+                        <field name="apartment_no" style="width: 23%%"/>                                        
+                </field>                
             </field>
-        </record>           
-        -->
+        </record>         
     </data>
 </openerp>        
