@@ -41,25 +41,7 @@ class res_partner_address_archive(models.Model):
     partner_id = fields.Many2one('res.partner', 'Partner')
 
 
-    #methods    
-    @one
-    def get_address_data(self):
-        vals = {
-            'country_id': self.country_id and self.country_id.id or False,
-            'state_id': self.state_id and self.state_id.id or False,            
-            'city': self.city or None, 
-            'name': self.zip or None, 
-            'eyre': self.eyre or None,  
-            'apartment_complex': self.apartment_complex or None, 
-            'house_name': self.house_name or None, 
-            'street': self.street or None, 
-            'street2': self.street2 or None, 
-            'house_no': self.house_no or None,
-            'apartment_no': self.apartment_no or None,
-            'address_description': self.address_description or None,         
-        } 
-        return vals        
-
+    #methods     
     def create(self, cr, uid, vals, context=None):
         if vals.get('partner_id') and vals.get('current'):
             address_ids = self.search(cr, uid, [('partner_id', '=', vals['partner_id'])], context=context)
@@ -79,7 +61,6 @@ class res_partner_address_archive(models.Model):
                         other_address.write({'current': False})
         return super(res_partner_address_archive, self).write(vals)
 
-    _sql_constraints = [('unique_current', 'unique(current, partner_id)', 'Only one Address can be Current!')]
     
 class res_partner(models.Model):
     _name = 'res.partner'
@@ -92,6 +73,13 @@ class res_partner(models.Model):
     house_name = fields.Char('House Name')
     address_description = fields.Char('Description')
     address_archive_ids = fields.One2many('res.partner.address_archive', 'partner_id', 'Addresses Archive')
+    #HS Info
+    have_key = fields.Boolean('We Have It')
+    key_numb = fields.Char('Key ID')
+    key_left = fields.Boolean('Is Left')
+    where_key = fields.Char('Where?')
+    house_alarm = fields.Selection([('on', 'Turn On'), ('off', 'Turn Off')], 'House')
+    gate_alarm = fields.Selection([('on', 'Turn On'), ('off', 'Turn Off')], 'Gate')
 
     #methods
     @one
