@@ -43,6 +43,9 @@ class crm_lead(models.Model):
             self.apartment_no = self.zip_id.apartment_no or False
 
     def _lead_create_contact(self, cr, uid, lead, name, is_company, parent_id=False, context=None):
+        """
+        Extends original method to also add house_no and apartment_no fields data
+        """
         partner = self.pool.get('res.partner')
         vals = {'name': name,
             'user_id': lead.user_id.id,

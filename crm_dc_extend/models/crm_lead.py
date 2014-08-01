@@ -20,6 +20,7 @@
 #
 ##############################################################################
 from openerp import models, fields
+from openerp import tools
 from openerp.api import multi, one
 WEEK_DAYS = [
     ('saturday', 'Saturday'),
@@ -50,4 +51,41 @@ class crm_lead(models.Model):
     apartment_complex = fields.Char('Apart. Complex')
     house_name = fields.Char('House Name')
     address_description = fields.Char('Address Description')
-    nationality_id = fields.Many2one('res.country', 'Nationality')        
+    nationality_id = fields.Many2one('res.country', 'Nationality') 
+
+    #methods
+    def _lead_create_contact(self, cr, uid, lead, name, is_company, parent_id=False, context=None):
+        """
+        Extends original method to also add:
+          house_no, apartment_no, eyre, house_name, apartment_complex, address_description 
+          fields data
+        """
+        partner = self.pool.get('res.partner')
+        vals = {'name': name,
+            'user_id': lead.user_id.id,
+            'comment': lead.description,
+            'section_id': lead.section_id.id or False,
+            'parent_id': parent_id,
+            'phone': lead.phone,
+            'mobile': lead.mobile,
+            'email': tools.email_split(lead.email_from) and tools.email_split(lead.email_from)[0] or False,
+            'fax': lead.fax,
+            'title': lead.title and lead.title.id or False,
+            'function': lead.function,
+            'street': lead.street,
+            'street2': lead.street2,
+            'zip': lead.zip,
+            'city': lead.city,
+            'country_id': lead.country_id and lead.country_id.id or False,
+            'state_id': lead.state_id and lead.state_id.id or False,
+            'is_company': is_company,
+            'type': 'contact',
+            'house_no': lead.house_no,
+            'apartment_no': lead.apartment_no,
+            'eyre': lead.eyre,
+            'house_name': lead.house_name,
+            'apartment_complex': lead.apartment_complex,
+            'address_description': lead.address_description,
+        }
+        partner = partner.create(cr, uid, vals, context=context)
+        return partner    
