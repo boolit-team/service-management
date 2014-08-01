@@ -76,8 +76,10 @@ class res_partner(models.Model):
     key_numb = fields.Char('Key ID')
     key_left = fields.Boolean('Is Left')
     where_key = fields.Char('Where?')
-    house_alarm = fields.Selection([('on', 'Turn On'), ('off', 'Turn Off')], 'House')
-    gate_alarm = fields.Selection([('on', 'Turn On'), ('off', 'Turn Off')], 'Gate')
+    house_alarm_on = fields.Char('House Alarm On')
+    house_alarm_off = fields.Char('House Alarm Off')
+    gate_alarm_on = fields.Char('Gate Alarm On')
+    gate_alarm_off = fields.Char('Gate Alarm Off')
 
     #methods
     @one

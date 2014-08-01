@@ -63,7 +63,8 @@
             <field name="act_window_id" ref="action_partner_address_archive_form"/>
         </record>    
 
-        <!-- res.partner -->                          
+        <!-- res.partner --> 
+
         <record id="view_partner_form_inherit" model="ir.ui.view">
             <field name="name">Partner Form - Inherit</field>
             <field name="model">res.partner</field>
@@ -113,8 +114,10 @@
                                 />
                             </group>
                             <group string="Alarm">
-                                <field name="house_alarm"/>
-                                <field name="gate_alarm"/>
+                                <field name="house_alarm_on"/>
+                                <field name="house_alarm_off"/>
+                                <field name="gate_alarm_on"/>
+                                <field name="gate_alarm_off"/>
                             </group>
                         </group>
                     </page>
@@ -127,7 +130,10 @@
                         />                        
                         <field name="address_archive_ids"/>
                     </page>
-                </page>                                              
+                </page>
+                <xpath expr="//form[@string='Contact']/sheet/group[1]/field[@name='mobile']" position="after">
+                    <field name="nationality_id" style="width: 30%%"/>
+                </xpath>                                              
             </field>
         </record>  
 
