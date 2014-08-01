@@ -126,17 +126,6 @@
                             type="object" class="oe_highlight"
                         />                        
                         <field name="address_archive_ids"/>
-                    <!--
-                        <tree string="Addresses" editable="bottom">
-                            <field name="name"/>
-                            <field name="street"/>
-                            <field name="city"/>
-                            <field name="state_id"/>
-                            <field name="country_id"/>  
-                            <field name="current"/>
-                            <field name="create_date" readonly="1"/>                                                         
-                        </tree>                    
-                    </field> -->
                     </page>
                 </page>                                              
             </field>

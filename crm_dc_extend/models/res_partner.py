@@ -40,7 +40,6 @@ class res_partner_address_archive(models.Model):
     address_description = fields.Char('Address Description')
     partner_id = fields.Many2one('res.partner', 'Partner')
 
-
     #methods     
     def create(self, cr, uid, vals, context=None):
         if vals.get('partner_id') and vals.get('current'):
@@ -60,7 +59,6 @@ class res_partner_address_archive(models.Model):
                     if other_address.current:
                         other_address.write({'current': False})
         return super(res_partner_address_archive, self).write(vals)
-
     
 class res_partner(models.Model):
     _name = 'res.partner'

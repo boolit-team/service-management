@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>   
+        <record id="crm_case_form_view_leads_inherit" model="ir.ui.view">
+            <field name="name">CRM Lead Form - Inherit</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm.crm_case_form_view_leads"/>
+            <field name="arch" type="xml">
+                <page string="Internal Notes" position="after">
+                    <page string="Cleaning Info">
+                        <group>
+                            <field name="product_id" style="width: 30%%"/>                            
+                        </group>
+                        <group>
+                            <field name="cleaning_calendar_ids">
+                                <tree string="Cleaning Time" editable="bottom">
+                                    <field name="cleaning_day"/>
+                                    <field name="clean_time_from" widget="float_time"/>
+                                    <field name="clean_time_to" widget="float_time"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </page>
+                </page>
+            </field>
+        </record> 
+
+        <record id="crm_case_form_view_oppor_inherit" model="ir.ui.view">
+            <field name="name">CRM Opportunity Form - Inherit</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm.crm_case_form_view_oppor"/>
+            <field name="arch" type="xml">
+                <page string="Internal Notes" position="after">
+                    <page string="Cleaning Info">
+                        <group>
+                            <field name="product_id" style="width: 30%%"/>                            
+                        </group>
+                        <group>
+                            <field name="cleaning_calendar_ids">
+                                <tree string="Cleaning Time" editable="bottom">
+                                    <field name="cleaning_day"/>
+                                    <field name="clean_time_from" widget="float_time"/>
+                                    <field name="clean_time_to" widget="float_time"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </page>
+                </page>
+            </field>
+        </record>           
+
+    </data>
+</openerp>        
