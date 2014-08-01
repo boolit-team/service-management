@@ -40,6 +40,7 @@ class res_partner_address_archive(models.Model):
     address_description = fields.Char('Address Description')
     partner_id = fields.Many2one('res.partner', 'Partner')
 
+
     #methods    
     @one
     def get_address_data(self):
@@ -66,23 +67,19 @@ class res_partner_address_archive(models.Model):
                 if address.current:
                     address.write({'current': False})
         return super(res_partner_address_archive, self).create(cr, uid, vals, context=context)
-    '''
-    @onchange('current')
-    def onchange_current(self):
-        if self.current:
-            print 'self.current', self.current            
-            self.city = 'test'
-    '''
+
     @multi
     def write(self, vals):
         for rec in self:
             if self.partner_id and vals.get('current'):                
                 archive_addresses = self.env['res.partner.address_archive'].search(
                     [('id', '!=', self.id), ('partner_id', '=', self.partner_id.id)])
-                for other_address in archive_addresses: ## TODO - FIX IT <---------------------<                   
+                for other_address in archive_addresses:                  
                     if other_address.current:
                         other_address.write({'current': False})
         return super(res_partner_address_archive, self).write(vals)
+
+    _sql_constraints = [('unique_current', 'unique(current, partner_id)', 'Only one Address can be Current!')]
     
 class res_partner(models.Model):
     _name = 'res.partner'
