@@ -12,11 +12,9 @@
                         placeholder="Address Completion"
                         attrs="{'invisible': [('partner_id','!=',False)]}"
                     />
-                    <div class="address_format">
                         <field name="street" placeholder="Street..." style="width: 51%%"/>
                         <field name="house_no" style="width: 23%%"/>
-                        <field name="apartment_no" style="width: 23%%"/>                    
-                    </div>
+                        <field name="apartment_no" style="width: 23%%"/>                                        
                 </field>
             </field>
         </record> 
