@@ -129,28 +129,3 @@ class res_partner(models.Model):
                 'address_description': address.address_description or None,        
             }
             self.write(vals)
-
-    ''' - Temp. disabled.
-    @multi
-    def write(self, vals):
-        for rec in self:
-            if not rec.address_archive_ids:
-                address_vals = {
-                    'country_id': self.country_id and self.country_id.id or False,
-                    'state_id': self.state_id and self.state_id.id or False,            
-                    'city': self.city or None, 
-                    'name': self.zip or None, 
-                    'eyre': self.eyre or None,  
-                    'apartment_complex': self.apartment_complex or None, 
-                    'house_name': self.house_name or None, 
-                    'street': self.street or None, 
-                    'street2': self.street2 or None, 
-                    'house_no': self.house_no or None,
-                    'apartment_no': self.apartment_no or None,
-                    'address_description': self.address_description or None,                
-                } 
-                print address_vals  
-        return super(res_partner, self).write(vals)
-    '''
-
-    

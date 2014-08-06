@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <!-- res.bank -->
+        <record id="view_res_bank_form_inherit" model="ir.ui.view">
+            <field name="name">res.bank.form.inherit</field>
+            <field name="model">res.bank</field>
+            <field name="inherit_id" ref="base.view_res_bank_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="/form/sheet/group[1]" position="replace">
+                    <group>
+                        <group>
+                            <field name="name"/>
+                        </group>
+                        <group>
+                            <field name="bic"/>
+                            <field name="sort_code"/>
+                        </group>
+                    </group>
+                </xpath>           
+            </field>
+        </record>
+
+        <record id="view_partner_bank_form_inherit" model="ir.ui.view">
+            <field name="name">res.partner.bank.form.inherit</field>
+            <field name="model">res.partner.bank</field>
+            <field name="inherit_id" ref="base.view_partner_bank_form"/>
+            <field name="arch" type="xml">
+                <field name="bank_bic" position="after">
+                    <field name="sort_code"/>
+                </field>
+            </field>
+        </record>        
+    </data>
+</openerp>
+

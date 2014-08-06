@@ -20,37 +20,14 @@
 #
 ##############################################################################
 
+from openerp import models, fields
 
-{
-    'name': 'HR - Extension',
-    'version': '1.0',
-    'category': 'Base',
-    'sequence': 2,
-    'summary': 'Summary',
-    'description': """
-	Description
-	""",
-    'author': 'OERP',
-    'website': 'www.oerp.eu',
-    'depends': [
-        'hr_contract', 'base_location_extension',      
-    ],
-    'data': [
-        #'security/ir.model.access.csv',
-        'views/hr_contract_view.xml',
-        'views/hr_view.xml',
-        'views/res_bank_view.xml',
-        #'data/,        
+class res_bank(models.Model):
+    _inherit = 'res.bank'
 
-    ],
-    'demo': [
-    ],
-    'test': [
+    sort_code = fields.Char('Sort Code', size=8)
 
-    ],
-    'installable': True,
-    'application': True,
-    'auto_install': False,
-    'images': [],
-}
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
+class res_bank_partner(models.Model):
+    _inherit = 'res.partner.bank'
+
+    sort_code = fields.Char('Sort Code', size=8)
