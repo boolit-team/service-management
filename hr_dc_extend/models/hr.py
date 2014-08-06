@@ -20,6 +20,7 @@
 #
 ##############################################################################
 from openerp import models, fields
+from openerp import api
 
 class hr_employee(models.Model):
     _name = 'hr.employee'
@@ -29,12 +30,22 @@ class hr_employee(models.Model):
     address_lt_id = fields.Many2one('res.better.zip',string="Home Address in LT")
     phone_lt = fields.Char(string='Phone number in LT')
     address_uk_id = fields.Many2one('res.better.zip',string="Home Address in UK")
-    #id_copy_fname = fields.Char('ID Copy Fname', readonly=True) - Temp. disabled
-    id_copy = fields.Binary('ID Copy')
+    id_copy_fname = fields.Char('ID Copy Fname', size=256, readonly=True, default="id_copy.pdf")
+    id_copy = fields.Binary('ID Copy', filters="*.pdf", filename=id_copy_fname)
     sort_code = fields.Char('Sort Code', size=8)
     nin = fields.Char('NIN', size=9)
     driving_licence = fields.Binary('Driving Licence')
     relatives = fields.Char('Relatives')
     relative_name = fields.Char('Relative Name')
     contact_info = fields.Text('Contact Info')
+    '''
+    @api.onchange('bank_account_id')
+    def onchange_bank_account_id(self):
+        if self.bank_account_id:
+            self.sort_code = self.bank_account_id.sort_code
+    '''
+    @api.multi
+    def onchange_bank_account_id(self, bank_account_id):
+        if bank_account_id:
+            self.sort_code = bank_account_id.sort_code
 

@@ -31,3 +31,9 @@ class res_bank_partner(models.Model):
     _inherit = 'res.partner.bank'
 
     sort_code = fields.Char('Sort Code', size=8)
+
+    def onchange_bank_id(self, cr, uid, ids, bank_id, context=None):
+        vals = super(res_bank_partner, self).onchange_bank_id(cr, uid, ids, bank_id, context=None)
+        bank = self.pool.get('res.bank').browse(cr, uid, bank_id, context=context)
+        vals['value']['sort_code'] = bank.sort_code
+        return vals  
