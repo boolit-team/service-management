@@ -20,7 +20,7 @@
 #
 ##############################################################################
 from openerp import models, fields
-from openerp.api import multi, one, onchange
+from openerp import api
 class res_partner_address_archive(models.Model):
     _name = 'res.partner.address_archive'
     _description = 'Partner Addresses Archive'
@@ -40,16 +40,17 @@ class res_partner_address_archive(models.Model):
     address_description = fields.Char('Address Description')
     partner_id = fields.Many2one('res.partner', 'Partner')
 
-    #methods     
-    def create(self, cr, uid, vals, context=None):
+    #methods
+    @api.model
+    def create(self, vals):
         if vals.get('partner_id') and vals.get('current'):
-            address_ids = self.search(cr, uid, [('partner_id', '=', vals['partner_id'])], context=context)
-            for address in self.browse(cr, uid, address_ids):
+            addresses = self.search([('partner_id', '=', vals['partner_id'])])
+            for address in addresses:
                 if address.current:
                     address.write({'current': False})
-        return super(res_partner_address_archive, self).create(cr, uid, vals, context=context)
+        return super(res_partner_address_archive, self).create(vals)    
 
-    @multi
+    @api.multi
     def write(self, vals):
         for rec in self:
             if self.partner_id and vals.get('current'):                
@@ -82,7 +83,7 @@ class res_partner(models.Model):
     gate_alarm_off = fields.Char('Gate Alarm Off')
 
     #methods
-    @one
+    @api.one
     def init_archive(self):
         vals = {
             'country_id': self.country_id and self.country_id.id or False,
@@ -108,7 +109,7 @@ class res_partner(models.Model):
                 if address.current:
                     address.write(vals)
 
-    @one
+    @api.one
     def update_address(self, context=None):
         address = self.env['res.partner.address_archive'].search(
             [('partner_id', '=', self.id), ('current', '=', True)])

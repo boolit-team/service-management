@@ -21,7 +21,7 @@
 ##############################################################################
 from openerp import models, fields
 from openerp import tools
-from openerp.api import multi, one
+from openerp import api
 WEEK_DAYS = [
     ('saturday', 'Saturday'),
     ('monday', 'Monday'),
@@ -54,6 +54,7 @@ class crm_lead(models.Model):
     nationality_id = fields.Many2one('res.country', 'Nationality') 
 
     #methods
+    
     def _lead_create_contact(self, cr, uid, lead, name, is_company, parent_id=False, context=None):
         """
         Extends original method to also add:
@@ -88,5 +89,6 @@ class crm_lead(models.Model):
             'address_description': lead.address_description,
             'nationality_id': not is_company and lead.nationality_id and lead.nationality_id.id or False
         }
+
         partner = partner.create(cr, uid, vals, context=context)
         return partner    
