@@ -7,14 +7,14 @@
             <field name="inherit_id" ref="hr.view_employee_form"/>
             <field name="arch" type="xml">
                 <field name="identification_id" position="after">
-                    <field name="id_copy" filename="id_copy_fname"/>
-                    <field name="nin"/>
+                    <field name="id_copy" filename="id_copy_fname"/>                    
                 </field>                       
                 <field name="bank_account_id" position="attributes">   <!-- TODO why on_change attribute do not add-->             
                     <atrribute name="on_change">onchange_bank_account_id(bank_account_id)</atrribute>                                    
                 </field> 
                 <field name="bank_account_id" position="after">
                     <field name="sort_code"/>
+                    <field name="nin"/>
                 </field>               
                 <field name="address_home_id" position="after">
                     <field name="address_lt_id"
