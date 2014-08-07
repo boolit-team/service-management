@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>      
+         <!--
+        calendar.service.work
+        -->
+        <record id="view_calendar_service_work_tree" model="ir.ui.view">
+            <field name="name">calendar.service.work.tree</field>
+            <field name="model">calendar.service.work</field>
+            <field name="priority">2</field>
+            <field name="arch" type="xml">
+                <tree string="Service Work">
+                    <field name="name"/>
+                    <field name="employee_id"/>
+                    <field name="start_time"/>
+                    <field name="end_time"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_calendar_service_work_form" model="ir.ui.view">
+            <field name="name">calendar.service.work.form</field>
+            <field name="model">calendar.service.work</field>
+            <field name="priority">5</field>
+            <field name="arch" type="xml">
+                <form string="Service Work">
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="employee_id"/>
+                            <field name="description"/>
+                        </group>
+                        <group>
+                            <field name="start_time"/>
+                            <field name="end_time"/>
+                            <field name="note"/>
+                        </group>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_calendar_service_work_calendar">
+            <field name="name">Service Works Calendar</field>
+            <field name="model">calendar.service.work</field>
+            <field name="priority" eval="1"/>
+            <field name="arch" type="xml">
+                <calendar string="Service Works" date_start="start_time" color="employee_id" date_stop="end_time" date_delay="duration">
+                    <field name="name"/>
+                    <field name="employee_id" style="font-weight: bold"/>
+                </calendar>
+            </field>
+        </record>        
+        <record id="action_calendar_service_work" model="ir.actions.act_window">
+            <field name="name">Service Works</field>
+            <field name="res_model">calendar.service.work</field>
+            <field name="view_mode">calendar,tree,form</field>
+            <field name="view_id" ref="view_calendar_service_work_calendar"/>
+            <!--<field name="search_view_id" ref="view_calendar_event_search"/>-->
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click to create new service work.
+              </p>
+            </field>
+        </record>   
+
+        <menuitem name="Service Calendar Work" id="menu_calendar_service_work" parent="base.menu_sales" sequence="4" action="action_calendar_service_work"/>                    
+    </data>
+</openerp>

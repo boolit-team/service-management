@@ -33,11 +33,11 @@
     'author': 'OERP',
     'website': 'www.oerp.eu',
     'depends': [
-        'crm_dc_extend',     
+        'hr_contract',     
     ],
     'data': [
-        #'security/ir.model.access.csv',
-        #'views/,
+        'security/ir.model.access.csv',
+        'views/calendar_service_view.xml',
         #'data/,        
 
     ],

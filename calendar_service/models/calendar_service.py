@@ -22,5 +22,18 @@
 
 from openerp import models, fields
 
-class calendar_service(models.Model):
-    _name = 'calendar.service'
+class calendar_service_work(models.Model):
+    _name = 'calendar.service.work'
+    _description = 'Services Work Management Through Calendar'
+
+    name = fields.Char('Subject', size=128)
+    note = fields.Text('Note')
+    employee_id = fields.Many2one('hr.employee', 'Responsible')
+    start_time = fields.Datetime('Starting at')
+    end_time = fields.Datetime('Ending at')
+    description = fields.Text('Description')
+    duration = fields.Float('Durations')
+
+
+
+
