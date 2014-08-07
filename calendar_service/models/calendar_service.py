@@ -20,34 +20,7 @@
 #
 ##############################################################################
 
+from openerp import models, fields
 
-{
-    'name': 'Calendar Domestic Cleaning',
-    'version': '1.0',
-    'category': 'Base',
-    'sequence': 2,
-    'summary': 'Calendar Domestic Cleaning',
-    'description': """
-	This module manages domestic cleaning specific events.
-	""",
-    'author': 'Andrius Laukavičius',
-    'website': 'OERP.EU',
-    'depends': [      
-    ],
-    'data': [
-        #'security/ir.model.access.csv',
-        #'views/,
-        #'data/,        
-
-    ],
-    'demo': [
-    ],
-    'test': [
-
-    ],
-    'installable': True,
-    'application': True,
-    'auto_install': False,
-    'images': [],
-}
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
+class calendar_service(models.Model):
+    _name = 'calendar.service'
