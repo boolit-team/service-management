@@ -105,7 +105,7 @@
             <field name="inherit_id" ref="analytic.view_account_analytic_account_form"/>
             <field name="arch" type="xml">
                 <page name="contract_page" position="after">
-                    <page string="Reason for Termination"
+                    <page string="Reasons for Termination"
                         attrs="{'invisible':['|', ('type','not in',['contract', 'template']), ('date', '=', False)]}"
                     >
                         <field name="termination_ids"/>
