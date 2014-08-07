@@ -94,10 +94,16 @@
                     <page string="Cleaning Info">
                         <group>
                             <group>
-                                <field name="product_id"/>                            
+                                <field name="product_id"/>
+                                <field name="nmb_bathrooms"/>
+                                <field name="nmb_bedrooms"/>
+                                <field name="pets_info"/>                            
                             </group>
                             <group>
                                 <field name="desirable_duration" widget="float_time"/>
+                                <field name="nmb_other_rooms"/>
+                                <field name="nbm_residents"/>
+                                <field name="cleaning_note"/>
                             </group>
                         </group>
                         <group>

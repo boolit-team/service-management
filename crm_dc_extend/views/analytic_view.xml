@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <record id="view_account_analytic_termination_tree" model="ir.ui.view">
+            <field name="name">account.analytic.termination.tree</field>
+            <field name="model">account.analytic.termination</field>
+            <field name="arch" type="xml">
+                <tree string="Termination Reasons">
+                    <field name="term_reason"/>
+                </tree>
+            </field>
+        </record>  
+
+        <record id="view_account_analytic_termination_form" model="ir.ui.view">
+            <field name="name">account.analytic.termination.form</field>
+            <field name="model">account.analytic.termination</field>
+            <field name="arch" type="xml">
+                <form string="Termination Reason">                    
+                    <group>
+                        <!--<label for="term_reason"/>-->
+                        <div class="oe_inline">
+                            <field name="term_reason" style="width: 37%%"/>
+                            <field name="moved" 
+                                style="width: 37%%"
+                                attrs="{'invisible': [('term_reason', '!=', 'moved')]}"
+                            />
+                            <field name="specify_moved" 
+                                style="width: 20%%"
+                                attrs="{'invisible': [('moved', '!=', 'else')]}"
+                            />
+                            <field name="specify_quality"
+                                style="width: 20%%"
+                                attrs="{'invisible': [('term_reason', '!=', 'quality')]}"                                
+                            />
+                            <field name="danger"
+                                style="width: 37%%"
+                                attrs="{'invisible': [('term_reason', '!=', 'danger')]}"                                
+                            />
+                            <field name="specify_danger"
+                                style="width: 20%%"
+                                attrs="{'invisible': [('danger', '!=', 'else')]}"                                
+                            />                                              
+                            <field name="specify_damage"
+                                style="width: 20%%"
+                                attrs="{'invisible': [('term_reason', '!=', 'damage')]}"                                
+                            />                                       
+                            <field name="communication"
+                                style="width: 37%%"
+                                attrs="{'invisible': [('term_reason', '!=', 'communication')]}"                                
+                            /> 
+                            <field name="specify_comm"
+                                style="width: 20%%"
+                                attrs="{'invisible': [('communication', '!=', 'else')]}"                                
+                            />
+                            <field name="specify_cheating"
+                                style="width: 20%%"
+                                attrs="{'invisible': [('term_reason', '!=', 'cheating')]}"                                
+                            />                            
+                            <field name="schedule"
+                                style="width: 37%%"
+                                attrs="{'invisible': [('term_reason', '!=', 'schedule')]}"                                
+                            />                            
+                            <field name="specify_schedule"
+                                style="width: 20%%"
+                                attrs="{'invisible': [('schedule', '!=', 'else')]}"                                
+                            />
+                            <field name="internal"
+                                style="width: 37%%"
+                                attrs="{'invisible': [('term_reason', '!=', 'internal')]}"                                
+                            />                                                       
+                            <field name="specify_internal"
+                                style="width: 20%%"
+                                attrs="{'invisible': [('internal', '!=', 'else')]}"                                
+                            />                             
+                            <field name="personal"
+                                style="width: 37%%"
+                                attrs="{'invisible': [('term_reason', '!=', 'personal')]}"                                
+                            />                            
+                            <field name="specify_personal"
+                                style="width: 20%%"
+                                attrs="{'invisible': [('personal', '!=', 'else')]}"                                
+                            />                            
+                            <field name="suspicious"
+                                style="width: 37%%"
+                                attrs="{'invisible': [('term_reason', '!=', 'suspicious')]}"                                
+                            />                            
+                            <field name="specify_suspicious"
+                                style="width: 20%%"
+                                attrs="{'invisible': [('suspicious', '!=', 'else')]}"                                
+                            />                            
+                            <field name="specify_other"
+                                style="width: 20%%"
+                                attrs="{'invisible': [('term_reason', '!=', 'other')]}"                                
+                            />                            
+                        </div>                    
+                    </group>                    
+                </form>
+            </field>
+        </record>              
+
+        <record id="view_account_analytic_account_form_inherit" model="ir.ui.view">
+            <field name="name">analytic.analytic.account.form.inherit</field>
+            <field name="model">account.analytic.account</field>
+            <field name="inherit_id" ref="analytic.view_account_analytic_account_form"/>
+            <field name="arch" type="xml">
+                <page name="contract_page" position="after">
+                    <page string="Reason for Termination"
+                        attrs="{'invisible':['|', ('type','not in',['contract', 'template']), ('date', '=', False)]}"
+                    >
+                        <field name="termination_ids"/>
+                    </page>
+                </page>
+            </field>
+        </record>
+     </data>
+</openerp>

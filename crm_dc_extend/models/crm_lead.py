@@ -45,6 +45,12 @@ class crm_lead(models.Model):
     _inherit = 'crm.lead'
     #fields
     product_id = fields.Many2one('product.product', 'Type of Service', domain=[('type', '=', 'service')])
+    nmb_bathrooms = fields.Integer('Number of Bathrooms')
+    nmb_bedrooms = fields.Integer('Number of Bedrooms')
+    nmb_other_rooms = fields.Integer('Number of Other Rooms')
+    nbm_residents = fields.Integer('Number of Residents')
+    pets_info = fields.Text('Pets')
+    cleaning_note = fields.Text('Notes')    
     cleaning_calendar_ids = fields.One2many('crm.lead.cleaning_calendar', 'lead_id', 'Cleaning Time')
     desirable_duration = fields.Float('Cleaning Time', help="Desirable Cleanng Time")
     eyre = fields.Char('Eyre')
