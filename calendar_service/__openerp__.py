@@ -33,7 +33,8 @@
     'author': 'OERP',
     'website': 'www.oerp.eu',
     'depends': [
-        'hr_contract',     
+        'hr_contract',
+        'crm_dc_extend',     
     ],
     'data': [
         'security/ir.model.access.csv',

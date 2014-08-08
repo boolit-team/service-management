@@ -40,7 +40,25 @@ class res_partner_address_archive(models.Model):
     address_description = fields.Char('Address Description')
     partner_id = fields.Many2one('res.partner', 'Partner')
 
-    #methods
+    @api.multi
+    def name_get(self):
+        res = []
+        print 'test this shit'
+        for address in self:
+            name = []
+            if address.name:
+                name.append(address.name)
+            if address.street:
+                name.append(address.street)
+            if address.city:
+                name.append(address.city)
+            if address.state_id:
+                name.append(address.state_id.name)
+            if address.country_id:
+                name.append(address.country_id.name)
+            res.append((address.id, ", ".join(name)))
+        return res    
+
     @api.model
     def create(self, vals):
         if vals.get('partner_id') and vals.get('current'):

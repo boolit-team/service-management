@@ -21,7 +21,7 @@
 ##############################################################################
 
 from openerp import models, fields
-
+from openerp import api
 class calendar_service_work(models.Model):
     _name = 'calendar.service.work'
     _description = 'Services Work Management Through Calendar'
@@ -32,7 +32,17 @@ class calendar_service_work(models.Model):
     start_time = fields.Datetime('Starting at')
     end_time = fields.Datetime('Ending at')
     description = fields.Text('Description')
-    duration = fields.Float('Durations')
+    duration = fields.Float('Duration')
+    partner_id = fields.Many2one('res.partner', 'Customer')
+    address_archive_id = fields.Many2one('res.partner.address_archive', 'Current Address')
+
+    @api.onchange('partner_id')
+    def onhange_partner_id(self):
+        if self.partner_id:
+            for address in self.partner_id.address_archive_ids:
+                if address.current:
+                    self.address_archive_id = address.id
+
 
 
 
