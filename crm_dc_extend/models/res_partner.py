@@ -43,7 +43,6 @@ class res_partner_address_archive(models.Model):
     @api.multi
     def name_get(self):
         res = []
-        print 'test this shit'
         for address in self:
             name = []
             if address.name:

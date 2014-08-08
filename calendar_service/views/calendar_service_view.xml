@@ -37,7 +37,9 @@
                                 <field name="duration"/>                                                               
                             </group>
                             <group>
-                                <field name="service_id"/>
+                                <field name="service_id"
+                                    context="{'default_partner_id': partner_id}"
+                                />
                                 <field name="partner_id"
                                     onchange="onchange_partner_id()"
                                 />
