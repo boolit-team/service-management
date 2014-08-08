@@ -37,20 +37,27 @@
                                 <field name="duration"/>                                                               
                             </group>
                             <group>
+                                <field name="service_id"/>
                                 <field name="partner_id"
                                     onchange="onchange_partner_id()"
                                 />
                                 <field name="address_archive_id"/>
                             </group>
                         </group>
-                        <group string="Additional Info">
-                            <group>
-                                <field name="description"/>
-                            </group>
-                            <group>
-                                <field name="note"/>
-                            </group> 
-                        </group>                       
+                        <notebook>
+                            <page string="Additional Info">
+                                <group>
+                                    <group>
+                                        <field name="description"/>
+                                        <label for="attention"/>
+                                        <span style="color: red"><field name="attention"/></span>
+                                    </group>
+                                    <group>
+                                        <field name="note"/>
+                                    </group> 
+                                </group> 
+                            </page>
+                        </notebook>                      
                     </sheet>
                 </form>
             </field>
@@ -61,9 +68,10 @@
             <field name="model">calendar.service.work</field>
             <field name="priority" eval="1"/>
             <field name="arch" type="xml">
-                <calendar string="Service Works" date_start="start_time" color="employee_id" date_stop="end_time" mode="week">
-                    <field name="name"/>
-                    <field name="employee_id"/>                                                     
+                <calendar string="Service Works" date_start="start_time" color="employee_id" 
+                    date_stop="end_time" mode="week" avatar_model="hr.employee" display="[employee_id], [partner_id]">                    
+                    <field name="employee_id"/>
+                    <field name="partner_id"/>                                                                                           
                 </calendar>                
             </field>
         </record>        
@@ -80,6 +88,72 @@
             </field>
         </record>   
 
-        <menuitem name="Service Works" id="menu_calendar_service_work" parent="base.menu_sales" sequence="4" action="action_calendar_service_work"/>                    
+        <menuitem name="Service Works" id="menu_calendar_service_work" parent="base.menu_sales" sequence="4" action="action_calendar_service_work"/>  
+
+         <!--
+        calendar.service
+        -->
+        <record id="view_calendar_service_tree" model="ir.ui.view">
+            <field name="name">calendar.service.tree</field>
+            <field name="model">calendar.service</field>
+            <field name="priority">2</field>
+            <field name="arch" type="xml">
+                <tree string="Service">
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_calendar_service_form" model="ir.ui.view">
+            <field name="name">calendar.service.form</field>
+            <field name="model">calendar.service</field>
+            <field name="priority">5</field>
+            <field name="arch" type="xml">
+                <form string="Service">
+                    <sheet>
+                        <group>
+                            <group>
+                               <field name="name"/> 
+                            </group>
+                            <group>
+                                <field name="partner_id"/>
+                            </group>
+                        </group>
+                        <group>                            
+                            <field name="work_ids"/>
+                        </group>                    
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- TODO - add calendar view
+        <record model="ir.ui.view" id="view_calendar_service_calendar">
+            <field name="name">Service Calendar</field>
+            <field name="model">calendar.service</field>
+            <field name="priority" eval="1"/>
+            <field name="arch" type="xml">
+                <calendar string="Services" date_start="start_time" color="employee_id" 
+                    date_stop="end_time" mode="week" avatar_model="hr.employee" display="[employee_id], [partner_id]">                    
+                    <field name="employee_id"/>
+                    <field name="partner_id"/>                                                                                           
+                </calendar>                
+            </field>
+        </record>   
+        -->     
+        <record id="action_calendar_service" model="ir.actions.act_window">
+            <field name="name">Services</field>
+            <field name="res_model">calendar.service</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_calendar_service_tree"/>
+            <!--<field name="search_view_id" ref="view_calendar_event_search"/>-->
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click to create new service.
+              </p>
+            </field>
+        </record>   
+
+        <menuitem name="Services" id="menu_calendar_service" parent="base.menu_sales" sequence="4" action="action_calendar_service"/>                                              
     </data>
 </openerp>
