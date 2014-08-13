@@ -34,11 +34,13 @@
                                 <field name="start_time"/>
                                 <field name="end_time"/> 
                                 <field name="employee_id"/>                                
-                                <field name="duration"/>                                                               
+                                <field name="duration" invisible="1"/>                                                               
+                                <field name="work_type"/>
                             </group>
                             <group>
                                 <field name="service_id"
                                     context="{'default_partner_id': partner_id}"
+                                    onchange="onchange_service_id()"
                                 />
                                 <field name="partner_id"
                                     onchange="onchange_partner_id()"
@@ -113,40 +115,48 @@
             <field name="arch" type="xml">
                 <form string="Service">
                     <sheet>
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only"/>
+                            <h1><field name="name"/></h1>                            
+                        </div>                        
                         <group>
                             <group>
-                               <field name="name"/> 
+                                <field name="start_time"/>
+                                <field name="end_time"/>
                             </group>
                             <group>
                                 <field name="partner_id"/>
+                                <field name="work_type"/>
                             </group>
                         </group>
                         <group>                            
-                            <field name="work_ids"/>
+                            <field name="work_ids"
+                                context="{'default_service_id': id}"
+                            />
                         </group>                    
                     </sheet>
                 </form>
             </field>
         </record>
 
-        <!-- TODO - add calendar view
+        <!-- TODO - add calendar view -->
         <record model="ir.ui.view" id="view_calendar_service_calendar">
             <field name="name">Service Calendar</field>
             <field name="model">calendar.service</field>
             <field name="priority" eval="1"/>
             <field name="arch" type="xml">
-                <calendar string="Services" date_start="start_time" color="employee_id" 
-                    date_stop="end_time" mode="week" avatar_model="hr.employee" display="[employee_id], [partner_id]">                    
-                    <field name="employee_id"/>
-                    <field name="partner_id"/>                                                                                           
+                <calendar string="Services" date_start="start_time" color="work_type"
+                    date_stop="end_time" mode="week">
+                    <field name="name"/>
+                    <field name="partner_id"/>                                                                                          
                 </calendar>                
             </field>
         </record>   
-        -->     
+           
         <record id="action_calendar_service" model="ir.actions.act_window">
             <field name="name">Services</field>
             <field name="res_model">calendar.service</field>
-            <field name="view_mode">tree,form</field>
+            <field name="view_mode">tree,calendar,form</field>
             <field name="view_id" ref="view_calendar_service_tree"/>
             <!--<field name="search_view_id" ref="view_calendar_event_search"/>-->
             <field name="help" type="html">

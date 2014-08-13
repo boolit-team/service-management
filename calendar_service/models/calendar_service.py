@@ -23,6 +23,8 @@
 from openerp import models, fields
 from openerp import api
 
+WORK_TYPE = [('recurrent', 'Recurrent'), ('one', 'One Time'), ('wait', 'Waiting')]
+
 class calendar_service_work(models.Model):
     _name = 'calendar.service.work'
     _description = 'Services Work Management Through Calendar'
@@ -38,6 +40,7 @@ class calendar_service_work(models.Model):
     partner_id = fields.Many2one('res.partner', 'Customer', domain=[('customer', '=', True)])
     address_archive_id = fields.Many2one('res.partner.address_archive', 'Current Address')
     service_id = fields.Many2one('calendar.service', 'Service')
+    work_type = fields.Selection(WORK_TYPE, 'Type', required=True)
 
     @api.onchange('partner_id')
     def onhange_partner_id(self):
@@ -48,14 +51,23 @@ class calendar_service_work(models.Model):
             self.note = self.partner_id.comment
             self.attention = self.partner_id.attention
 
+    @api.onchange('service_id')
+    def onchange_service_id(self):
+        if self.service_id:
+            self.start_time = self.service_id.start_time
+            self.end_time = self.service_id.end_time
+            self.work_type = self.service_id.work_type
+            self.partner_id = self.service_id.partner_id and self.service_id.partner_id.id or False
+
 class calendar_service(models.Model):
     _name = 'calendar.service'
     _description = 'Calendar Service'
 
     name = fields.Char('Service No.')
     partner_id = fields.Many2one('res.partner', 'Customer', domain=[('customer', '=', True)])
+    start_time = fields.Datetime('Starting at', required=True)
+    end_time = fields.Datetime('Ending at', required=True)
+    work_type = fields.Selection(WORK_TYPE, 'Type', required=True)
     work_ids = fields.One2many('calendar.service.work', 'service_id', 'Works')
-
-
 
 
