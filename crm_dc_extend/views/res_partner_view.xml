@@ -25,18 +25,19 @@
                     <separator string="Address"/>
                     <group>
                         <group>
-                            <field name="name"/>
                             <field name="street"/>
-                            <field name="city"/>
-                            <field name="state_id"/>
-                            <field name="country_id"/>                           
-                        </group>
-                        <group>
-                            <field name="eyre"/>
-                            <field name="apartment_complex"/>
-                            <field name="house_name"/>
+                            <field name="street2"/>
+                            <field name="house_name"/>   
                             <field name="house_no"/>
                             <field name="apartment_no"/>
+                            <field name="eyre"/>                         
+                        </group>
+                        <group>
+                            <field name="apartment_complex"/>
+                            <field name="city"/>
+                            <field name="name"/>                            
+                            <field name="state_id"/>
+                            <field name="country_id"/>  
                             <field name="address_description"/>
                         </group>
                         <group string="Status">
@@ -82,6 +83,9 @@
                             placeholder="HS Name"
                         />
                     </div>
+                </field>
+                <field name="street2" position="attributes">
+                    <attribute name="placeholder">Entry Street</attribute>
                 </field>
                 <field name="zip" position="attributes">
                     <attribute name="placeholder">Post Code</attribute>
