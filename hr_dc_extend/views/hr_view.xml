@@ -7,11 +7,9 @@
             <field name="inherit_id" ref="hr.view_employee_form"/>
             <field name="arch" type="xml">
                 <field name="identification_id" position="after">
-                    <field name="id_copy" filename="id_copy_fname"/>                    
+                    <field name="id_copy" filename="id_copy_fname"/>
+                    <field name="driving_licence"/>                    
                 </field>                       
-                <field name="bank_account_id" position="attributes">   <!-- TODO why on_change attribute do not add-->             
-                    <atrribute name="on_change">onchange_bank_account_id(bank_account_id)</atrribute>                                    
-                </field> 
                 <field name="bank_account_id" position="after">
                     <field name="sort_code"/>
                     <field name="nin"/>
@@ -24,7 +22,15 @@
                     <field name="address_uk_id"
                         domain="[('country_id.code', '=', 'GB')]"
                         />
-                </field>  
+                </field> 
+                <!-- TODO why on_change attribute do not add 
+                <field name="bank_account_id" position="attributes">             
+                    <attribute name="onchange">onchange_bank_account_id()</attribute>                                    
+                </field>   
+                -->              
+                <field name="address_home_id" position="attributes">
+                    <attribute name="groups">hr_dc_extend.group_hr_features</attribute>
+                </field>
                 <group string="Birth" position="after">
                     <group string="Emergency">
                         <field name="relatives"/>

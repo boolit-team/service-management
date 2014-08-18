@@ -37,6 +37,7 @@
     ],
     'data': [
         #'security/ir.model.access.csv',
+        'security/hr_security.xml',
         'views/hr_contract_view.xml',
         'views/hr_view.xml',
         'views/res_bank_view.xml',

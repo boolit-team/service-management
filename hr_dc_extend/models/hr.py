@@ -34,18 +34,14 @@ class hr_employee(models.Model):
     id_copy = fields.Binary('ID Copy', filters="*.pdf", filename=id_copy_fname)
     sort_code = fields.Char('Sort Code', size=8)
     nin = fields.Char('NIN', size=9)
-    driving_licence = fields.Binary('Driving Licence')
+    driving_licence = fields.Binary('Driving Licence', filters="*.pdf")
     relatives = fields.Char('Relatives')
     relative_name = fields.Char('Relative Name')
     contact_info = fields.Text('Contact Info')
+
     '''
     @api.onchange('bank_account_id')
     def onchange_bank_account_id(self):
         if self.bank_account_id:
             self.sort_code = self.bank_account_id.sort_code
     '''
-    @api.multi
-    def onchange_bank_account_id(self, bank_account_id):
-        if bank_account_id:
-            self.sort_code = bank_account_id.sort_code
-
