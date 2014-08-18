@@ -39,6 +39,8 @@
     'data': [
         'security/ir.model.access.csv',
         'views/calendar_service_view.xml',
+        'views/hr_contract_view.xml',
+        'views/hr_view.xml',
         #'data/,        
 
     ],

@@ -21,22 +21,19 @@
 ##############################################################################
 from openerp import models, fields
 from openerp import api
+from openerp.exceptions import Warning
+from openerp.tools.translate import _
+class hr_contract(models.Model):
+    _name = 'hr.contract'
+    _inherit = 'hr.contract'
 
-class hr_employee(models.Model):
-    _name = 'hr.employee'
-    _inherit = 'hr.employee'
+    track_calendar = fields.Boolean('Track in Calendar')
 
-    #fields
-    address_lt_id = fields.Many2one('res.better.zip',string="Home Address in LT")
-    phone_lt = fields.Char(string='Phone number in LT')
-    address_uk_id = fields.Many2one('res.better.zip',string="Home Address in UK")
-    id_copy_fname = fields.Char('ID Copy Fname', size=256, readonly=True, default="id_copy.pdf")
-    id_copy = fields.Binary('ID Copy', filters="*.pdf", filename=id_copy_fname)
-    sort_code = fields.Char('Sort Code', size=8)
-    nin = fields.Char('NIN', size=9)
-    driving_licence = fields.Binary('Driving Licence', filters="*.pdf")
-    relatives = fields.Char('Relatives')
-    relative_name = fields.Char('Relative Name')
-    contact_info = fields.Text('Contact Info')
-
-             
+    @api.one
+    @api.constrains('track_calendar', 'employee_id')
+    def _unique_tracking(self):
+        if self.track_calendar:
+            contracts = self.env['hr.contract'].search(
+                [('employee_id', '=', self.employee_id.id), ('track_calendar', '=', True), ('id', '!=', self.id)])
+            if contracts:
+                raise Warning(_('Contract per employee must be Unique for calendar Tracking'))

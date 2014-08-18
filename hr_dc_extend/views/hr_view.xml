@@ -37,7 +37,7 @@
                         <field name="relative_name"/>
                         <field name="contact_info"/>
                     </group>
-                </group>                                                
+                </group>                                              
             </field>
         </record>     
     </data>

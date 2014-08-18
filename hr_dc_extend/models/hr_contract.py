@@ -20,7 +20,11 @@
 #
 ##############################################################################
 from openerp import models, fields
-
+from openerp import api
+from datetime import datetime
+from datetime import timedelta
+from openerp.exceptions import Warning
+from openerp.tools.translate import _
 class hr_contract(models.Model):
     _name = 'hr.contract'
     _inherit = 'hr.contract'
