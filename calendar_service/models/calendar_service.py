@@ -101,6 +101,7 @@ class calendar_service(models.Model):
     no_notify_speficy = fields.Char('Specify')
     cleaning_calendar_ids = fields.One2many('crm.lead.cleaning_calendar', 'service_id', 'Cleaning Time')
     canceled_until = fields.Date('Canceled Until')
+    opportunity_id = fields.Many2one('crm.lead', 'Related Opportunity', domain=[('type', '=', 'opportunity')])
     @api.one
     def close_state(self):
         self.state = 'done'

@@ -146,6 +146,7 @@
                             <group>
                                 <field name="start_time"/>
                                 <field name="end_time"/>
+                                <field name="opportunity_id"/>
                             </group>
                             <group>
                                 <field name="partner_id"/>
