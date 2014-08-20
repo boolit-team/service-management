@@ -200,8 +200,14 @@
                                             style="width: 20%%"
                                             attrs="{'invisible': [('no_notify', '!=', 'else')]}"
                                         />                                        
-
                                     </div>
+                                    <field name="cleaning_calendar_ids" attrs="{'invisible': [('cancel_reason', '!=', 'change_time')]}">
+                                        <tree string="Cleaning Time" editable="bottom">
+                                            <field name="cleaning_day"/>
+                                            <field name="clean_time_from" widget="float_time"/>
+                                            <field name="clean_time_to" widget="float_time"/>
+                                        </tree>
+                                    </field>                                    
                                 </group>
                             </page>
                         </notebook>                    

@@ -99,6 +99,7 @@ class calendar_service(models.Model):
     prior_notify_specify = fields.Char('Specify')
     no_notify = fields.Selection(NO_NOTIFY, 'No Notification')
     no_notify_speficy = fields.Char('Specify')
+    cleaning_calendar_ids = fields.One2many('crm.lead.cleaning_calendar', 'service_id', 'Cleaning Time')
     @api.one
     def close_state(self):
         self.state = 'done'
