@@ -207,7 +207,8 @@
                                             <field name="clean_time_from" widget="float_time"/>
                                             <field name="clean_time_to" widget="float_time"/>
                                         </tree>
-                                    </field>                                    
+                                    </field>
+                                    <field name="canceled_until"/>                                    
                                 </group>
                             </page>
                         </notebook>                    
