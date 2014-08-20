@@ -14,6 +14,7 @@
                     <field name="employee_id"/>
                     <field name="start_time"/>
                     <field name="end_time"/>
+                    <field name="state"/>
                 </tree>
             </field>
         </record>
@@ -24,7 +25,18 @@
             <field name="priority">5</field>
             <field name="arch" type="xml">
                 <form string="Service Work">
-                    <sheet>
+                    <header>
+                        <button name="close_state" string="Done" type="object"
+                            help="Finish Service" class="oe_highlight"
+                            attrs="{'invisible': [('state', '=', 'done')]}"
+                        /> 
+                        <button name="cancel_state" string="Cancel" type="object"
+                            help="Cancel Service" class="oe_highlight"
+                            attrs="{'invisible': [('state', '=', 'cancel')]}"
+                        /> 
+                        <field name="state" widget="statusbar"/>                     
+                    </header>                    
+                    <sheet>                        
                         <div class="oe_title">
                             <label for="name" class="oe_edit_only"/>
                             <h1><field name="name"/></h1>                            
@@ -114,6 +126,17 @@
             <field name="priority">5</field>
             <field name="arch" type="xml">
                 <form string="Service">
+                    <header>
+                        <button name="close_state" string="Done" type="object"
+                            help="Finish Service" class="oe_highlight"
+                            attrs="{'invisible': [('state', '=', 'done')]}"
+                        /> 
+                        <button name="cancel_state" string="Cancel" type="object"
+                            help="Cancel Service" class="oe_highlight"
+                            attrs="{'invisible': [('state', '=', 'cancel')]}"
+                        /> 
+                        <field name="state" widget="statusbar"/>                     
+                    </header>
                     <sheet>
                         <div class="oe_title">
                             <label for="name" class="oe_edit_only"/>
@@ -127,19 +150,70 @@
                             <group>
                                 <field name="partner_id"/>
                                 <field name="work_type"/>
+                                <field name="one_time"
+                                    attrs="{'invisible': [('work_type', '!=', 'one')]}"
+                                />
                             </group>
                         </group>
-                        <group>                            
-                            <field name="work_ids"
-                                context="{'default_service_id': id}"
-                            />
-                        </group>                    
+                        <notebook>
+                            <page string="Works"> 
+                                <group>                                                   
+                                    <field name="work_ids"
+                                        context="{'default_service_id': id}"
+                                    />
+                                </group>
+                            </page>
+                            <page string="Cancellation Reason" attrs="{'invisible': [('state', '!=', 'cancel')]}">
+                                <group>
+                                    <label for="cancel_reason"/>
+                                    <div class="oe_inline">
+                                        <field name="cancel_reason" style="width: 37%%"/>
+                                        <field name="no_reason_specify"
+                                            style="width: 20%%"
+                                            attrs="{'invisible': [('cancel_reason', '!=', 'no_reason')]}"
+                                        />
+                                        <field name="reason"
+                                            style="width: 37%%"
+                                            attrs="{'invisible': [('cancel_reason', '!=', 'reason')]}"
+                                        />                                        
+                                        <field name="reason_unexpected_specify"
+                                            style="width: 20%%"
+                                            attrs="{'invisible': [('reason', '!=', 'unexpect')]}"
+                                        />                                        
+                                        <field name="reason_specify"
+                                            style="width: 20%%"
+                                            attrs="{'invisible': [('reason', '!=', 'else')]}"
+                                        />                                        
+                                        <field name="prior_notify"
+                                            style="width: 37%%"
+                                            attrs="{'invisible': [('cancel_reason', '!=', 'prior_notify')]}"
+                                        />
+                                        <field name="prior_notify_specify"
+                                            style="width: 20%%"
+                                            attrs="{'invisible': [('prior_notify', '!=', 'else')]}"
+                                        />                                                                   
+                                        <field name="no_notify"
+                                            style="width: 37%%"
+                                            attrs="{'invisible': [('cancel_reason', '!=', 'no_notify')]}"
+                                        />                                                     
+                                        <field name="no_notify_speficy"
+                                            style="width: 20%%"
+                                            attrs="{'invisible': [('no_notify', '!=', 'else')]}"
+                                        />                                        
+
+                                    </div>
+                                </group>
+                            </page>
+                        </notebook>                    
                     </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>                    
                 </form>
             </field>
         </record>
 
-        <!-- TODO - add calendar view -->
         <record model="ir.ui.view" id="view_calendar_service_calendar">
             <field name="name">Service Calendar</field>
             <field name="model">calendar.service</field>

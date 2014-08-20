@@ -24,7 +24,16 @@ from openerp import models, fields
 from openerp import api
 
 WORK_TYPE = [('recurrent', 'Recurrent'), ('one', 'One Time'), ('wait', 'Waiting')]
+STATE = [('open', 'Open'), ('done', 'Done'), ('cancel', 'Canceled')]
+ONE_TIME = [('out', 'Move Out'), ('in', 'Move In'), ('built', 'After Building'),
+    ('spring', 'Spring Cleaning'), ('alternate', 'Alternates Cleaners')]
 
+CANCEL_REASON = [('no_reason', 'Last min. Without Reason'), ('reason', 'Last min. Without Reason'), 
+    ('prior_notify', 'Prior Notification'), ('no_notify', 'Did not Notify'), 
+    ('holiday', 'Holiday'), ('change_time', 'Change Cleaning Time')]
+REASON = [('illness', 'Illness'), ('unexpect', 'Unexpected Problems'), ('else', 'Else')]
+PRIOR_NOTIFY = ([('repair', 'Repair'), ('vacation', 'Vacation'), ('illness', 'Illness'), ('else', 'Else')])
+NO_NOTIFY = [('nobody_home', 'Nobody was at Home'), ('cant_enter', 'Couldn\'t Enter'), ('else', 'Else')]
 class calendar_service_work(models.Model):
     _name = 'calendar.service.work'
     _description = 'Services Work Management Through Calendar'
@@ -41,6 +50,15 @@ class calendar_service_work(models.Model):
     address_archive_id = fields.Many2one('res.partner.address_archive', 'Current Address')
     service_id = fields.Many2one('calendar.service', 'Service')
     work_type = fields.Selection(WORK_TYPE, 'Type', required=True)
+    state = fields.Selection(STATE, 'State', readonly=True, default='open', track_visibility='onchange')
+
+    @api.one
+    def close_state(self):
+        self.state = 'done'
+
+    @api.one
+    def cancel_state(self):
+        self.state = 'cancel'    
 
     @api.onchange('partner_id')
     def onhange_partner_id(self):
@@ -62,12 +80,35 @@ class calendar_service_work(models.Model):
 class calendar_service(models.Model):
     _name = 'calendar.service'
     _description = 'Calendar Service'
+    _inherit = ['mail.thread', 'ir.needaction_mixin']
 
     name = fields.Char('Service No.')
     partner_id = fields.Many2one('res.partner', 'Customer', domain=[('customer', '=', True)])
     start_time = fields.Datetime('Starting at', required=True)
     end_time = fields.Datetime('Ending at', required=True)
     work_type = fields.Selection(WORK_TYPE, 'Type', required=True)
+    one_time = fields.Selection(ONE_TIME, 'One Time Type')
     work_ids = fields.One2many('calendar.service.work', 'service_id', 'Works')
+    state = fields.Selection(STATE, 'State', readonly=True, default='open', track_visibility='onchange')
+    cancel_reason = fields.Selection(CANCEL_REASON, 'Cancel Reason')
+    no_reason_specify = fields.Char('Specify')
+    reason = fields.Selection(REASON, 'Reason')
+    reason_unexpected_specify = fields.Char('Specify')
+    reason_specify = fields.Char('Specify')
+    prior_notify = fields.Selection(PRIOR_NOTIFY, 'Notification')
+    prior_notify_specify = fields.Char('Specify')
+    no_notify = fields.Selection(NO_NOTIFY, 'No Notification')
+    no_notify_speficy = fields.Char('Specify')
+    @api.one
+    def close_state(self):
+        self.state = 'done'
+        for work in self.work_ids:
+            work.state = 'done'
+
+    @api.one
+    def cancel_state(self):
+        self.state = 'cancel'
+        for work in self.work_ids:
+            work.state = 'cancel'        
 
 
