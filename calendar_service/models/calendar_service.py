@@ -22,14 +22,17 @@
 
 from openerp import models, fields
 from openerp import api
+from datetime import datetime, timedelta
+from openerp.exceptions import Warning
+from openerp.tools.translate import _
 
 WEEK_DAYS = [
-    ('saturday', 'Saturday'),
-    ('monday', 'Monday'),
-    ('tuesday', 'Tuesday'),
-    ('wednesday', 'Wednesday'),
-    ('thursday', 'Thursday'),
-    ('friday', 'Friday'),
+    (5, 'Saturday'),
+    (0, 'Monday'),
+    (1, 'Tuesday'),
+    (2, 'Wednesday'),
+    (3, 'Thursday'),
+    (4, 'Friday'),
 ]
 WORK_TYPE = [('recurrent', 'Recurrent'), ('one', 'One Time'), ('wait', 'Waiting')]
 STATE = [('open', 'Open'), ('done', 'Done'), ('cancel', 'Canceled')]
@@ -42,6 +45,14 @@ CANCEL_REASON = [('no_reason', 'Last min. Without Reason'), ('reason', 'Last min
 REASON = [('illness', 'Illness'), ('unexpect', 'Unexpected Problems'), ('else', 'Else')]
 PRIOR_NOTIFY = ([('repair', 'Repair'), ('vacation', 'Vacation'), ('illness', 'Illness'), ('else', 'Else')])
 NO_NOTIFY = [('nobody_home', 'Nobody was at Home'), ('cant_enter', 'Couldn\'t Enter'), ('else', 'Else')]
+
+def relative_date(reference, weekday, timevalue):
+    hour, minute = divmod(timevalue, 1)
+    minute *= 60
+    days = reference.weekday() - weekday
+    return (reference - timedelta(days=days)).replace(
+        hour=int(hour), minute=int(minute), second=0, microsecond=0)
+
 class calendar_service_work(models.Model):
     _name = 'calendar.service.work'
     _description = 'Services Work Management Through Calendar'
@@ -141,6 +152,20 @@ class calendar_service_recurrent(models.Model):
     name = fields.Char('Name', size=64)
     active = fields.Boolean('Active', default=True)
     rule_ids = fields.One2many('calendar.service.recurrent.rule', 'recurrent_id', 'Rules')
+
+    @api.one
+    def generate_recurrent(self): #TODO - Finish It!
+        if self.active:
+            ref_time = datetime.today()
+            service_obj = self.env['calendar.service']
+            for rule in self.rule_ids:
+                for cal_rec in rule.calendar_ids:
+                    start_time = relative_date(ref_time, cal_rec.cleaning_day, cal_rec.clean_time_from)
+                    end_time = relative_date(ref_time, cal_rec.cleaning_day, cal_rec.clean_time_to)
+                    service_obj.create({
+                        'start_time': start_time, 'end_time': end_time,
+                        'user_id': 1, 'work_type': 'recurrent',
+                    })
 
 class calendar_service_recurrent_rule(models.Model):
     _name = 'calendar.service.recurrent.rule'

@@ -11,6 +11,8 @@
             <field name="arch" type="xml">
                 <tree string="Recurrent Rule">
                     <field name="partner_id"/>
+                    <field name="write_date"/>
+                    <field name="write_uid"/>
                 </tree>
             </field>
         </record>
@@ -25,14 +27,14 @@
                         <group>
                             <field name="partner_id"/>
                         </group>
-                            <field name="calendar_ids">
-                                <tree string="Cleaning Time" editable="bottom">
-                                    <field name="cleaning_day"/>
-                                    <field name="clean_time_from" widget="float_time"/>
-                                    <field name="clean_time_to" widget="float_time"/>
-                                    <field name="employee_ids" widget="many2many"/>
-                                </tree>
-                            </field>                     
+                        <field name="calendar_ids">
+                            <tree string="Cleaning Time" editable="bottom">
+                                <field name="cleaning_day"/>
+                                <field name="clean_time_from" widget="float_time"/>
+                                <field name="clean_time_to" widget="float_time"/>
+                                <field name="employee_ids" widget="many2many"/>
+                            </tree>
+                        </field>                    
                     </sheet>
                 </form>
             </field>
@@ -61,6 +63,7 @@
             <field name="arch" type="xml">
                 <tree string="Recurrent Calendar">
                     <field name="name"/>
+                    <field name="write_date"/>
                 </tree>
             </field>
         </record>
@@ -71,6 +74,11 @@
             <field name="priority">5</field>
             <field name="arch" type="xml">
                 <form string="Recurrent Calendar">
+                    <header>
+                        <button name="generate_recurrent" string="Generate Recurrent" 
+                            type="object" class="oe_highlight">
+                        </button>    
+                    </header>
                     <sheet>
                         <group>
                             <group>
