@@ -23,6 +23,14 @@
 from openerp import models, fields
 from openerp import api
 
+WEEK_DAYS = [
+    ('saturday', 'Saturday'),
+    ('monday', 'Monday'),
+    ('tuesday', 'Tuesday'),
+    ('wednesday', 'Wednesday'),
+    ('thursday', 'Thursday'),
+    ('friday', 'Friday'),
+]
 WORK_TYPE = [('recurrent', 'Recurrent'), ('one', 'One Time'), ('wait', 'Waiting')]
 STATE = [('open', 'Open'), ('done', 'Done'), ('cancel', 'Canceled')]
 ONE_TIME = [('out', 'Move Out'), ('in', 'Move In'), ('built', 'After Building'),
@@ -103,6 +111,7 @@ class calendar_service(models.Model):
     canceled_until = fields.Date('Canceled Until')
     opportunity_id = fields.Many2one('crm.lead', 'Related Opportunity', domain=[('type', '=', 'opportunity')])
     user_id = fields.Many2one('res.users', 'Salesman')
+
     @api.one
     def close_state(self):
         self.state = 'done'
@@ -113,6 +122,30 @@ class calendar_service(models.Model):
     def cancel_state(self):
         self.state = 'cancel'
         for work in self.work_ids:
-            work.state = 'cancel'        
+            work.state = 'cancel'
 
+class calendar_service_calendar(models.Model):
+    _name = 'calendar.service.calendar'
+    _description = 'Calendar Service Working Time'
 
+    cleaning_day = fields.Selection(WEEK_DAYS, 'Week Day', required=True)
+    clean_time_from = fields.Float('From', required=True)
+    clean_time_to = fields.Float('To', required=True)
+    employee_ids = fields.Many2many('hr.employee', 'hr_employee_calendar_rel', 'calendar_id', 'employee_id', 'Employees')
+    rule_id = fields.Many2one('calendar.service.recurrent.rule', 'Rule')
+
+class calendar_service_recurrent(models.Model):
+    _name = 'calendar.service.recurrent'
+    _description = 'Recurrent Calendar Services'
+
+    name = fields.Char('Name', size=64)
+    active = fields.Boolean('Active', default=True)
+    rule_ids = fields.One2many('calendar.service.recurrent.rule', 'recurrent_id', 'Rules')
+
+class calendar_service_recurrent_rule(models.Model):
+    _name = 'calendar.service.recurrent.rule'
+    _description = 'Recurrent Calendar Services Rules'
+
+    recurrent_id = fields.Many2one('calendar.service.recurrent', 'Recurrent Calendar')
+    partner_id = fields.Many2one('res.partner', 'Customer', domain=[('customer', '=', True)])
+    calendar_ids = fields.One2many('calendar.service.calendar', 'rule_id', 'Cleaning Time')

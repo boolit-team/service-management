@@ -140,7 +140,7 @@
                     <sheet>
                         <div class="oe_title">
                             <label for="name" class="oe_edit_only"/>
-                            <h1><field name="name"/></h1>                            
+                            <h1><field name="name" attrs="{'readonly': [('state', '=', 'done')]}"/></h1>                            
                         </div>                        
                         <group>
                             <group>
@@ -266,6 +266,7 @@
             <field name="view_mode">tree,calendar,form</field>
             <field name="view_id" ref="view_calendar_service_tree"/>
             <field name="search_view_id" ref="view_calendar_service_search"/>
+            <field name="context">{'res_id': active_id}</field>
             <field name="help" type="html">
               <p class="oe_view_nocontent_create">
                 Click to create new service.

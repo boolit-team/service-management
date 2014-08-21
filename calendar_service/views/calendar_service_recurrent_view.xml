@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>      
+         <!--
+        calendar.service.recurrent.rule
+        -->
+        <record id="view_calendar_service_recurrent_rule_tree" model="ir.ui.view">
+            <field name="name">calendar.service.recurrent.rule</field>
+            <field name="model">calendar.service.recurrent.rule</field>
+            <field name="priority">2</field>
+            <field name="arch" type="xml">
+                <tree string="Recurrent Rule">
+                    <field name="partner_id"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_calendar_service_recurrent_rule_form" model="ir.ui.view">
+            <field name="name">calendar.service.recurrent.rule.form</field>
+            <field name="model">calendar.service.recurrent.rule</field>
+            <field name="priority">5</field>
+            <field name="arch" type="xml">
+                <form string="Recurrent Rule">               
+                    <sheet>                        
+                        <group>
+                            <field name="partner_id"/>
+                        </group>
+                            <field name="calendar_ids">
+                                <tree string="Cleaning Time" editable="bottom">
+                                    <field name="cleaning_day"/>
+                                    <field name="clean_time_from" widget="float_time"/>
+                                    <field name="clean_time_to" widget="float_time"/>
+                                    <field name="employee_ids" widget="many2many"/>
+                                </tree>
+                            </field>                     
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+        <record id="action_calendar_service_recurrent_rule" model="ir.actions.act_window">
+            <field name="name">Recurrent Rules</field>
+            <field name="res_model">calendar.service.recurrent.rule</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_calendar_service_recurrent_rule_tree"/>
+            <!--<field name="search_view_id" ref="view_calendar_event_search"/>-->
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click to create new Recurrent Rule.
+              </p>
+            </field>
+        </record>   
+ 
+         <!--
+        calendar.service.recurrent
+        -->
+        <record id="view_calendar_service_recurrent_tree" model="ir.ui.view">
+            <field name="name">calendar.service.recurrent.tree</field>
+            <field name="model">calendar.service.recurrent</field>
+            <field name="priority">2</field>
+            <field name="arch" type="xml">
+                <tree string="Recurrent Calendar">
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_calendar_service_recurrent_form" model="ir.ui.view">
+            <field name="name">calendar.service.recurrent.form</field>
+            <field name="model">calendar.service.recurrent</field>
+            <field name="priority">5</field>
+            <field name="arch" type="xml">
+                <form string="Recurrent Calendar">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                            </group>
+                            <group>
+                                <field name="active"/>
+                            </group>
+                        </group>
+                        <group>
+                            <field name="rule_ids"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+                      
+        <record id="action_calendar_service_recurrent" model="ir.actions.act_window">
+            <field name="name">Recurrent Calendars</field>
+            <field name="res_model">calendar.service.recurrent</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_calendar_service_recurrent_tree"/>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click to create new recurrent calendar.
+              </p>
+            </field>
+        </record>   
+
+        <menuitem name="Recurrent Services Config" id="menu_calendar_service_recurrent" parent="base.menu_base_config" sequence="4" action="action_calendar_service_recurrent"/>                                              
+    </data>
+</openerp>
