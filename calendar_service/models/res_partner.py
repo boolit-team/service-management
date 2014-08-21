@@ -20,39 +20,16 @@
 #
 ##############################################################################
 
+from openerp import models, fields
+from openerp import api
 
-{
-    'name': 'Calendar Domestic Cleaning',
-    'version': '1.0',
-    'category': 'Base',
-    'sequence': 2,
-    'summary': 'Calendar Domestic Cleaning',
-    'description': """
-	This module manages domestic cleaning specific events.
-	""",
-    'author': 'OERP',
-    'website': 'www.oerp.eu',
-    'depends': [
-        'hr_contract',
-        'crm_dc_extend',     
-    ],
-    'data': [
-        'security/ir.model.access.csv',
-        'views/calendar_service_view.xml',
-        'views/hr_contract_view.xml',
-        'views/hr_view.xml',
-        'views/res_partner_view.xml'
-        #'data/,        
+class res_partner(models.Model):
+    _inherit = 'res.partner'
 
-    ],
-    'demo': [
-    ],
-    'test': [
+    service_ids = fields.One2many('calendar.service', 'partner_id', 'Calendar Services')
+    service_count = fields.Integer('Services', compute='_count_services')
 
-    ],
-    'installable': True,
-    'application': True,
-    'auto_install': False,
-    'images': [],
-}
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
+    @api.one
+    @api.depends('service_ids')
+    def _count_services(self):
+        self.service_count = len(self.service_ids)

@@ -139,7 +139,6 @@
                     <field name="nationality_id" style="width: 30%%"/>
                 </xpath>                                              
             </field>
-        </record>  
-
+        </record>          
     </data>
 </openerp>        

@@ -146,6 +146,7 @@
                             <group>
                                 <field name="start_time"/>
                                 <field name="end_time"/>
+                                <field name="user_id"/>
                                 <field name="opportunity_id"/>
                             </group>
                             <group>
@@ -233,14 +234,38 @@
                     <field name="partner_id"/>                                                                                          
                 </calendar>                
             </field>
-        </record>   
+        </record>
+
+        <record id="view_calendar_service_search" model="ir.ui.view">
+            <field name="name">Calendar Service - Search</field>
+            <field name="model">calendar.service</field>
+            <field name="arch" type="xml">
+                <search string="Search Services">
+                    <field name="name" string="Service / Customer" filter_domain="['|',('partner_id','ilike',self),('name','ilike',self)]"/>
+                    <separator/>
+                    <filter string="My Services"
+                            domain="[('user_id','=',uid)]"
+                            help="Services I'm responsible"/>
+                    <filter string="Unassigned" name="unassigned"
+                            domain="[('user_id','=', False)]"
+                            help="No salesperson"/>
+                    <group expand="0" string="Group By">
+                        <filter string="Salesperson" domain="[]" context="{'group_by':'user_id'}"/>
+                        <filter string="Customer" domain="[]" context="{'group_by':'partner_id'}"/>
+                        <filter string="State" domain="[]" context="{'group_by':'state'}"/>
+                        <filter string="Customer" help="Partner" domain="[]" context="{'group_by':'partner_id'}"/>
+                        <filter string="Type"  domain="[]" context="{'group_by':'work_type'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>           
            
         <record id="action_calendar_service" model="ir.actions.act_window">
             <field name="name">Services</field>
             <field name="res_model">calendar.service</field>
             <field name="view_mode">tree,calendar,form</field>
             <field name="view_id" ref="view_calendar_service_tree"/>
-            <!--<field name="search_view_id" ref="view_calendar_event_search"/>-->
+            <field name="search_view_id" ref="view_calendar_service_search"/>
             <field name="help" type="html">
               <p class="oe_view_nocontent_create">
                 Click to create new service.
