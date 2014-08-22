@@ -42,8 +42,8 @@
         'views/calendar_service_recurrent_view.xml',
         'views/hr_contract_view.xml',
         'views/hr_view.xml',
-        'views/res_partner_view.xml'
-        #'data/,        
+        'views/res_partner_view.xml',
+        'data/sequences.xml',        
 
     ],
     'demo': [

@@ -11,6 +11,7 @@
             <field name="arch" type="xml">
                 <tree string="Recurrent Rule">
                     <field name="partner_id"/>
+                    <field name="user_id"/>
                     <field name="write_date"/>
                     <field name="write_uid"/>
                 </tree>
@@ -23,9 +24,14 @@
             <field name="priority">5</field>
             <field name="arch" type="xml">
                 <form string="Recurrent Rule">               
-                    <sheet>                        
-                        <group>
-                            <field name="partner_id"/>
+                    <sheet>
+                        <group>                        
+                            <group>
+                                <field name="partner_id"/>
+                            </group>
+                            <group>
+                                <field name="user_id"/>
+                            </group>
                         </group>
                         <field name="calendar_ids">
                             <tree string="Cleaning Time" editable="bottom">

@@ -101,7 +101,7 @@ class calendar_service(models.Model):
     _description = 'Calendar Service'
     _inherit = ['mail.thread', 'ir.needaction_mixin']
 
-    name = fields.Char('Service No.')
+    name = fields.Char('Service No.', default='/', readonly=True)
     partner_id = fields.Many2one('res.partner', 'Customer', domain=[('customer', '=', True)])
     start_time = fields.Datetime('Starting at', required=True)
     end_time = fields.Datetime('Ending at', required=True)
@@ -122,6 +122,12 @@ class calendar_service(models.Model):
     canceled_until = fields.Date('Canceled Until')
     opportunity_id = fields.Many2one('crm.lead', 'Related Opportunity', domain=[('type', '=', 'opportunity')])
     user_id = fields.Many2one('res.users', 'Salesman')
+
+    @api.model
+    def create(self, vals):
+        if vals.get('name','/')=='/':
+            vals['name'] = self.env['ir.sequence'].get('calendar.service') or '/'
+        return super(calendar_service, self).create(vals)
 
     @api.one
     def close_state(self):
@@ -159,18 +165,30 @@ class calendar_service_recurrent(models.Model):
             ref_time = datetime.today()
             service_obj = self.env['calendar.service']
             for rule in self.rule_ids:
+                current_address = self.env['res.partner.address_archive'].search(
+                    [('partner_id', '=', rule.partner_id.id), ('current', '=', True)])
                 for cal_rec in rule.calendar_ids:
                     start_time = relative_date(ref_time, cal_rec.cleaning_day, cal_rec.clean_time_from)
                     end_time = relative_date(ref_time, cal_rec.cleaning_day, cal_rec.clean_time_to)
-                    service_obj.create({
+                    service = service_obj.create({
                         'start_time': start_time, 'end_time': end_time,
-                        'user_id': 1, 'work_type': 'recurrent',
+                        'user_id': rule.user_id.id, 'work_type': 'recurrent',
+                        'partner_id': rule.partner_id.id,
                     })
+                    service_work_obj = self.env['calendar.service.work']
+                    for empl in cal_rec.employee_ids:
+                        service_work_obj.create({
+                            'start_time': start_time, 'end_time': end_time,
+                            'employee_id': empl.id, 'work_type': 'recurrent',
+                            'address_archive_id': current_address.id,
+                            'partner_id': rule.partner_id.id, 'note': rule.partner_id.comment, 
+                            'attention': rule.partner_id.attention, 'service_id': service.id,                                
+                        })
 
 class calendar_service_recurrent_rule(models.Model):
     _name = 'calendar.service.recurrent.rule'
     _description = 'Recurrent Calendar Services Rules'
-
+    user_id = fields.Many2one('res.users', 'Salesman')
     recurrent_id = fields.Many2one('calendar.service.recurrent', 'Recurrent Calendar')
     partner_id = fields.Many2one('res.partner', 'Customer', domain=[('customer', '=', True)])
     calendar_ids = fields.One2many('calendar.service.calendar', 'rule_id', 'Cleaning Time')

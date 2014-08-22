@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="1">
+
+        <!-- Sequences for medical.card.segment.res -->
+        <record id="seq_type_calendar_service" model="ir.sequence.type">
+            <field name="name">Calendar Service</field>
+            <field name="code">calendar.service</field>
+        </record>
+
+        <record id="seq_calendar_service" model="ir.sequence">
+            <field name="name">Calendar Service</field>
+            <field name="code">calendar.service</field>
+            <field name="prefix"></field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+    </data>
+</openerp>
