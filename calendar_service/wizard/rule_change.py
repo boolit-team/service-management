@@ -20,41 +20,26 @@
 #
 ##############################################################################
 
+from openerp import models, fields
+from openerp import api
+from datetime import datetime, timedelta
+from openerp.exceptions import Warning
+from openerp.tools.translate import _
 
-{
-    'name': 'Calendar Domestic Cleaning',
-    'version': '1.0',
-    'category': 'Base',
-    'sequence': 2,
-    'summary': 'Calendar Domestic Cleaning',
-    'description': """
-	This module manages domestic cleaning specific events.
-	""",
-    'author': 'OERP',
-    'website': 'www.oerp.eu',
-    'depends': [
-        'hr_contract',
-        'crm_dc_extend',     
-    ],
-    'data': [
-        'security/ir.model.access.csv',
-        'wizard/rule_change_view.xml',
-        'views/calendar_service_view.xml',
-        'views/calendar_service_recurrent_view.xml',
-        'views/hr_contract_view.xml',
-        'views/hr_view.xml',
-        'views/res_partner_view.xml',
-        'data/sequences.xml',        
+WEEK_DAYS = [
+    (5, 'Saturday'),
+    (0, 'Monday'),
+    (1, 'Tuesday'),
+    (2, 'Wednesday'),
+    (3, 'Thursday'),
+    (4, 'Friday'),
+]
 
-    ],
-    'demo': [
-    ],
-    'test': [
+class recurrent_rule_change(models.TransientModel):
+    _name = 'recurrent.rule.change'
+    _description = 'Recurrent Rule Change Wizard'
 
-    ],
-    'installable': True,
-    'application': True,
-    'auto_install': False,
-    'images': [],
-}
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
+    recurrent_id = fields.Many2one('calendar.service.recurrent', 'Recurrent Calendar')
+    rule_id = fields.Many2one('calendar.service.recurrent.rule', 'Rule')
+
+    #@api.multi

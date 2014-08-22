@@ -83,7 +83,10 @@
                     <header>
                         <button name="generate_recurrent" string="Generate Recurrent" 
                             type="object" class="oe_highlight">
-                        </button>    
+                        </button>
+                        <button name="%(calendar_service.act_recurrent_rule_change)d" string="Change Rule" 
+                            type="action" class="oe_highlight">
+                        </button>                               
                     </header>
                     <sheet>
                         <group>
