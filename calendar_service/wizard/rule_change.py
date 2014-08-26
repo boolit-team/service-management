@@ -48,10 +48,14 @@ class recurrent_rule_change_time(models.TransientModel):
 class recurrent_rule_change(models.TransientModel):
     _name = 'recurrent.rule.change'
     _description = 'Recurrent Rule Change Wizard'
-
+    date_from = fields.Datetime('Change From')
     recurrent_id = fields.Many2one('calendar.service.recurrent', 'Recurrent Calendar')
     rule_id = fields.Many2one('calendar.service.recurrent.rule', 'Rule')
     change_time_ids = fields.One2many('recurrent.rule.change.time', 'change_id', 'Change Times')
+
+    @api.one
+    def change_rule(self):
+        pass
 
     #TODO - Might need to rewrite it
     '''

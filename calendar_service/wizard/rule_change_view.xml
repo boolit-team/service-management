@@ -13,12 +13,15 @@
                     <sheet>
                         <group>
                             <group>
-                                <field name="rule_id" style="width: 30%%"/>
+                                <field name="rule_id"/>
+                            </group>
+                            <group>
+                                <field name="date_from"/>
                             </group>
                         </group>
-                        <field name="change_time_ids" domain="[('rule_id', '=', rule_id.id)]">
+                        <field name="change_time_ids">
                             <tree string="Change Times" editable="bottom">
-                                <field name="calendar_id"/>
+                                <field name="calendar_id" domain="[('rule_id', '=', rule_id.id)]"/>
                                 <field name="change_day"/>
                                 <field name="change_time_to"/>
                                 <field name="change_time_from"/>
