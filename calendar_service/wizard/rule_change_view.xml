@@ -10,9 +10,21 @@
             <field name="priority">2</field>
             <field name="arch" type="xml">
                 <form string="Rule Change">
-                    <group>
-                        <field name="rule_id"/>
-                    </group>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="rule_id" style="width: 30%%"/>
+                            </group>
+                        </group>
+                        <field name="change_time_ids">
+                            <tree string="Change Times" editable="bottom">
+                                <field name="calendar_id"/>
+                                <field name="change_day"/>
+                                <field name="change_time_to"/>
+                                <field name="change_time_from"/>
+                            </tree>
+                        </field>
+                    </sheet>
                 </form>
             </field>
         </record>

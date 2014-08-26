@@ -27,6 +27,7 @@
                     <sheet>
                         <group>                        
                             <group>
+                                <field name="name"/>
                                 <field name="partner_id"/>
                             </group>
                             <group>

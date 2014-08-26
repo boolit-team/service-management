@@ -46,6 +46,13 @@ REASON = [('illness', 'Illness'), ('unexpect', 'Unexpected Problems'), ('else', 
 PRIOR_NOTIFY = ([('repair', 'Repair'), ('vacation', 'Vacation'), ('illness', 'Illness'), ('else', 'Else')])
 NO_NOTIFY = [('nobody_home', 'Nobody was at Home'), ('cant_enter', 'Couldn\'t Enter'), ('else', 'Else')]
 
+def get_weekday(nmb):
+    weekdays = {
+        0: 'Monday', 1: 'Tuesday', 2: 'Wednesday',
+        3: 'Wednesday', 4: 'Friday', 5: 'Saturday',
+        6: 'Sunday'
+    }
+    return weekdays[nmb]
 def relative_date(reference, weekday, timevalue):
     hour, minute = divmod(timevalue, 1)
     minute *= 60
@@ -145,11 +152,29 @@ class calendar_service_calendar(models.Model):
     _name = 'calendar.service.calendar'
     _description = 'Calendar Service Working Time'
 
+    name = fields.Char('Calendar', size=64)
     cleaning_day = fields.Selection(WEEK_DAYS, 'Week Day', required=True)
     clean_time_from = fields.Float('From', required=True)
     clean_time_to = fields.Float('To', required=True)
     employee_ids = fields.Many2many('hr.employee', 'hr_employee_calendar_rel', 'calendar_id', 'employee_id', 'Employees')
     rule_id = fields.Many2one('calendar.service.recurrent.rule', 'Rule')
+
+    @api.multi
+    def name_get(self):
+        result = []
+        name = self._rec_name
+        if name in self._fields:
+            for record in self:
+                rec_name = []
+                if record.name:
+                    rec_name.append(record.name)
+                rec_name.append(get_weekday(record.cleaning_day))
+                rec_name.append("%s - %s" % (record.clean_time_from, record.clean_time_to))
+                result.append((record.id, ", ".join(rec_name)))    
+        else:
+            for record in self:
+                result.append((record.id, "%s,%s" % (record._name, record.id)))
+        return result
 
 class calendar_service_recurrent(models.Model):
     _name = 'calendar.service.recurrent'
@@ -189,6 +214,24 @@ class calendar_service_recurrent_rule(models.Model):
     _name = 'calendar.service.recurrent.rule'
     _description = 'Recurrent Calendar Services Rules'
     user_id = fields.Many2one('res.users', 'Salesman')
+    name = fields.Char('Rule Name')
     recurrent_id = fields.Many2one('calendar.service.recurrent', 'Recurrent Calendar')
     partner_id = fields.Many2one('res.partner', 'Customer', domain=[('customer', '=', True)])
     calendar_ids = fields.One2many('calendar.service.calendar', 'rule_id', 'Cleaning Time')
+
+    @api.multi
+    def name_get(self):
+        result = []
+        name = self._rec_name
+        if name in self._fields:
+            for record in self:
+                rec_name = []
+                if record.name:
+                    rec_name.append(record.name)
+                if record.partner_id:
+                    rec_name.append(record.partner_id.name)
+                result.append((record.id, ", ".join(rec_name)))    
+        else:
+            for record in self:
+                result.append((record.id, "%s,%s" % (record._name, record.id)))
+        return result    

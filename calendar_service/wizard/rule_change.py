@@ -35,11 +35,22 @@ WEEK_DAYS = [
     (4, 'Friday'),
 ]
 
+class recurrent_rule_change_time(models.TransientModel):
+    _name = 'recurrent.rule.change.time'
+    _description = 'Recurrent Rule Change Time'
+
+    calendar_id = fields.Many2one('calendar.service.calendar', 'Cleaning Time')
+    change_day = fields.Selection(WEEK_DAYS, 'Week Day')
+    change_time_from = fields.Float('Change From')
+    change_time_to = fields.Float('Change To')
+    change_id = fields.Many2one('recurrent.rule.change', 'Rule Change')    
+
 class recurrent_rule_change(models.TransientModel):
     _name = 'recurrent.rule.change'
     _description = 'Recurrent Rule Change Wizard'
 
     recurrent_id = fields.Many2one('calendar.service.recurrent', 'Recurrent Calendar')
     rule_id = fields.Many2one('calendar.service.recurrent.rule', 'Rule')
+    change_time_ids = fields.One2many('recurrent.rule.change.time', 'change_id', 'Change Times')
 
     #@api.multi
