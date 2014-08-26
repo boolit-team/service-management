@@ -53,4 +53,13 @@ class recurrent_rule_change(models.TransientModel):
     rule_id = fields.Many2one('calendar.service.recurrent.rule', 'Rule')
     change_time_ids = fields.One2many('recurrent.rule.change.time', 'change_id', 'Change Times')
 
-    #@api.multi
+    #TODO - Might need to rewrite it
+    '''
+    def onchange_rule_id(self, cr, uid, rule_id, context=None):
+        res = {}
+        if rule_id:
+            domain = {}
+            rule = self.pool.get('calendar.service.recurrent.rule').browse(cr, uid, rule_id, context=context)
+            domain['change_time_ids.calendar_id']
+        return {'domain': domain}
+    '''

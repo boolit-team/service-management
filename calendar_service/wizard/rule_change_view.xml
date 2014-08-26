@@ -16,7 +16,7 @@
                                 <field name="rule_id" style="width: 30%%"/>
                             </group>
                         </group>
-                        <field name="change_time_ids">
+                        <field name="change_time_ids" domain="[('rule_id', '=', rule_id.id)]">
                             <tree string="Change Times" editable="bottom">
                                 <field name="calendar_id"/>
                                 <field name="change_day"/>

@@ -170,6 +170,8 @@ class calendar_service_calendar(models.Model):
                     rec_name.append(record.name)
                 rec_name.append(get_weekday(record.cleaning_day))
                 rec_name.append("%s - %s" % (record.clean_time_from, record.clean_time_to))
+                if record.rule_id.partner_id:
+                    rec_name.append("/ %s" % (record.rule_id.partner_id.name))
                 result.append((record.id, ", ".join(rec_name)))    
         else:
             for record in self:
