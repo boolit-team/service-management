@@ -53,12 +53,6 @@ def get_weekday(nmb):
         6: 'Sunday'
     }
     return weekdays[nmb]
-def relative_date(reference, weekday, timevalue):
-    hour, minute = divmod(timevalue, 1)
-    minute *= 60
-    days = reference.weekday() - weekday
-    return (reference - timedelta(days=days)).replace(
-        hour=int(hour), minute=int(minute), second=0, microsecond=0)
 
 class calendar_service_work(models.Model):
     _name = 'calendar.service.work'
@@ -129,6 +123,7 @@ class calendar_service(models.Model):
     canceled_until = fields.Date('Canceled Until')
     opportunity_id = fields.Many2one('crm.lead', 'Related Opportunity', domain=[('type', '=', 'opportunity')])
     user_id = fields.Many2one('res.users', 'Salesman')
+    rule_calendar_id = fields.Many2one('calendar.service.calendar', 'Rule Calendar Item')
 
     @api.model
     def create(self, vals):
@@ -178,6 +173,15 @@ class calendar_service_calendar(models.Model):
                 result.append((record.id, "%s,%s" % (record._name, record.id)))
         return result
 
+    @api.model
+    def relative_date(self, reference, weekday, timevalue):
+        hour, minute = divmod(timevalue, 1)
+        minute *= 60
+        days = reference.weekday() - weekday
+        date = (reference - timedelta(days=days)).replace(
+            hour=int(hour), minute=int(minute), second=0, microsecond=0)
+        return date
+
 class calendar_service_recurrent(models.Model):
     _name = 'calendar.service.recurrent'
     _description = 'Recurrent Calendar Services'
@@ -195,12 +199,12 @@ class calendar_service_recurrent(models.Model):
                 current_address = self.env['res.partner.address_archive'].search(
                     [('partner_id', '=', rule.partner_id.id), ('current', '=', True)])
                 for cal_rec in rule.calendar_ids:
-                    start_time = relative_date(ref_time, cal_rec.cleaning_day, cal_rec.clean_time_from)
-                    end_time = relative_date(ref_time, cal_rec.cleaning_day, cal_rec.clean_time_to)
+                    start_time = cal_rec.relative_date(ref_time, cal_rec.cleaning_day, cal_rec.clean_time_from)
+                    end_time = cal_rec.relative_date(ref_time, cal_rec.cleaning_day, cal_rec.clean_time_to)
                     service = service_obj.create({
                         'start_time': start_time, 'end_time': end_time,
                         'user_id': rule.user_id.id, 'work_type': 'recurrent',
-                        'partner_id': rule.partner_id.id,
+                        'rule_calendar_id': cal_rec.id,'partner_id': rule.partner_id.id,
                     })
                     service_work_obj = self.env['calendar.service.work']
                     for empl in cal_rec.employee_ids:
@@ -218,7 +222,7 @@ class calendar_service_recurrent_rule(models.Model):
     user_id = fields.Many2one('res.users', 'Salesman')
     name = fields.Char('Rule Name')
     recurrent_id = fields.Many2one('calendar.service.recurrent', 'Recurrent Calendar')
-    partner_id = fields.Many2one('res.partner', 'Customer', domain=[('customer', '=', True)])
+    partner_id = fields.Many2one('res.partner', 'Customer', domain=[('customer', '=', True)], required=True)
     calendar_ids = fields.One2many('calendar.service.calendar', 'rule_id', 'Cleaning Time')
 
     @api.multi

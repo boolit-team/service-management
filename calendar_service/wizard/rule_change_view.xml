@@ -14,20 +14,29 @@
                         <group>
                             <group>
                                 <field name="rule_id"/>
+                                <field name="change_type"/>
                             </group>
                             <group>
                                 <field name="date_from"/>
+                                <field name="date_to"/>
                             </group>
                         </group>
                         <field name="change_time_ids">
                             <tree string="Change Times" editable="bottom">
-                                <field name="calendar_id" domain="[('rule_id', '=', rule_id.id)]"/>
-                                <field name="change_day"/>
-                                <field name="change_time_to"/>
-                                <field name="change_time_from"/>
+                                <field name="calendar_id"/>
+                                <field name="action"/>
+                                <field name="day" 
+                                    attrs="{'readonly': [('action', '=', 'delete')], 'required': [('action', '=', 'update')]}"/>                                
+                                <field name="time_from" widget="float_time" 
+                                    attrs="{'readonly': [('action', '=', 'delete')], 'required': [('action', '=', 'update')]}"/>
+                                <field name="time_to" widget="float_time" 
+                                    attrs="{'readonly': [('action', '=', 'delete')], 'required': [('action', '=', 'update')]}"/>
                             </tree>
                         </field>
                     </sheet>
+                    <footer>
+                        <button name="change_rule" string="Change Rule" class="oe_highlight" type="object"/>
+                    </footer>
                 </form>
             </field>
         </record>

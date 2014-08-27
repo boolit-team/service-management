@@ -40,22 +40,55 @@ class recurrent_rule_change_time(models.TransientModel):
     _description = 'Recurrent Rule Change Time'
 
     calendar_id = fields.Many2one('calendar.service.calendar', 'Cleaning Time')
-    change_day = fields.Selection(WEEK_DAYS, 'Week Day')
-    change_time_from = fields.Float('Change From')
-    change_time_to = fields.Float('Change To')
+    action = fields.Selection([('delete', 'Delete'), ('update', 'Update')], 'Action', required=True)
+    day = fields.Selection(WEEK_DAYS, 'Week Day')
+    time_from = fields.Float('Change From')
+    time_to = fields.Float('Change To')
     change_id = fields.Many2one('recurrent.rule.change', 'Rule Change')    
 
 class recurrent_rule_change(models.TransientModel):
     _name = 'recurrent.rule.change'
     _description = 'Recurrent Rule Change Wizard'
-    date_from = fields.Datetime('Change From')
+    date_from = fields.Datetime('Change From', required=True)
+    date_to = fields.Datetime('Change to')
     recurrent_id = fields.Many2one('calendar.service.recurrent', 'Recurrent Calendar')
     rule_id = fields.Many2one('calendar.service.recurrent.rule', 'Rule')
     change_time_ids = fields.One2many('recurrent.rule.change.time', 'change_id', 'Change Times')
+    change_type = fields.Selection([('permanent', 'Permanent'), ('once', 'One Time')], 'Change Type', required=True)
 
     @api.one
     def change_rule(self):
-        pass
+        """
+        Changes already generated calendar service records
+        and if change_type == 'permanent' changes rules 
+        according to specific change_rule
+        """
+        if self.date_from and self.rule_id:
+            service_domain = []
+            if self.date_to:
+                date_from = datetime.strptime(self.date_from, '%Y-%m-%d %H:%M:%S')
+                date_to = datetime.strptime(self.date_to, '%Y-%m-%d %H:%M:%S')
+                if date_to < date_from:
+                    raise Warning(_('Date To can\'t be lower than Date From!'))
+                service_domain.append(('date_to', '<=', self.date_to))
+            partner = self.rule_id.partner_id
+            for change_time in self.change_time_ids:
+                service_domain.extend((('start_time', '>=', self.date_from), 
+                    ('rule_calendar_id', '=', change_time.calendar_id.id), ('state', '=', 'open')))
+                service = self.env['calendar.service'].search(service_domain)
+                if service:
+                    if change_time.action == 'delete':
+                        service.unlink()
+                    elif change_time.action == 'update':
+                        cal_serv_cal = self.env['calendar.service.calendar']
+                        start_time = cal_serv_cal.relative_date(
+                            datetime.strptime(service.start_time, "%Y-%m-%d %H:%M:%S"), change_time.day, change_time.time_from)
+                        print start_time
+                        end_time = cal_serv_cal.relative_date(
+                            datetime.strptime(service.end_time, "%Y-%m-%d %H:%M:%S"), change_time.day, change_time.time_to)
+                        service.write({'start_time': start_time, 'end_time': end_time})
+                        for work in service.work_ids:
+                            work.write({'start_time': start_time, 'end_time': end_time})
 
     #TODO - Might need to rewrite it
     '''
