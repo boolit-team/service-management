@@ -73,6 +73,8 @@ class recurrent_rule_change(models.TransientModel):
                 service_domain.append(('date_to', '<=', self.date_to))
             partner = self.rule_id.partner_id
             for change_time in self.change_time_ids:
+                if change_time.calendar_id.rule_id.id != self.rule_id.id:
+                    raise Warning(_('Calendar item does not match Rule!'))
                 service_domain.extend((('start_time', '>=', self.date_from), 
                     ('rule_calendar_id', '=', change_time.calendar_id.id), ('state', '=', 'open')))
                 service = self.env['calendar.service'].search(service_domain)
@@ -83,12 +85,13 @@ class recurrent_rule_change(models.TransientModel):
                         cal_serv_cal = self.env['calendar.service.calendar']
                         start_time = cal_serv_cal.relative_date(
                             datetime.strptime(service.start_time, "%Y-%m-%d %H:%M:%S"), change_time.day, change_time.time_from)
-                        print start_time
                         end_time = cal_serv_cal.relative_date(
                             datetime.strptime(service.end_time, "%Y-%m-%d %H:%M:%S"), change_time.day, change_time.time_to)
                         service.write({'start_time': start_time, 'end_time': end_time})
                         for work in service.work_ids:
                             work.write({'start_time': start_time, 'end_time': end_time})
+                else:
+                    raise Warning(_('No Services were Found!'))
 
     #TODO - Might need to rewrite it
     '''

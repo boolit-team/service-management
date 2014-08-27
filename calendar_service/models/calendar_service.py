@@ -182,6 +182,31 @@ class calendar_service_calendar(models.Model):
             hour=int(hour), minute=int(minute), second=0, microsecond=0)
         return date
 
+    @api.one
+    @api.constrains('clean_time_to', 'clean_time_from')
+    def _check_calendar(self):
+        if self.clean_time_to < self.clean_time_from:
+            raise Warning(_("Cleaning End time can\'t be lower than Start!"))
+
+    @api.one
+    @api.constrains('cleaning_day', 'clean_time_from', 'clean_time_to', 'employee_ids')
+    def _check_resource(self):
+        for empl in self.employee_ids:
+            items = self.search(
+                [('id', '!=', self.id), ('employee_ids', 'in', [empl.id]), 
+                ('cleaning_day', '=', self.cleaning_day), ('clean_time_from', '<', self.clean_time_to)])
+            for item in items:
+                if item.clean_time_to <= self.clean_time_from:
+                    continue
+                else:
+                    raise Warning(_("%s is already assigned to work at '%s %s - %s' for %s!\n"
+                        "You tried to assign %s to work at '%s %s - %s' for %s'.") % 
+                        (empl.name, get_weekday(item.cleaning_day), 
+                            item.clean_time_from, item.clean_time_to, item.rule_id.partner_id.name,
+                            empl.name, get_weekday(self.cleaning_day), self.clean_time_from, 
+                            self.clean_time_to, self.rule_id.partner_id.name))
+
+
 class calendar_service_recurrent(models.Model):
     _name = 'calendar.service.recurrent'
     _description = 'Recurrent Calendar Services'
@@ -240,4 +265,13 @@ class calendar_service_recurrent_rule(models.Model):
         else:
             for record in self:
                 result.append((record.id, "%s,%s" % (record._name, record.id)))
-        return result    
+        return result  
+
+    @api.one
+    @api.constrains('partner_id')
+    def _check_partner(self):
+        rules = self.env['calendar.service.recurrent.rule'].search([('id', '!=', self.id)])
+        for rule in rules:
+            if rule.partner_id.id == self.partner_id.id:
+                raise Warning(_('Partner per Rule must be Unique!'))
+
