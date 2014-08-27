@@ -52,7 +52,7 @@ class recurrent_rule_change(models.TransientModel):
     date_from = fields.Datetime('Change From', required=True)
     date_to = fields.Datetime('Change to')
     recurrent_id = fields.Many2one('calendar.service.recurrent', 'Recurrent Calendar')
-    rule_id = fields.Many2one('calendar.service.recurrent.rule', 'Rule')
+    rule_id = fields.Many2one('calendar.service.recurrent.rule', 'Rule', required=True)
     change_time_ids = fields.One2many('recurrent.rule.change.time', 'change_id', 'Change Times')
     change_type = fields.Selection([('permanent', 'Permanent'), ('once', 'One Time')], 'Change Type', required=True)
 
@@ -72,13 +72,17 @@ class recurrent_rule_change(models.TransientModel):
                     raise Warning(_('Date To can\'t be lower than Date From!'))
                 service_domain.append(('date_to', '<=', self.date_to))
             partner = self.rule_id.partner_id
+            if not self.change_time_ids:
+                raise Warning(_('You must enter at least one change time!'))
             for change_time in self.change_time_ids:
                 if change_time.calendar_id.rule_id.id != self.rule_id.id:
                     raise Warning(_('Calendar item does not match Rule!'))
                 service_domain.extend((('start_time', '>=', self.date_from), 
                     ('rule_calendar_id', '=', change_time.calendar_id.id), ('state', '=', 'open')))
-                service = self.env['calendar.service'].search(service_domain)
-                if service:
+                services = self.env['calendar.service'].search(service_domain)
+                if not services:
+                    raise Warning(_('No Services were Found!'))
+                for service in services:
                     if change_time.action == 'delete':
                         service.unlink()
                     elif change_time.action == 'update':
@@ -90,8 +94,7 @@ class recurrent_rule_change(models.TransientModel):
                         service.write({'start_time': start_time, 'end_time': end_time})
                         for work in service.work_ids:
                             work.write({'start_time': start_time, 'end_time': end_time})
-                else:
-                    raise Warning(_('No Services were Found!'))
+                    
 
     #TODO - Might need to rewrite it
     '''

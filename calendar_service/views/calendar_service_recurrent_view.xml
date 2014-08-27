@@ -93,6 +93,7 @@
                         <group>
                             <group>
                                 <field name="name"/>
+                                <field name="weeks"/>
                             </group>
                             <group>
                                 <field name="active"/>

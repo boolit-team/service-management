@@ -23,8 +23,8 @@
                         </group>
                         <field name="change_time_ids">
                             <tree string="Change Times" editable="bottom">
-                                <field name="calendar_id"/>
                                 <field name="action"/>
+                                <field name="calendar_id"/>                                
                                 <field name="day" 
                                     attrs="{'readonly': [('action', '=', 'delete')], 'required': [('action', '=', 'update')]}"/>                                
                                 <field name="time_from" widget="float_time" 
@@ -35,7 +35,7 @@
                         </field>
                     </sheet>
                     <footer>
-                        <button name="change_rule" string="Change Rule" class="oe_highlight" type="object"/>
+                        <button name="change_rule" string="Update Rule" class="oe_highlight" type="object"/>
                     </footer>
                 </form>
             </field>

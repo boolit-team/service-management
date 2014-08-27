@@ -214,32 +214,42 @@ class calendar_service_recurrent(models.Model):
     name = fields.Char('Name', size=64)
     active = fields.Boolean('Active', default=True)
     rule_ids = fields.One2many('calendar.service.recurrent.rule', 'recurrent_id', 'Rules')
-
+    weeks = fields.Integer('Weeks', 
+        help="How many weeks to generate. \n0 means generate only this week starting from now + 1 hour", default=0)
     @api.one
     def generate_recurrent(self): #TODO - Finish It!
         if self.active:
-            ref_time = datetime.today()
+            check_time = datetime.today() + timedelta(hours=1)
             service_obj = self.env['calendar.service']
             for rule in self.rule_ids:
                 current_address = self.env['res.partner.address_archive'].search(
                     [('partner_id', '=', rule.partner_id.id), ('current', '=', True)])
                 for cal_rec in rule.calendar_ids:
-                    start_time = cal_rec.relative_date(ref_time, cal_rec.cleaning_day, cal_rec.clean_time_from)
-                    end_time = cal_rec.relative_date(ref_time, cal_rec.cleaning_day, cal_rec.clean_time_to)
-                    service = service_obj.create({
-                        'start_time': start_time, 'end_time': end_time,
-                        'user_id': rule.user_id.id, 'work_type': 'recurrent',
-                        'rule_calendar_id': cal_rec.id,'partner_id': rule.partner_id.id,
-                    })
-                    service_work_obj = self.env['calendar.service.work']
-                    for empl in cal_rec.employee_ids:
-                        service_work_obj.create({
-                            'start_time': start_time, 'end_time': end_time,
-                            'employee_id': empl.id, 'work_type': 'recurrent',
-                            'address_archive_id': current_address.id,
-                            'partner_id': rule.partner_id.id, 'note': rule.partner_id.comment, 
-                            'attention': rule.partner_id.attention, 'service_id': service.id,                                
-                        })
+                    for week in range(self.weeks + 1): #+1 to run at least once
+                        ref_time = datetime.today() + timedelta(weeks=week)
+                        start_time = cal_rec.relative_date(ref_time, cal_rec.cleaning_day, cal_rec.clean_time_from)
+                        end_time = cal_rec.relative_date(ref_time, cal_rec.cleaning_day, cal_rec.clean_time_to)
+                        if start_time >= check_time:
+                            service = service_obj.create({
+                                'start_time': start_time, 'end_time': end_time,
+                                'user_id': rule.user_id.id, 'work_type': 'recurrent',
+                                'rule_calendar_id': cal_rec.id,'partner_id': rule.partner_id.id,
+                            })
+                            service_work_obj = self.env['calendar.service.work']
+                            for empl in cal_rec.employee_ids:
+                                service_work_obj.create({
+                                    'start_time': start_time, 'end_time': end_time,
+                                    'employee_id': empl.id, 'work_type': 'recurrent',
+                                    'address_archive_id': current_address.id,
+                                    'partner_id': rule.partner_id.id, 'note': rule.partner_id.comment, 
+                                    'attention': rule.partner_id.attention, 'service_id': service.id,                                
+                                })
+
+    @api.one
+    @api.constrains('weeks')
+    def _check_weeks(self):
+        if self.weeks < 0:
+            raise Warning(_('Weeks can\'t be negative!'))
 
 class calendar_service_recurrent_rule(models.Model):
     _name = 'calendar.service.recurrent.rule'
