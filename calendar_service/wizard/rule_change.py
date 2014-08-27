@@ -54,14 +54,16 @@ class recurrent_rule_change(models.TransientModel):
     recurrent_id = fields.Many2one('calendar.service.recurrent', 'Recurrent Calendar')
     rule_id = fields.Many2one('calendar.service.recurrent.rule', 'Rule', required=True)
     change_time_ids = fields.One2many('recurrent.rule.change.time', 'change_id', 'Change Times')
-    change_type = fields.Selection([('permanent', 'Permanent'), ('once', 'One Time')], 'Change Type', required=True)
+    change_type = fields.Selection([('permanent', 'Permanent'), ('once', 'One Time')], 
+        'Change Type', required=True, help="Choosing 'One Time', it only modifies calendar.\nChoosing 'Permanent', it also updates rules")
 
     @api.one
     def change_rule(self):
         """
         Changes already generated calendar service records
         and if change_type == 'permanent' changes rules 
-        according to specific change_rule
+        according to specific change_rule. Skips updates
+        for records that would otherwise be changed into past time.
         """
         if self.date_from and self.rule_id:
             service_domain = []
@@ -91,9 +93,18 @@ class recurrent_rule_change(models.TransientModel):
                             datetime.strptime(service.start_time, "%Y-%m-%d %H:%M:%S"), change_time.day, change_time.time_from)
                         end_time = cal_serv_cal.relative_date(
                             datetime.strptime(service.end_time, "%Y-%m-%d %H:%M:%S"), change_time.day, change_time.time_to)
-                        service.write({'start_time': start_time, 'end_time': end_time})
-                        for work in service.work_ids:
-                            work.write({'start_time': start_time, 'end_time': end_time})
+                        if start_time > datetime.today() + timedelta(hours=1):
+                            service.write({'start_time': start_time, 'end_time': end_time})
+                            for work in service.work_ids:
+                                work.write({'start_time': start_time, 'end_time': end_time})
+                if self.change_type == 'permanent':
+                    if change_time.action == 'delete':
+                        change_time.calendar_id.unlink()
+                    if change_time.action == 'update':
+                        change_time.calendar_id.write({'cleaning_day': change_time.day, 
+                            'clean_time_from': change_time.time_from, 'clean_time_to': change_time.time_to})
+
+
                     
 
     #TODO - Might need to rewrite it
