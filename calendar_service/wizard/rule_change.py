@@ -49,7 +49,7 @@ class recurrent_rule_change_time(models.TransientModel):
 class recurrent_rule_change(models.TransientModel):
     _name = 'recurrent.rule.change'
     _description = 'Recurrent Rule Change Wizard'
-    date_from = fields.Datetime('Change From', required=True)
+    date_from = fields.Datetime('Change From', required=True, default=datetime.now())
     date_to = fields.Datetime('Change to')
     recurrent_id = fields.Many2one('calendar.service.recurrent', 'Recurrent Calendar')
     rule_id = fields.Many2one('calendar.service.recurrent.rule', 'Rule', required=True)
@@ -76,6 +76,7 @@ class recurrent_rule_change(models.TransientModel):
             partner = self.rule_id.partner_id
             if not self.change_time_ids:
                 raise Warning(_('You must enter at least one change time!'))
+            rule_changes = []
             for change_time in self.change_time_ids:
                 if change_time.calendar_id.rule_id.id != self.rule_id.id:
                     raise Warning(_('Calendar item does not match Rule!'))
@@ -100,11 +101,14 @@ class recurrent_rule_change(models.TransientModel):
                 if self.change_type == 'permanent':
                     if change_time.action == 'delete':
                         change_time.calendar_id.unlink()
-                    if change_time.action == 'update':
-                        change_time.calendar_id.write({'cleaning_day': change_time.day, 
+                    elif change_time.action == 'update':
+                        rule_changes.append({'id': change_time.calendar_id.id,'cleaning_day': change_time.day, 
                             'clean_time_from': change_time.time_from, 'clean_time_to': change_time.time_to})
-
-
+            for change in rule_changes:
+                item = self.env['calendar.service.calendar'].search([('id', '=', change['id'])])
+                if item:
+                    item.write({'cleaning_day': change['cleaning_day'], 
+                        'clean_time_from': change['clean_time_from'], 'clean_time_to': change['clean_time_to']})
                     
 
     #TODO - Might need to rewrite it
