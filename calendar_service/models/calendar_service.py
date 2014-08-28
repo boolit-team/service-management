@@ -20,11 +20,11 @@
 #
 ##############################################################################
 
-from openerp import models, fields
-from openerp import api
+from openerp import models, fields, api, SUPERUSER_ID
 from datetime import datetime, timedelta
 from openerp.exceptions import Warning
 from openerp.tools.translate import _
+import pytz
 
 WEEK_DAYS = [
     (5, 'Saturday'),
@@ -178,9 +178,25 @@ class calendar_service_calendar(models.Model):
         hour, minute = divmod(timevalue, 1)
         minute *= 60
         days = reference.weekday() - weekday
-        date = (reference - timedelta(days=days)).replace(
+        dt = (reference - timedelta(days=days)).replace(
             hour=int(hour), minute=int(minute), second=0, microsecond=0)
-        return date
+        dt = self.set_utc(dt)
+        return dt
+
+    @api.model
+    def set_utc(self, dt, check_tz=True):
+        """
+        Sets UTC timezone, so user would see correct time from GUI.
+        """
+        if check_tz:
+            user = self.env['res.users'].search([('id', '=', SUPERUSER_ID)])
+            local_tz = pytz.timezone(user.tz)
+            dt = local_tz.localize(dt)
+            dt = dt.astimezone(pytz.utc)
+        else:
+            dt = dt.replace(tzinfo=pytz.utc)
+        return dt
+
 
     @api.one
     @api.constrains('clean_time_to', 'clean_time_from')
@@ -216,10 +232,12 @@ class calendar_service_recurrent(models.Model):
     rule_ids = fields.One2many('calendar.service.recurrent.rule', 'recurrent_id', 'Rules')
     weeks = fields.Integer('Weeks', 
         help="How many weeks to generate. \n0 means generate only this week starting from now + 1 hour", default=0)
+
     @api.one
     def generate_recurrent(self): #TODO - Finish It!
         if self.active:
-            check_time = datetime.today() + timedelta(hours=1)
+            cal_serv_cal = self.env['calendar.service.calendar']
+            now1 = cal_serv_cal.set_utc(datetime.today() + timedelta(hours=1), check_tz=False)
             service_obj = self.env['calendar.service']
             for rule in self.rule_ids:
                 current_address = self.env['res.partner.address_archive'].search(
@@ -229,7 +247,7 @@ class calendar_service_recurrent(models.Model):
                         ref_time = datetime.today() + timedelta(weeks=week)
                         start_time = cal_rec.relative_date(ref_time, cal_rec.cleaning_day, cal_rec.clean_time_from)
                         end_time = cal_rec.relative_date(ref_time, cal_rec.cleaning_day, cal_rec.clean_time_to)
-                        if start_time >= check_time:
+                        if start_time >= now1:
                             service = service_obj.create({
                                 'start_time': start_time, 'end_time': end_time,
                                 'user_id': rule.user_id.id, 'work_type': 'recurrent',

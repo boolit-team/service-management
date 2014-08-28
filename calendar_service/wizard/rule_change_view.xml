@@ -24,13 +24,17 @@
                         <field name="change_time_ids">
                             <tree string="Change Times" editable="bottom">
                                 <field name="action"/>
-                                <field name="calendar_id"/>                                
+                                <field name="calendar_id" 
+                                    attrs="{'readonly': [('action', '=', 'add')], 'required': [('action', 'in', ('update', 'delete'))]}"/>                                
                                 <field name="day" 
-                                    attrs="{'readonly': [('action', '=', 'delete')], 'required': [('action', '=', 'update')]}"/>                                
+                                    attrs="{'readonly': [('action', '=', 'delete')], 'required': [('action', 'in', ('update', 'add'))]}"/>                                
                                 <field name="time_from" widget="float_time" 
-                                    attrs="{'readonly': [('action', '=', 'delete')], 'required': [('action', '=', 'update')]}"/>
+                                    attrs="{'readonly': [('action', '=', 'delete')], 'required': [('action', 'in', ('update', 'add'))]}"/>
                                 <field name="time_to" widget="float_time" 
-                                    attrs="{'readonly': [('action', '=', 'delete')], 'required': [('action', '=', 'update')]}"/>
+                                    attrs="{'readonly': [('action', '=', 'delete')], 'required': [('action', 'in', ('update', 'add'))]}"/>
+                                <field name="weeks" attrs="{'readonly': [('action', '!=', 'add')], 'required': [('action', '=', 'add')]}"/>
+                                <field name="employee_ids" widget="many2many"
+                                    attrs="{'readonly': [('action', '=', 'delete')], 'required': [('action', '=', 'add')]}"/>
                             </tree>
                         </field>
                     </sheet>
