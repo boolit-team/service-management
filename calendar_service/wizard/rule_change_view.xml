@@ -34,7 +34,7 @@
                                     attrs="{'readonly': [('action', '=', 'delete')], 'required': [('action', 'in', ('update', 'add'))]}"/>
                                 <field name="weeks" attrs="{'readonly': [('action', '!=', 'add')], 'required': [('action', '=', 'add')]}"/>
                                 <field name="employee_ids" widget="many2many"
-                                    attrs="{'readonly': [('action', '=', 'delete')], 'required': [('action', '=', 'add')]}"/>
+                                    attrs="{'readonly': [('action', 'in', ('delete', 'update'))], 'required': [('action', '=', 'add')]}"/>
                             </tree>
                         </field>
                     </sheet>

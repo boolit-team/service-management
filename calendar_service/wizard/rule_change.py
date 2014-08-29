@@ -128,7 +128,6 @@ class recurrent_rule_change(models.TransientModel):
                 raise Warning(_('You must enter at least one change time!'))
             cal_serv_cal = self.env['calendar.service.calendar']
             rule_changes = []
-            employee_ids = [] # TODO implement employees changing when updating!!
             now1 = cal_serv_cal.set_utc(datetime.today() + timedelta(hours=1), check_tz=False)
             for change_time in self.change_time_ids:
                 if change_time.action == 'add':  #skips rest of the iteration, because using add, it is not relevant to continue.
@@ -141,8 +140,6 @@ class recurrent_rule_change(models.TransientModel):
                 services = self.env['calendar.service'].search(service_domain)
                 if not services:
                     raise Warning(_('No Services were Found!'))
-                for empl in change_time.employee_ids:
-                    employee_ids.append(empl.id)
                 for service in services: #using for, because there might be generated records for more then present week (for future weeks too!)
                     if change_time.action == 'delete':
                         service.unlink()

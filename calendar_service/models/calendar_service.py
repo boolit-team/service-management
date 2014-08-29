@@ -232,10 +232,11 @@ class calendar_service_recurrent(models.Model):
     rule_ids = fields.One2many('calendar.service.recurrent.rule', 'recurrent_id', 'Rules')
     weeks = fields.Integer('Weeks', 
         help="How many weeks to generate. \n0 means generate only this week starting from now + 1 hour", default=0)
+    next_gen_time = fields.Datetime('Next Generate Time', readonly=True)
 
     @api.one
-    def generate_recurrent(self): #TODO - Finish It!
-        if self.active:
+    def generate_recurrent(self):
+        if self.active: #TODO - implement next_gen_time check to prevent dublicates generation.
             cal_serv_cal = self.env['calendar.service.calendar']
             now1 = cal_serv_cal.set_utc(datetime.today() + timedelta(hours=1), check_tz=False)
             service_obj = self.env['calendar.service']
@@ -262,12 +263,37 @@ class calendar_service_recurrent(models.Model):
                                     'partner_id': rule.partner_id.id, 'note': rule.partner_id.comment, 
                                     'attention': rule.partner_id.attention, 'service_id': service.id,                                
                                 })
+            # Set next generate time
+            weeks = self.weeks + 1 # we need to jump to the next week after the last one generated (+1).
+            next_gen_time = datetime.today() + timedelta(weeks=weeks)
+            next_gen_time = next_gen_time - timedelta(days=next_gen_time.weekday()) #Set it to monday
+            next_gen_time = next_gen_time.replace(hour=0, minute=0, second=0, microsecond=0)
+            next_gen_time = cal_serv_cal.set_utc(next_gen_time) #set time back to UTC
+            self.next_gen_time = next_gen_time
+        else:
+            raise Warning(_("Inactive Recurrent Calendar can\'t be generated!"))
+
 
     @api.one
     @api.constrains('weeks')
     def _check_weeks(self):
         if self.weeks < 0:
             raise Warning(_('Weeks can\'t be negative!'))
+
+    @api.one
+    @api.constrains('active')
+    def _check_active(self):
+        if self.active:
+            recurrent_recs = self.search([('id', '!=', self.id), ('active', '=', True)])
+            if recurrent_recs:
+                raise Warning(_("Only one Recurrent Calendar can be active at a Time!"))
+
+    @api.one
+    @api.constrains('rule_ids')
+    def _check_rules(self):
+        if not self.rule_ids:
+            raise Warning(_("You should enter at least one Rule!"))
+
 
 class calendar_service_recurrent_rule(models.Model):
     _name = 'calendar.service.recurrent.rule'
@@ -298,8 +324,14 @@ class calendar_service_recurrent_rule(models.Model):
     @api.one
     @api.constrains('partner_id')
     def _check_partner(self):
-        rules = self.env['calendar.service.recurrent.rule'].search([('id', '!=', self.id)])
+        rules = self.search([('id', '!=', self.id), ('recurrent_id', '=', self.recurrent_id.id)])
         for rule in rules:
             if rule.partner_id.id == self.partner_id.id:
                 raise Warning(_('Partner per Rule must be Unique!'))
+
+    @api.one
+    @api.constrains('calendar_ids')
+    def _check_calendar_ids(self):
+        if not self.calendar_ids:
+            raise Warning(_("You should enter at least one Calendar Item!"))
 
