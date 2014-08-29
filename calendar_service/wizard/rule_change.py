@@ -130,7 +130,7 @@ class recurrent_rule_change(models.TransientModel):
             rule_changes = []
             now1 = cal_serv_cal.set_utc(datetime.today() + timedelta(hours=1), check_tz=False)
             for change_time in self.change_time_ids:
-                if change_time.action == 'add':  #skips rest of the iteration, because using add, it is not relevant to continue.
+                if change_time.action == 'add':  #skips rest of the iteration, because using 'add' action, it is not relevant to continue.
                     self._add_rule_item(change_time)
                     continue
                 if change_time.calendar_id.rule_id.id != self.rule_id.id:
@@ -140,7 +140,7 @@ class recurrent_rule_change(models.TransientModel):
                 services = self.env['calendar.service'].search(service_domain)
                 if not services:
                     raise Warning(_('No Services were Found!'))
-                for service in services: #using for, because there might be generated records for more then present week (for future weeks too!)
+                for service in services: #using 'for', because there might be generated records for more than present week (for future weeks too!)
                     if change_time.action == 'delete':
                         service.unlink()
                     elif change_time.action == 'update':

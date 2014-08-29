@@ -232,7 +232,7 @@ class calendar_service_recurrent(models.Model):
     rule_ids = fields.One2many('calendar.service.recurrent.rule', 'recurrent_id', 'Rules')
     weeks = fields.Integer('Weeks', 
         help="How many weeks to generate. \n0 means generate only this week starting from now + 1 hour", default=0)
-    next_gen_time = fields.Datetime('Next Generate Time', readonly=True)
+    next_gen_time = fields.Datetime('Next Generate Time', readonly=False)
 
     @api.one
     def generate_recurrent(self):
@@ -272,6 +272,18 @@ class calendar_service_recurrent(models.Model):
             self.next_gen_time = next_gen_time
         else:
             raise Warning(_("Inactive Recurrent Calendar can\'t be generated!"))
+
+    @api.cr_uid
+    def _auto_generate_recurrent(self, cr, uid, context=None):
+        """
+        Only used for Cron Job. Calls generate_recurrent()
+        if conditions are satisfied.
+        """
+        recurrent_ids = self.search(cr, uid, [('active', '=', True)], context=context)
+        if recurrent_ids:
+            recurrent = self.browse(cr, uid, recurrent_ids, context=context)[0]
+            if not recurrent.next_gen_time or datetime.today() >= datetime.strptime(recurrent.next_gen_time, "%Y-%m-%d %H:%M:%S"):
+                self.generate_recurrent(cr, uid, recurrent.id, context=context) 
 
 
     @api.one

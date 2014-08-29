@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="1">
+        <record model="ir.cron" id="ir_cron_scheduler_auto_generate_recurrent" forcecreate="True">
+          <field name="name">Recurrent Calendar Scheduler</field>
+          <field name="active" eval="True"/>
+          <field name="interval_number">1</field>
+          <field name="interval_type">weeks</field>
+          <field name="numbercall">-1</field>
+          <field name="doall" eval="True"/>
+          <field name="model" eval="'calendar.service.recurrent'"/>
+          <field name="function" eval="'_auto_generate_recurrent'"/>
+          <field name="args" eval="'()'"/>
+         </record>
+    </data>
+</openerp>
