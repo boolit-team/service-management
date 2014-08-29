@@ -1,11 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
-    <data>      
+    <data> 
+        <!-- recurrent.rule.change.time-->
+        <record id="view_recurrent_rule_change_time_form" model="ir.ui.view">
+            <field name="name">recurrent.rule.change.time.form</field>
+            <field name="model">recurrent.rule.change.time</field>
+            <field name="priority">2</field>
+            <field name="arch" type="xml">
+                <form string="Rule Change Time">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="action"/>
+                                <field name="calendar_id"
+                                    widget="selection" 
+                                    attrs="{'invisible': [('action', '=', 'add')], 'required': [('action', 'in', ('update', 'delete'))]}"
+                                    domain="[('rule_id', '=', rule_id)]"/>                                
+                                <field name="day" 
+                                    attrs="{'invisible': [('action', '=', 'delete')], 'required': [('action', 'in', ('update', 'add'))]}"/>                                                                  
+                                <field name="weeks" 
+                                    attrs="{'invisible': [('action', '!=', 'add')], 'required': [('action', '=', 'add')]}"/>                                            
+                            </group>
+                            <group>
+                                <field name="time_from" widget="float_time" 
+                                    attrs="{'invisible': [('action', '=', 'delete')], 'required': [('action', 'in', ('update', 'add'))]}"/>
+                                <field name="time_to" widget="float_time" 
+                                    attrs="{'invisible': [('action', '=', 'delete')], 'required': [('action', 'in', ('update', 'add'))]}"/>
+                                <field name="employee_ids" widget="many2many_tags"
+                                    attrs="{'invisible': [('action', 'in', ('delete', 'update'))], 'required': [('action', '=', 'add')]}"/>     
+
+                                <field name="rule_id" invisible="1"/>                                
+                            </group>
+                        </group>                              
+                    </sheet>
+                </form>
+            </field>
+        </record>        
+
          <!--
-        calendar.service.recurrent.rule
+        recurrent.rule.change
         -->
         <record id="view_recurrent_rule_change_form" model="ir.ui.view">
-            <field name="name">recurrent.rule.change</field>
+            <field name="name">recurrent.rule.change.form</field>
             <field name="model">recurrent.rule.change</field>
             <field name="priority">2</field>
             <field name="arch" type="xml">
@@ -13,7 +49,7 @@
                     <sheet>
                         <group>
                             <group>
-                                <field name="rule_id"/>
+                                <field name="rule_id" attrs="{'readonly': [('change_time_ids', '!=', ())]}"/>
                                 <field name="change_type"/>
                             </group>
                             <group>
@@ -21,20 +57,13 @@
                                 <field name="date_to"/>
                             </group>
                         </group>
-                        <field name="change_time_ids">
-                            <tree string="Change Times" editable="bottom">
+                        <field name="change_time_ids" context="{'default_rule_id': rule_id}">
+                            <tree string="Change Times">
                                 <field name="action"/>
-                                <field name="calendar_id" 
-                                    attrs="{'readonly': [('action', '=', 'add')], 'required': [('action', 'in', ('update', 'delete'))]}"/>                                
-                                <field name="day" 
-                                    attrs="{'readonly': [('action', '=', 'delete')], 'required': [('action', 'in', ('update', 'add'))]}"/>                                
-                                <field name="time_from" widget="float_time" 
-                                    attrs="{'readonly': [('action', '=', 'delete')], 'required': [('action', 'in', ('update', 'add'))]}"/>
-                                <field name="time_to" widget="float_time" 
-                                    attrs="{'readonly': [('action', '=', 'delete')], 'required': [('action', 'in', ('update', 'add'))]}"/>
-                                <field name="weeks" attrs="{'readonly': [('action', '!=', 'add')], 'required': [('action', '=', 'add')]}"/>
-                                <field name="employee_ids" widget="many2many"
-                                    attrs="{'readonly': [('action', 'in', ('delete', 'update'))], 'required': [('action', '=', 'add')]}"/>
+                                <field name="calendar_id"/>                                
+                                <field name="day"/>                                
+                                <field name="time_from" widget="float_time" />
+                                <field name="time_to" widget="float_time"/>
                             </tree>
                         </field>
                     </sheet>

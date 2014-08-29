@@ -27,14 +27,13 @@ from openerp.exceptions import Warning
 from openerp.tools.translate import _
 
 WEEK_DAYS = [
-    (5, 'Saturday'),
-    (0, 'Monday'),
-    (1, 'Tuesday'),
-    (2, 'Wednesday'),
-    (3, 'Thursday'),
-    (4, 'Friday'),
+    ('S', 'Saturday'),
+    ('M', 'Monday'),
+    ('T', 'Tuesday'),
+    ('W', 'Wednesday'),
+    ('Th', 'Thursday'),
+    ('F', 'Friday'),
 ]
-
 class recurrent_rule_change_time(models.TransientModel):
     _name = 'recurrent.rule.change.time'
     _description = 'Recurrent Rule Change Time'
@@ -47,7 +46,8 @@ class recurrent_rule_change_time(models.TransientModel):
     change_id = fields.Many2one('recurrent.rule.change', 'Rule Change')
     employee_ids = fields.Many2many('hr.employee', 'hr_employee_change_time_rel', 'change_time_id', 'employee_id', 'Employees')
     weeks = fields.Integer('Weeks', help="How many weeks to generate."
-        "\n0 means generate only this week starting from now + 1 hour", default=0)   
+        "\n0 means generate only this week starting from now + 1 hour", default=0)
+    rule_id = fields.Many2one('calendar.service.recurrent.rule', 'Rule')   
 
 class recurrent_rule_change(models.TransientModel):
     _name = 'recurrent.rule.change'
@@ -89,9 +89,10 @@ class recurrent_rule_change(models.TransientModel):
         for week in range(change_time.weeks+1): 
             ref_time = datetime.today() + timedelta(weeks=week) 
             start_time = change_time.calendar_id.relative_date(
-                ref_time, change_time.day, change_time.time_from)
+                ref_time, calendar_item.get_weekday(change_time.day, name=False), change_time.time_from)
             end_time = change_time.calendar_id.relative_date(
-                ref_time, change_time.day, change_time.time_to)
+                ref_time, calendar_item.get_weekday(change_time.day, name=False), change_time.time_to)
+            #filters with interval to only add inside generated calendars events
             if (start_time >= now1) and (start_time >= date_from) and (end_time <= next_gen_time):
                 serv_vals = {
                     'start_time': start_time, 'end_time': end_time,
@@ -149,9 +150,11 @@ class recurrent_rule_change(models.TransientModel):
                         service.unlink()
                     elif change_time.action == 'update':
                         start_time = cal_serv_cal.relative_date(
-                            datetime.strptime(service.start_time, "%Y-%m-%d %H:%M:%S"), change_time.day, change_time.time_from)
+                            datetime.strptime(service.start_time, "%Y-%m-%d %H:%M:%S"), 
+                            cal_serv_cal.get_weekday(change_time.day, name=False), change_time.time_from)
                         end_time = cal_serv_cal.relative_date(
-                            datetime.strptime(service.end_time, "%Y-%m-%d %H:%M:%S"), change_time.day, change_time.time_to)
+                            datetime.strptime(service.end_time, "%Y-%m-%d %H:%M:%S"), 
+                            cal_serv_cal.get_weekday(change_time.day, name=False), change_time.time_to)
                         if start_time >= now1:
                             service.write({'start_time': start_time, 'end_time': end_time})
                             for work in service.work_ids:

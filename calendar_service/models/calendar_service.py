@@ -27,12 +27,12 @@ from openerp.tools.translate import _
 import pytz
 
 WEEK_DAYS = [
-    (5, 'Saturday'),
-    (0, 'Monday'),
-    (1, 'Tuesday'),
-    (2, 'Wednesday'),
-    (3, 'Thursday'),
-    (4, 'Friday'),
+    ('S', 'Saturday'),
+    ('M', 'Monday'),
+    ('T', 'Tuesday'),
+    ('W', 'Wednesday'),
+    ('Th', 'Thursday'),
+    ('F', 'Friday'),
 ]
 WORK_TYPE = [('recurrent', 'Recurrent'), ('one', 'One Time'), ('wait', 'Waiting')]
 STATE = [('open', 'Open'), ('done', 'Done'), ('cancel', 'Canceled')]
@@ -45,14 +45,6 @@ CANCEL_REASON = [('no_reason', 'Last min. Without Reason'), ('reason', 'Last min
 REASON = [('illness', 'Illness'), ('unexpect', 'Unexpected Problems'), ('else', 'Else')]
 PRIOR_NOTIFY = ([('repair', 'Repair'), ('vacation', 'Vacation'), ('illness', 'Illness'), ('else', 'Else')])
 NO_NOTIFY = [('nobody_home', 'Nobody was at Home'), ('cant_enter', 'Couldn\'t Enter'), ('else', 'Else')]
-
-def get_weekday(nmb):
-    weekdays = {
-        0: 'Monday', 1: 'Tuesday', 2: 'Wednesday',
-        3: 'Wednesday', 4: 'Friday', 5: 'Saturday',
-        6: 'Sunday'
-    }
-    return weekdays[nmb]
 
 class calendar_service_work(models.Model):
     _name = 'calendar.service.work'
@@ -163,7 +155,7 @@ class calendar_service_calendar(models.Model):
                 rec_name = []
                 if record.name:
                     rec_name.append(record.name)
-                rec_name.append(get_weekday(record.cleaning_day))
+                rec_name.append(self.get_weekday(record.cleaning_day))
                 rec_name.append("%s - %s" % (record.clean_time_from, record.clean_time_to))
                 if record.rule_id.partner_id:
                     rec_name.append("/ %s" % (record.rule_id.partner_id.name))
@@ -182,6 +174,22 @@ class calendar_service_calendar(models.Model):
             hour=int(hour), minute=int(minute), second=0, microsecond=0)
         dt = self.set_utc(dt)
         return dt
+
+    @api.model
+    def get_weekday(self, key, name=True):
+        if name:
+            weekdays = {
+                'M': 'Monday', 'T': 'Tuesday', 'W': 'Wednesday',
+                'Th': 'Thursday', 'F': 'Friday', 'S': 'Saturday',
+                'Sn': 'Sunday',
+            }
+        else:
+            weekdays = {
+                'M': 0, 'T': 1, 'W': 2,
+                'Th': 3, 'F': 4, 'S': 5,
+                'Sn': 6,
+            }            
+        return weekdays[key]
 
     @api.model
     def set_utc(self, dt, check_tz=True):
@@ -217,9 +225,9 @@ class calendar_service_calendar(models.Model):
                 else:
                     raise Warning(_("%s is already assigned to work at '%s %s - %s' for %s!\n"
                         "You tried to assign %s to work at '%s %s - %s' for %s'.") % 
-                        (empl.name, get_weekday(item.cleaning_day), 
+                        (empl.name, self.get_weekday(item.cleaning_day), 
                             item.clean_time_from, item.clean_time_to, item.rule_id.partner_id.name,
-                            empl.name, get_weekday(self.cleaning_day), self.clean_time_from, 
+                            empl.name, self.get_weekday(self.cleaning_day), self.clean_time_from, 
                             self.clean_time_to, self.rule_id.partner_id.name))
 
 
@@ -246,8 +254,10 @@ class calendar_service_recurrent(models.Model):
                 for cal_rec in rule.calendar_ids:
                     for week in range(self.weeks + 1): #+1 to run at least once
                         ref_time = datetime.today() + timedelta(weeks=week)
-                        start_time = cal_rec.relative_date(ref_time, cal_rec.cleaning_day, cal_rec.clean_time_from)
-                        end_time = cal_rec.relative_date(ref_time, cal_rec.cleaning_day, cal_rec.clean_time_to)
+                        start_time = cal_rec.relative_date(ref_time, 
+                            cal_rec.get_weekday(cal_rec.cleaning_day, name=False), cal_rec.clean_time_from)
+                        end_time = cal_rec.relative_date(ref_time, 
+                            cal_rec.get_weekday(cal_rec.cleaning_day, name=False), cal_rec.clean_time_to)
                         if start_time >= now1:
                             service = service_obj.create({
                                 'start_time': start_time, 'end_time': end_time,
