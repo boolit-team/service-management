@@ -84,13 +84,15 @@ class recurrent_rule_change(models.TransientModel):
             [('partner_id', '=', self.rule_id.partner_id.id), ('current', '=', True)])            
         now1 = calendar_item.set_utc(datetime.today() + timedelta(hours=1), check_tz=False) #Setting UTC to now1 and date_from to be able to compare.
         date_from = calendar_item.set_utc(datetime.strptime(self.date_from, "%Y-%m-%d %H:%M:%S"), check_tz=False)
+        next_gen_time = self.rule_id.recurrent_id.next_gen_time
+        next_gen_time = calendar_item.set_utc(datetime.strptime(next_gen_time, "%Y-%m-%d %H:%M:%S"))           
         for week in range(change_time.weeks+1): 
             ref_time = datetime.today() + timedelta(weeks=week) 
             start_time = change_time.calendar_id.relative_date(
                 ref_time, change_time.day, change_time.time_from)
             end_time = change_time.calendar_id.relative_date(
                 ref_time, change_time.day, change_time.time_to)
-            if (start_time > now1) and (start_time >= date_from):
+            if (start_time >= now1) and (start_time >= date_from) and (end_time <= next_gen_time):
                 serv_vals = {
                     'start_time': start_time, 'end_time': end_time,
                     'user_id': self.rule_id.user_id.id, 'work_type': 'recurrent',
@@ -115,6 +117,8 @@ class recurrent_rule_change(models.TransientModel):
         according to specific change_rule. Skips updates
         for records that would otherwise be changed into past time.
         """
+        if not self.rule_id.recurrent_id.next_gen_time:
+            raise Warning(_("You have to generate Recurrent Calendar first!"))
         if self.date_from and self.rule_id:
             service_domain = []
             if self.date_to:
@@ -128,7 +132,7 @@ class recurrent_rule_change(models.TransientModel):
                 raise Warning(_('You must enter at least one change time!'))
             cal_serv_cal = self.env['calendar.service.calendar']
             rule_changes = []
-            now1 = cal_serv_cal.set_utc(datetime.today() + timedelta(hours=1), check_tz=False)
+            now1 = cal_serv_cal.set_utc(datetime.today() + timedelta(hours=1), check_tz=False)         
             for change_time in self.change_time_ids:
                 if change_time.action == 'add':  #skips rest of the iteration, because using 'add' action, it is not relevant to continue.
                     self._add_rule_item(change_time)
@@ -148,7 +152,7 @@ class recurrent_rule_change(models.TransientModel):
                             datetime.strptime(service.start_time, "%Y-%m-%d %H:%M:%S"), change_time.day, change_time.time_from)
                         end_time = cal_serv_cal.relative_date(
                             datetime.strptime(service.end_time, "%Y-%m-%d %H:%M:%S"), change_time.day, change_time.time_to)
-                        if start_time > now1:
+                        if start_time >= now1:
                             service.write({'start_time': start_time, 'end_time': end_time})
                             for work in service.work_ids:
                                 work.write({'start_time': start_time, 'end_time': end_time})

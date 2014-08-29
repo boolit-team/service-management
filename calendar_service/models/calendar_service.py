@@ -236,7 +236,7 @@ class calendar_service_recurrent(models.Model):
 
     @api.one
     def generate_recurrent(self):
-        if self.active: #TODO - implement next_gen_time check to prevent dublicates generation.
+        if self.active:
             cal_serv_cal = self.env['calendar.service.calendar']
             now1 = cal_serv_cal.set_utc(datetime.today() + timedelta(hours=1), check_tz=False)
             service_obj = self.env['calendar.service']
