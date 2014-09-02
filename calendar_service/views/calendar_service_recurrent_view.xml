@@ -94,11 +94,13 @@
                         <group>
                             <group>
                                 <field name="name"/>
+                                <field name="init_weeks"/>
                                 <field name="weeks"/>
                             </group>
                             <group>
                                 <field name="active"/>
                                 <field name="next_gen_time"/>
+                                <field name="init"/>
                             </group>
                         </group>
                         <group>
@@ -121,6 +123,6 @@
             </field>
         </record>   
 
-        <menuitem name="Recurrent Services Config" id="menu_calendar_service_recurrent" parent="base.menu_base_config" sequence="4" action="action_calendar_service_recurrent"/>                                              
+        <menuitem name="Recurrent Services Config" id="menu_calendar_service_recurrent" parent="base.menu_base_config" sequence="4" action="action_calendar_service_recurrent" groups="base.group_sale_manager"/>                                              
     </data>
 </openerp>

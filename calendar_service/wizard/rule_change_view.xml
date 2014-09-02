@@ -49,7 +49,7 @@
                     <sheet>
                         <group>
                             <group>
-                                <field name="rule_id" attrs="{'readonly': [('change_time_ids', '!=', ())]}"/>
+                                <field name="rule_id" attrs="{'required': True}"/>
                                 <field name="change_type"/>
                             </group>
                             <group>

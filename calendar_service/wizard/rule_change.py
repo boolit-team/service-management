@@ -55,7 +55,7 @@ class recurrent_rule_change(models.TransientModel):
     date_from = fields.Datetime('Change From', required=True, default=datetime.now())
     date_to = fields.Datetime('Change to')
     recurrent_id = fields.Many2one('calendar.service.recurrent', 'Recurrent Calendar')
-    rule_id = fields.Many2one('calendar.service.recurrent.rule', 'Rule', required=True)
+    rule_id = fields.Many2one('calendar.service.recurrent.rule', 'Rule')
     change_time_ids = fields.One2many('recurrent.rule.change.time', 'change_id', 'Change Times')
     change_type = fields.Selection([('permanent', 'Permanent'), ('once', 'One Time')], 
         'Change Type', required=True, help="Choosing 'One Time', it only modifies calendar.\nChoosing 'Permanent', it also updates rules")
@@ -68,12 +68,12 @@ class recurrent_rule_change(models.TransientModel):
         """
         if change_time.weeks < 0:
             raise Warning(_("Weeks can't be negative!"))
-        calendar_item = self.env['calendar.service.calendar']
+        cal_serv_cal = self.env['calendar.service.calendar']
         if self.change_type == 'permanent':
             employee_ids = []
             for empl in change_time.employee_ids:
                 employee_ids.append(empl.id)            
-            calendar_item.create({
+            cal_serv_cal.create({
                 'cleaning_day': change_time.day, 
                 'clean_time_from': change_time.time_from, 
                 'clean_time_to': change_time.time_to, 
@@ -82,22 +82,22 @@ class recurrent_rule_change(models.TransientModel):
             })
         current_address = self.env['res.partner.address_archive'].search(
             [('partner_id', '=', self.rule_id.partner_id.id), ('current', '=', True)])            
-        now1 = calendar_item.set_utc(datetime.today() + timedelta(hours=1), check_tz=False) #Setting UTC to now1 and date_from to be able to compare.
-        date_from = calendar_item.set_utc(datetime.strptime(self.date_from, "%Y-%m-%d %H:%M:%S"), check_tz=False)
+        now1 = cal_serv_cal.set_utc(datetime.today() + timedelta(hours=1), check_tz=False) #Setting UTC to now1 and date_from to be able to compare.
+        date_from = cal_serv_cal.set_utc(datetime.strptime(self.date_from, "%Y-%m-%d %H:%M:%S"), check_tz=False)
         next_gen_time = self.rule_id.recurrent_id.next_gen_time
-        next_gen_time = calendar_item.set_utc(datetime.strptime(next_gen_time, "%Y-%m-%d %H:%M:%S"))           
+        next_gen_time = cal_serv_cal.set_utc(datetime.strptime(next_gen_time, "%Y-%m-%d %H:%M:%S"))           
         for week in range(change_time.weeks+1): 
             ref_time = datetime.today() + timedelta(weeks=week) 
             start_time = change_time.calendar_id.relative_date(
-                ref_time, calendar_item.get_weekday(change_time.day, name=False), change_time.time_from)
+                ref_time, cal_serv_cal.get_weekday(change_time.day, name=False), change_time.time_from)
             end_time = change_time.calendar_id.relative_date(
-                ref_time, calendar_item.get_weekday(change_time.day, name=False), change_time.time_to)
+                ref_time, cal_serv_cal.get_weekday(change_time.day, name=False), change_time.time_to)
             #filters with interval to only add inside generated calendars events
             if (start_time >= now1) and (start_time >= date_from) and (end_time <= next_gen_time):
                 serv_vals = {
                     'start_time': start_time, 'end_time': end_time,
                     'user_id': self.rule_id.user_id.id, 'work_type': 'recurrent',
-                    'rule_calendar_id': calendar_item.id,'partner_id': self.rule_id.partner_id.id,
+                    'rule_calendar_id': cal_serv_cal.id,'partner_id': self.rule_id.partner_id.id,
                 }
                 service = self.env['calendar.service'].create(serv_vals)
                 service_work = self.env['calendar.service.work']
@@ -170,15 +170,3 @@ class recurrent_rule_change(models.TransientModel):
                 if item:
                     item.write({'cleaning_day': change['cleaning_day'], 
                         'clean_time_from': change['clean_time_from'], 'clean_time_to': change['clean_time_to']})
-                    
-
-    #TODO - Might need to rewrite it
-    '''
-    def onchange_rule_id(self, cr, uid, rule_id, context=None):
-        res = {}
-        if rule_id:
-            domain = {}
-            rule = self.pool.get('calendar.service.recurrent.rule').browse(cr, uid, rule_id, context=context)
-            domain['change_time_ids.calendar_id']
-        return {'domain': domain}
-    '''

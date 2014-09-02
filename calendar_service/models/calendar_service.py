@@ -238,9 +238,31 @@ class calendar_service_recurrent(models.Model):
     name = fields.Char('Name', size=64)
     active = fields.Boolean('Active', default=True)
     rule_ids = fields.One2many('calendar.service.recurrent.rule', 'recurrent_id', 'Rules')
-    weeks = fields.Integer('Weeks', 
-        help="How many weeks to generate. \n0 means generate only this week starting from now + 1 hour", default=0)
+    init_weeks = fields.Integer('Initial Weeks', 
+        help="How Initially many weeks to generate. \n0 means generate only this week starting from now + 1 hour", default=8)
+    weeks = fields.Integer('Weeks', default=1)
     next_gen_time = fields.Datetime('Next Generate Time', readonly=False)
+    init = fields.Boolean('Init')
+
+    @api.model
+    def _get_week_range(self):
+        if self.init:
+            return self.init_weeks + 1 #to run at least once           
+        else:
+            return self.weeks
+
+    @api.one
+    def set_next_gen_time(self):
+        if self.init:
+            cal_serv_cal = self.env['calendar.service.calendar']
+            weeks = self.init_weeks + 1 # we need to jump to the next week after the last one generated (+1).
+            next_gen_time = datetime.today() + timedelta(weeks=weeks)
+            next_gen_time = next_gen_time - timedelta(days=next_gen_time.weekday()) #Set it to monday
+            next_gen_time = next_gen_time.replace(hour=0, minute=0, second=0, microsecond=0)
+            next_gen_time = cal_serv_cal.set_utc(next_gen_time) #set time back to UTC
+        else:
+            next_gen_time = datetime.strptime(self.next_gen_time, "%Y-%m-%d %H:%M:%S") + timedelta(weeks=self.weeks)
+        self.next_gen_time = next_gen_time        
 
     @api.one
     def generate_recurrent(self):
@@ -248,23 +270,30 @@ class calendar_service_recurrent(models.Model):
             cal_serv_cal = self.env['calendar.service.calendar']
             now1 = cal_serv_cal.set_utc(datetime.today() + timedelta(hours=1), check_tz=False)
             service_obj = self.env['calendar.service']
+            service_work_obj = self.env['calendar.service.work']
             for rule in self.rule_ids:
                 current_address = self.env['res.partner.address_archive'].search(
                     [('partner_id', '=', rule.partner_id.id), ('current', '=', True)])
                 for cal_rec in rule.calendar_ids:
-                    for week in range(self.weeks + 1): #+1 to run at least once
-                        ref_time = datetime.today() + timedelta(weeks=week)
+                    for week in range(self._get_week_range()):
+                        if not self.init:
+                            ref_time = datetime.strptime(self.next_gen_time, "%Y-%m-%d %H:%M:%S") + timedelta(weeks=week, days=1) #add day to jump to next week
+                            now1 = cal_serv_cal.set_utc(datetime.strptime(self.next_gen_time, "%Y-%m-%d %H:%M:%S"), check_tz=False)
+                        else:
+                            ref_time = datetime.today() + timedelta(weeks=week)                            
                         start_time = cal_rec.relative_date(ref_time, 
                             cal_rec.get_weekday(cal_rec.cleaning_day, name=False), cal_rec.clean_time_from)
                         end_time = cal_rec.relative_date(ref_time, 
                             cal_rec.get_weekday(cal_rec.cleaning_day, name=False), cal_rec.clean_time_to)
+                        print 'start_time:', start_time
+                        print 'ref_time: ', ref_time
+                        print 'now1: ', now1
                         if start_time >= now1:
                             service = service_obj.create({
                                 'start_time': start_time, 'end_time': end_time,
                                 'user_id': rule.user_id.id, 'work_type': 'recurrent',
                                 'rule_calendar_id': cal_rec.id,'partner_id': rule.partner_id.id,
                             })
-                            service_work_obj = self.env['calendar.service.work']
                             for empl in cal_rec.employee_ids:
                                 service_work_obj.create({
                                     'start_time': start_time, 'end_time': end_time,
@@ -272,14 +301,12 @@ class calendar_service_recurrent(models.Model):
                                     'address_archive_id': current_address.id,
                                     'partner_id': rule.partner_id.id, 'note': rule.partner_id.comment, 
                                     'attention': rule.partner_id.attention, 'service_id': service.id,                                
-                                })
+                                })                              
             # Set next generate time
-            weeks = self.weeks + 1 # we need to jump to the next week after the last one generated (+1).
-            next_gen_time = datetime.today() + timedelta(weeks=weeks)
-            next_gen_time = next_gen_time - timedelta(days=next_gen_time.weekday()) #Set it to monday
-            next_gen_time = next_gen_time.replace(hour=0, minute=0, second=0, microsecond=0)
-            next_gen_time = cal_serv_cal.set_utc(next_gen_time) #set time back to UTC
-            self.next_gen_time = next_gen_time
+            self.set_next_gen_time()
+            if self.init:
+                self.init = False
+
         else:
             raise Warning(_("Inactive Recurrent Calendar can\'t be generated!"))
 
@@ -299,8 +326,10 @@ class calendar_service_recurrent(models.Model):
     @api.one
     @api.constrains('weeks')
     def _check_weeks(self):
-        if self.weeks < 0:
-            raise Warning(_('Weeks can\'t be negative!'))
+        if self.init_weeks < 0:
+            raise Warning(_('Init Weeks can\'t be negative!'))
+        if self.weeks < 1:
+            raise Warning(_('Weeks can\'t be lower than 1!'))
 
     @api.one
     @api.constrains('active')
