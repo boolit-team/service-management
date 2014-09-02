@@ -89,6 +89,19 @@ class calendar_service_work(models.Model):
             self.work_type = self.service_id.work_type
             self.partner_id = self.service_id.partner_id and self.service_id.partner_id.id or False
 
+    @api.constrains('start_time', 'end_time', 'employee_id')
+    def _check_resource(self):
+        cal_serv_cal = self.env['calendar.service.calendar']
+        recs = self.search([('id', '!=', self.id), 
+            ('employee_id', '=', self.employee_id.id), ('state', '=', 'open'), 
+            ('start_time', '<', self.end_time), ('end_time', '>', self.start_time)])
+        for rec in recs:
+            start_time = cal_serv_cal.set_tz(datetime.strptime(rec.start_time, "%Y-%m-%d %H:%M:%S"))
+            #start_time = start_time.strftime
+            end_time = cal_serv_cal.set_tz(datetime.strptime(rec.end_time, "%Y-%m-%d %H:%M:%S"))
+            raise Warning(_("%s Already Assigned from %s to %s in Service %s for %s" % 
+                (rec.employee_id.name, start_time, end_time, rec.service_id.name, rec.partner_id.name)))
+
 class calendar_service(models.Model):
     _name = 'calendar.service'
     _description = 'Calendar Service'
@@ -191,20 +204,30 @@ class calendar_service_calendar(models.Model):
             }            
         return weekdays[key]
 
+    #@api.model
+
     @api.model
     def set_utc(self, dt, check_tz=True):
         """
         Sets UTC timezone, so user would see correct time from GUI.
         """
         if check_tz:
-            user = self.env['res.users'].search([('id', '=', SUPERUSER_ID)])
-            local_tz = pytz.timezone(user.tz)
+            local_tz = pytz.timezone(self.env.user.tz)
             dt = local_tz.localize(dt)
             dt = dt.astimezone(pytz.utc)
         else:
             dt = dt.replace(tzinfo=pytz.utc)
         return dt
 
+    @api.model
+    def set_tz(self, dt):
+        """
+        Sets Timezone that user is living in.
+        """
+        local_tz = pytz.timezone(self.env.user.tz)
+        dt = dt.replace(tzinfo=pytz.utc)
+        dt = dt.astimezone(local_tz)
+        return dt
 
     @api.one
     @api.constrains('clean_time_to', 'clean_time_from')
@@ -218,17 +241,15 @@ class calendar_service_calendar(models.Model):
         for empl in self.employee_ids:
             items = self.search(
                 [('id', '!=', self.id), ('employee_ids', 'in', [empl.id]), 
-                ('cleaning_day', '=', self.cleaning_day), ('clean_time_from', '<', self.clean_time_to)])
+                ('cleaning_day', '=', self.cleaning_day), ('clean_time_from', '<', self.clean_time_to), 
+                ('clean_time_to', '>', self.clean_time_from)])
             for item in items:
-                if item.clean_time_to <= self.clean_time_from:
-                    continue
-                else:
-                    raise Warning(_("%s is already assigned to work at '%s %s - %s' for %s!\n"
-                        "You tried to assign %s to work at '%s %s - %s' for %s'.") % 
-                        (empl.name, self.get_weekday(item.cleaning_day), 
-                            item.clean_time_from, item.clean_time_to, item.rule_id.partner_id.name,
-                            empl.name, self.get_weekday(self.cleaning_day), self.clean_time_from, 
-                            self.clean_time_to, self.rule_id.partner_id.name))
+                raise Warning(_("%s is already assigned to work at '%s %s - %s' for %s!\n"
+                    "You tried to assign %s to work at '%s %s - %s' for %s'.") % 
+                    (empl.name, self.get_weekday(item.cleaning_day), 
+                        item.clean_time_from, item.clean_time_to, item.rule_id.partner_id.name,
+                        empl.name, self.get_weekday(self.cleaning_day), self.clean_time_from, 
+                        self.clean_time_to, self.rule_id.partner_id.name))
 
 
 class calendar_service_recurrent(models.Model):
@@ -285,9 +306,6 @@ class calendar_service_recurrent(models.Model):
                             cal_rec.get_weekday(cal_rec.cleaning_day, name=False), cal_rec.clean_time_from)
                         end_time = cal_rec.relative_date(ref_time, 
                             cal_rec.get_weekday(cal_rec.cleaning_day, name=False), cal_rec.clean_time_to)
-                        print 'start_time:', start_time
-                        print 'ref_time: ', ref_time
-                        print 'now1: ', now1
                         if start_time >= now1:
                             service = service_obj.create({
                                 'start_time': start_time, 'end_time': end_time,
