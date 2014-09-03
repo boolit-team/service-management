@@ -89,18 +89,39 @@ class calendar_service_work(models.Model):
             self.work_type = self.service_id.work_type
             self.partner_id = self.service_id.partner_id and self.service_id.partner_id.id or False
 
-    @api.constrains('start_time', 'end_time', 'employee_id')
+    @api.one
+    @api.constrains('start_time', 'end_time', 'employee_id', 'state', 'work_type')
     def _check_resource(self):
         cal_serv_cal = self.env['calendar.service.calendar']
         recs = self.search([('id', '!=', self.id), 
-            ('employee_id', '=', self.employee_id.id), ('state', '=', 'open'), 
+            ('employee_id', '=', self.employee_id.id), ('state', '=', 'open'), ('work_type', '!=', 'wait'), 
             ('start_time', '<', self.end_time), ('end_time', '>', self.start_time)])
         for rec in recs:
             start_time = cal_serv_cal.set_tz(datetime.strptime(rec.start_time, "%Y-%m-%d %H:%M:%S"))
-            #start_time = start_time.strftime
             end_time = cal_serv_cal.set_tz(datetime.strptime(rec.end_time, "%Y-%m-%d %H:%M:%S"))
-            raise Warning(_("%s Already Assigned from %s to %s in Service %s for %s" % 
-                (rec.employee_id.name, start_time, end_time, rec.service_id.name, rec.partner_id.name)))
+            warn_str = "%s Already Assigned from %s to %s in Service %s for %s" % \
+                (rec.employee_id.name, start_time, end_time, rec.service_id.name, rec.partner_id.name)
+            raise Warning(_(warn_str))
+        if self.state == 'open' and self.work_type != 'wait':
+            start_time = cal_serv_cal.set_tz(datetime.strptime(self.start_time, 
+                cal_serv_cal.get_dt_fmt()))
+            weekday = cal_serv_cal.get_rev_weekday(start_time.weekday()) #get weekday in calendar.service.calendar
+            start_h = start_time.hour
+            start_min = round(float(start_time.minute) / 60, 2)
+            time_from = float(start_h + start_min)
+            end_time = cal_serv_cal.set_tz(datetime.strptime(self.end_time, 
+                cal_serv_cal.get_dt_fmt()))
+            end_h = end_time.hour
+            end_min = round(float(end_time.minute) / 60, 2)
+            time_to = float(end_h + end_min)
+            cal_recs = cal_serv_cal.search([('employee_ids', 'in', [self.employee_id.id]), 
+                ('weekday', '=', weekday), ('time_from', '<', time_to), 
+                ('time_to', '>', time_from)])
+            for cal_rec in cal_recs:
+                raise Warning(_("There is rule already defined for \n"
+                    "%s to work at %s from %s to %s !" % (self.employee_id.name, 
+                    cal_serv_cal.get_weekday(weekday), cal_rec.time_from, cal_rec.time_to)))
+            
 
 class calendar_service(models.Model):
     _name = 'calendar.service'
@@ -124,7 +145,7 @@ class calendar_service(models.Model):
     prior_notify_specify = fields.Char('Specify')
     no_notify = fields.Selection(NO_NOTIFY, 'No Notification')
     no_notify_speficy = fields.Char('Specify')
-    cleaning_calendar_ids = fields.One2many('crm.lead.cleaning_calendar', 'service_id', 'Cleaning Time')
+    cleaning_calendar_ids = fields.One2many('crm.lead.cleaning_calendar', 'service_id', 'Work Time')
     canceled_until = fields.Date('Canceled Until')
     opportunity_id = fields.Many2one('crm.lead', 'Related Opportunity', domain=[('type', '=', 'opportunity')])
     user_id = fields.Many2one('res.users', 'Salesman')
@@ -135,6 +156,14 @@ class calendar_service(models.Model):
         if vals.get('name','/')=='/':
             vals['name'] = self.env['ir.sequence'].get('calendar.service') or '/'
         return super(calendar_service, self).create(vals)
+
+    @api.multi
+    def write(self, vals):
+        for rec in self:
+            if vals.get('work_type'):
+                for work in rec.work_ids:
+                    work.work_type = vals.get('work_type')
+        return super(calendar_service, self).write(vals)
 
     @api.one
     def close_state(self):
@@ -153,9 +182,9 @@ class calendar_service_calendar(models.Model):
     _description = 'Calendar Service Working Time'
 
     name = fields.Char('Calendar', size=64)
-    cleaning_day = fields.Selection(WEEK_DAYS, 'Week Day', required=True)
-    clean_time_from = fields.Float('From', required=True)
-    clean_time_to = fields.Float('To', required=True)
+    weekday = fields.Selection(WEEK_DAYS, 'Week Day', required=True)
+    time_from = fields.Float('From', required=True)
+    time_to = fields.Float('To', required=True)
     employee_ids = fields.Many2many('hr.employee', 'hr_employee_calendar_rel', 'calendar_id', 'employee_id', 'Employees')
     rule_id = fields.Many2one('calendar.service.recurrent.rule', 'Rule')
 
@@ -168,8 +197,8 @@ class calendar_service_calendar(models.Model):
                 rec_name = []
                 if record.name:
                     rec_name.append(record.name)
-                rec_name.append(self.get_weekday(record.cleaning_day))
-                rec_name.append("%s - %s" % (record.clean_time_from, record.clean_time_to))
+                rec_name.append(self.get_weekday(record.weekday))
+                rec_name.append("%s - %s" % (record.time_from, record.time_to))
                 if record.rule_id.partner_id:
                     rec_name.append("/ %s" % (record.rule_id.partner_id.name))
                 result.append((record.id, ", ".join(rec_name)))    
@@ -204,7 +233,25 @@ class calendar_service_calendar(models.Model):
             }            
         return weekdays[key]
 
-    #@api.model
+    @api.model
+    def get_rev_weekday(self, key):
+        """
+        Returns weekday letter from weekday 
+        number (reverse of get_weekday())
+        """
+        weekdays = {
+            0: 'M', 1: 'T', 2: 'W',
+            3: 'Th', 4: 'F', 5: 'S',
+            6: 'Sn',
+        }
+        return weekdays[key]            
+
+    @api.model
+    def get_dt_fmt(self):
+        """
+        returns standard datetime format
+        """
+        return "%Y-%m-%d %H:%M:%S"
 
     @api.model
     def set_utc(self, dt, check_tz=True):
@@ -230,26 +277,26 @@ class calendar_service_calendar(models.Model):
         return dt
 
     @api.one
-    @api.constrains('clean_time_to', 'clean_time_from')
+    @api.constrains('time_to', 'time_from')
     def _check_calendar(self):
-        if self.clean_time_to < self.clean_time_from:
-            raise Warning(_("Cleaning End time can\'t be lower than Start!"))
+        if self.time_to < self.time_from:
+            raise Warning(_("End time can\'t be lower than Start!"))
 
     @api.one
-    @api.constrains('cleaning_day', 'clean_time_from', 'clean_time_to', 'employee_ids')
+    @api.constrains('weekday', 'time_from', 'time_to', 'employee_ids')
     def _check_resource(self):
         for empl in self.employee_ids:
             items = self.search(
                 [('id', '!=', self.id), ('employee_ids', 'in', [empl.id]), 
-                ('cleaning_day', '=', self.cleaning_day), ('clean_time_from', '<', self.clean_time_to), 
-                ('clean_time_to', '>', self.clean_time_from)])
+                ('weekday', '=', self.weekday), ('time_from', '<', self.time_to), 
+                ('time_to', '>', self.time_from)])
             for item in items:
                 raise Warning(_("%s is already assigned to work at '%s %s - %s' for %s!\n"
                     "You tried to assign %s to work at '%s %s - %s' for %s'.") % 
-                    (empl.name, self.get_weekday(item.cleaning_day), 
-                        item.clean_time_from, item.clean_time_to, item.rule_id.partner_id.name,
-                        empl.name, self.get_weekday(self.cleaning_day), self.clean_time_from, 
-                        self.clean_time_to, self.rule_id.partner_id.name))
+                    (empl.name, self.get_weekday(item.weekday), 
+                        item.time_from, item.time_to, item.rule_id.partner_id.name,
+                        empl.name, self.get_weekday(self.weekday), self.time_from, 
+                        self.time_to, self.rule_id.partner_id.name))
 
 
 class calendar_service_recurrent(models.Model):
@@ -303,9 +350,9 @@ class calendar_service_recurrent(models.Model):
                         else:
                             ref_time = datetime.today() + timedelta(weeks=week)                            
                         start_time = cal_rec.relative_date(ref_time, 
-                            cal_rec.get_weekday(cal_rec.cleaning_day, name=False), cal_rec.clean_time_from)
+                            cal_rec.get_weekday(cal_rec.weekday, name=False), cal_rec.time_from)
                         end_time = cal_rec.relative_date(ref_time, 
-                            cal_rec.get_weekday(cal_rec.cleaning_day, name=False), cal_rec.clean_time_to)
+                            cal_rec.get_weekday(cal_rec.weekday, name=False), cal_rec.time_to)
                         if start_time >= now1:
                             service = service_obj.create({
                                 'start_time': start_time, 'end_time': end_time,

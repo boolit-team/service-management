@@ -36,9 +36,9 @@
                         </group>
                         <field name="calendar_ids">
                             <tree string="Cleaning Time" editable="bottom">
-                                <field name="cleaning_day"/>
-                                <field name="clean_time_from" widget="float_time"/>
-                                <field name="clean_time_to" widget="float_time"/>
+                                <field name="weekday"/>
+                                <field name="time_from" widget="float_time"/>
+                                <field name="time_to" widget="float_time"/>
                                 <field name="employee_ids" widget="many2many_tags"/>
                             </tree>
                         </field>                    

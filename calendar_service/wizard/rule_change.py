@@ -40,7 +40,7 @@ class recurrent_rule_change_time(models.TransientModel):
 
     calendar_id = fields.Many2one('calendar.service.calendar', 'Cleaning Time')
     action = fields.Selection([('delete', 'Delete'), ('update', 'Update'), ('add', 'Add')], 'Action', required=True)
-    day = fields.Selection(WEEK_DAYS, 'Week Day')
+    weekday = fields.Selection(WEEK_DAYS, 'Week Day')
     time_from = fields.Float('Change From')
     time_to = fields.Float('Change To')
     change_id = fields.Many2one('recurrent.rule.change', 'Rule Change')
@@ -74,9 +74,9 @@ class recurrent_rule_change(models.TransientModel):
             for empl in change_time.employee_ids:
                 employee_ids.append(empl.id)            
             cal_serv_cal.create({
-                'cleaning_day': change_time.day, 
-                'clean_time_from': change_time.time_from, 
-                'clean_time_to': change_time.time_to, 
+                'weekday': change_time.weekday, 
+                'time_from': change_time.time_from, 
+                'time_to': change_time.time_to, 
                 'employee_ids': [(6, 0, employee_ids)],
                 'rule_id': self.rule_id.id,
             })
@@ -89,9 +89,9 @@ class recurrent_rule_change(models.TransientModel):
         for week in range(change_time.weeks+1): 
             ref_time = datetime.today() + timedelta(weeks=week) 
             start_time = change_time.calendar_id.relative_date(
-                ref_time, cal_serv_cal.get_weekday(change_time.day, name=False), change_time.time_from)
+                ref_time, cal_serv_cal.get_weekday(change_time.weekday, name=False), change_time.time_from)
             end_time = change_time.calendar_id.relative_date(
-                ref_time, cal_serv_cal.get_weekday(change_time.day, name=False), change_time.time_to)
+                ref_time, cal_serv_cal.get_weekday(change_time.weekday, name=False), change_time.time_to)
             #filters with interval to only add inside generated calendars events
             if (start_time >= now1) and (start_time >= date_from) and (end_time <= next_gen_time):
                 serv_vals = {
@@ -151,10 +151,10 @@ class recurrent_rule_change(models.TransientModel):
                     elif change_time.action == 'update':
                         start_time = cal_serv_cal.relative_date(
                             datetime.strptime(service.start_time, "%Y-%m-%d %H:%M:%S"), 
-                            cal_serv_cal.get_weekday(change_time.day, name=False), change_time.time_from)
+                            cal_serv_cal.get_weekday(change_time.weekday, name=False), change_time.time_from)
                         end_time = cal_serv_cal.relative_date(
                             datetime.strptime(service.end_time, "%Y-%m-%d %H:%M:%S"), 
-                            cal_serv_cal.get_weekday(change_time.day, name=False), change_time.time_to)
+                            cal_serv_cal.get_weekday(change_time.weekday, name=False), change_time.time_to)
                         if start_time >= now1:
                             service.write({'start_time': start_time, 'end_time': end_time})
                             for work in service.work_ids:
@@ -163,10 +163,10 @@ class recurrent_rule_change(models.TransientModel):
                     if change_time.action == 'delete':
                         change_time.calendar_id.unlink()
                     elif change_time.action == 'update':
-                        rule_changes.append({'id': change_time.calendar_id.id,'cleaning_day': change_time.day, 
-                            'clean_time_from': change_time.time_from, 'clean_time_to': change_time.time_to})
+                        rule_changes.append({'id': change_time.calendar_id.id,'weekday': change_time.weekday, 
+                            'time_from': change_time.time_from, 'time_to': change_time.time_to})
             for change in rule_changes: #Applying write at the end of the method to bypass null constraint violation
                 item = cal_serv_cal.search([('id', '=', change['id'])])
                 if item:
-                    item.write({'cleaning_day': change['cleaning_day'], 
-                        'clean_time_from': change['clean_time_from'], 'clean_time_to': change['clean_time_to']})
+                    item.write({'weekday': change['weekday'], 
+                        'time_from': change['time_from'], 'time_to': change['time_to']})

@@ -16,7 +16,7 @@
                                     widget="selection" 
                                     attrs="{'invisible': [('action', '=', 'add')], 'required': [('action', 'in', ('update', 'delete'))]}"
                                     domain="[('rule_id', '=', rule_id)]"/>                                
-                                <field name="day" 
+                                <field name="weekday" 
                                     attrs="{'invisible': [('action', '=', 'delete')], 'required': [('action', 'in', ('update', 'add'))]}"/>                                                                  
                                 <field name="weeks" 
                                     attrs="{'invisible': [('action', '!=', 'add')], 'required': [('action', '=', 'add')]}"/>                                            
@@ -61,7 +61,7 @@
                             <tree string="Change Times">
                                 <field name="action"/>
                                 <field name="calendar_id"/>                                
-                                <field name="day"/>                                
+                                <field name="weekday"/>                                
                                 <field name="time_from" widget="float_time" />
                                 <field name="time_to" widget="float_time"/>
                             </tree>
