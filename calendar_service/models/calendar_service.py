@@ -116,9 +116,10 @@ class calendar_service_work(models.Model):
             end_h = end_time.hour
             end_min = round(float(end_time.minute) / 60, 2)
             time_to = float(end_h + end_min)
+            recurrent = self.env['calendar.service.recurrent'].search([('active', '=', True)])
             cal_recs = cal_serv_cal.search([('employee_ids', 'in', [self.employee_id.id]), 
-                ('weekday', '=', weekday), ('time_from', '<', time_to), 
-                ('time_to', '>', time_from)])
+                ('rule_id.recurrent_id', '=', recurrent.id), ('weekday', '=', weekday), 
+                ('time_from', '<', time_to), ('time_to', '>', time_from)])
             for cal_rec in cal_recs:
                 raise Warning(_("There is rule already defined for \n"
                     "%s to work at %s from %s to %s !" % (self.employee_id.name, 
