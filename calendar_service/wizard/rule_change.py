@@ -93,6 +93,11 @@ class recurrent_rule_change(models.TransientModel):
             end_time = change_time.calendar_id.relative_date(
                 ref_time, cal_serv_cal.get_weekday(change_time.weekday, name=False), change_time.time_to)
             #filters with interval to only add inside generated calendars events
+            print 'start_time ', start_time
+            print 'now1 ', now1
+            print 'date_from ', date_from
+            print 'end_time ', end_time
+            print 'next_gen_time ', next_gen_time            
             if (start_time >= now1) and (start_time >= date_from) and (end_time <= next_gen_time):
                 serv_vals = {
                     'start_time': start_time, 'end_time': end_time,

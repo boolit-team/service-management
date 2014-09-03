@@ -105,7 +105,6 @@ class calendar_service_work(models.Model):
             raise Warning(_(warn_str))
         #Checks Rules if that time is already reserved for any of it
         if self.state == 'open' and self.work_type != 'wait' and not self.ign_rule_chk:
-            cal_serv_cal = self.env['calendar.service.calendar']
             start_time = cal_serv_cal.set_tz(datetime.strptime(self.start_time, 
                 cal_serv_cal.get_dt_fmt()))
             weekday = cal_serv_cal.get_rev_weekday(start_time.weekday()) #get weekday in calendar.service.calendar
@@ -388,8 +387,8 @@ class calendar_service_recurrent(models.Model):
         recurrent_ids = self.search(cr, uid, [('active', '=', True)], context=context)
         if recurrent_ids:
             recurrent = self.browse(cr, uid, recurrent_ids, context=context)[0]
-            if not recurrent.next_gen_time or datetime.today() >= datetime.strptime(recurrent.next_gen_time, "%Y-%m-%d %H:%M:%S"):
-                self.generate_recurrent(cr, uid, recurrent.id, context=context) 
+            #if not recurrent.next_gen_time or datetime.today() >= datetime.strptime(recurrent.next_gen_time, "%Y-%m-%d %H:%M:%S"):
+            self.generate_recurrent(cr, uid, recurrent.id, context=context) 
 
 
     @api.one
