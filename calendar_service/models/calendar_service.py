@@ -63,6 +63,7 @@ class calendar_service_work(models.Model):
     service_id = fields.Many2one('calendar.service', 'Service', ondelete='cascade')
     work_type = fields.Selection(WORK_TYPE, 'Type', required=True)
     state = fields.Selection(STATE, 'State', readonly=True, default='open', track_visibility='onchange')
+    ign_rule_chk = fields.Boolean('Ignore Rule Check')
 
     @api.one
     def close_state(self):
@@ -102,7 +103,9 @@ class calendar_service_work(models.Model):
             warn_str = "%s Already Assigned from %s to %s in Service %s for %s" % \
                 (rec.employee_id.name, start_time, end_time, rec.service_id.name, rec.partner_id.name)
             raise Warning(_(warn_str))
-        if self.state == 'open' and self.work_type != 'wait':
+        #Checks Rules if that time is already reserved for any of it
+        if self.state == 'open' and self.work_type != 'wait' and not self.ign_rule_chk:
+            cal_serv_cal = self.env['calendar.service.calendar']
             start_time = cal_serv_cal.set_tz(datetime.strptime(self.start_time, 
                 cal_serv_cal.get_dt_fmt()))
             weekday = cal_serv_cal.get_rev_weekday(start_time.weekday()) #get weekday in calendar.service.calendar
@@ -365,7 +368,8 @@ class calendar_service_recurrent(models.Model):
                                     'employee_id': empl.id, 'work_type': 'recurrent',
                                     'address_archive_id': current_address.id,
                                     'partner_id': rule.partner_id.id, 'note': rule.partner_id.comment, 
-                                    'attention': rule.partner_id.attention, 'service_id': service.id,                                
+                                    'attention': rule.partner_id.attention, 'service_id': service.id,
+                                    'ign_rule_chk': True, #ign_rule_chk lets prevent istelf constraining.                                
                                 })                              
             # Set next generate time
             self.set_next_gen_time()

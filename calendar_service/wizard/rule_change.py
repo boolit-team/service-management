@@ -107,7 +107,8 @@ class recurrent_rule_change(models.TransientModel):
                     'employee_id': empl.id, 'work_type': 'recurrent',
                     'address_archive_id': current_address.id,
                     'partner_id': self.rule_id.partner_id.id, 'note': self.rule_id.partner_id.comment, 
-                    'attention': self.rule_id.partner_id.attention, 'service_id': service.id,})
+                    'attention': self.rule_id.partner_id.attention, 'service_id': service.id,
+                    'ign_rule_chk': True}) #ign_rule_chk lets prevent istelf constraining.
 
 
     @api.one
