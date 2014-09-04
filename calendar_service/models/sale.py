@@ -20,7 +20,7 @@
 #
 ##############################################################################
 
-from openerp import models, fields
+from openerp import models, fields, api
 from openerp.exceptions import Warning
 from openerp.tools.translate import _
 
@@ -28,3 +28,10 @@ class sale_order(models.Model):
     _inherit = 'sale.order'
 
     calendar_service_id = fields.Many2one('calendar.service', 'Calendar Service')
+
+    @api.one
+    def action_button_confirm(self):
+        if self.calendar_service_id and self.calendar_service_id.state != 'done':
+            raise Warning(_("Related Calendar Service with No. %s is not in Done State!" % \
+                (self.calendar_service_id.name)))
+        return super(sale_order, self).action_button_confirm()

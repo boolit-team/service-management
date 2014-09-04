@@ -185,7 +185,7 @@ class calendar_service(models.Model):
             time_diff = end_time - start_time
             qty = round(time_diff.total_seconds() / 3600, 3)            
             line_vals = {'product_id': self.product_id.id, 'product_uom_qty': qty,}                      
-            if not self.order_id:
+            if not self.order_id or (self.order_id and self.order_id.state == 'cancel'):
                 order = order_obj.create(vals)
                 self.order_id = order.id
                 line_vals['order_id'] = order.id
@@ -206,6 +206,8 @@ class calendar_service(models.Model):
 
     @api.one
     def open_state(self):
+        if self.order_id and self.order_id.state not in ('draft', 'cancel'):
+            raise Warning(_("Can't open Service, because \nSale Order is not in Draft or Cancelled state!"))
         self.state = 'open'
         for work in self.work_ids:
             work.state = 'open'
