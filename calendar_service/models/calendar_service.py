@@ -153,6 +153,9 @@ class calendar_service(models.Model):
     opportunity_id = fields.Many2one('crm.lead', 'Related Opportunity', domain=[('type', '=', 'opportunity')])
     user_id = fields.Many2one('res.users', 'Salesman')
     rule_calendar_id = fields.Many2one('calendar.service.calendar', 'Rule Calendar Item')
+    product_id = fields.Many2one('product.product', 'Service', domain=[('type', '=', 'service')])
+    order_id = fields.Many2one('sale.order', 'Sale Order')
+
 
     @api.model
     def create(self, vals):
@@ -170,6 +173,27 @@ class calendar_service(models.Model):
 
     @api.one
     def close_state(self):
+        if self.product_id:
+            cal_serv_cal = self.env['calendar.service.calendar']
+            order_obj = self.env['sale.order']                      
+            vals = {'partner_id': self.partner_id.id, 'date_order': self.end_time,
+                'pricelist_id': self.partner_id.property_product_pricelist.id,
+                'user_id': self.user_id.id, 'calendar_service_id': self.id,
+            }  
+            start_time = cal_serv_cal.str_to_dt(self.start_time)
+            end_time = cal_serv_cal.str_to_dt(self.end_time)  
+            time_diff = end_time - start_time
+            qty = round(time_diff.total_seconds() / 3600, 3)            
+            line_vals = {'product_id': self.product_id.id, 'product_uom_qty': qty,}                      
+            if not self.order_id:
+                order = order_obj.create(vals)
+                self.order_id = order.id
+                line_vals['order_id'] = order.id
+                self.env['sale.order.line'].create(line_vals)
+            elif self.order_id.state == 'draft':
+                order = self.order_id.write(vals)
+                for line in self.order_id.order_line:
+                    line.write(line_vals)
         self.state = 'done'
         for work in self.work_ids:
             work.state = 'done'
@@ -179,6 +203,20 @@ class calendar_service(models.Model):
         self.state = 'cancel'
         for work in self.work_ids:
             work.state = 'cancel'
+
+    @api.one
+    @api.constrains('work_ids')
+    def _check_works(self):
+        if not self.work_ids:
+            raise Warning(_("Works can't be Empty!"))
+
+    @api.one
+    @api.constrains('start_time', 'end_time')
+    def _check_time(self):
+        start_time = datetime.strptime(self.start_time, "%Y-%m-%d %H:%M:%S")
+        end_time = datetime.strptime(self.end_time, "%Y-%m-%d %H:%M:%S")
+        if end_time < start_time:
+            raise Warning(_("End Time can't be lower than Start Time!"))
 
 class calendar_service_calendar(models.Model):
     _name = 'calendar.service.calendar'
@@ -255,6 +293,14 @@ class calendar_service_calendar(models.Model):
         returns standard datetime format
         """
         return "%Y-%m-%d %H:%M:%S"
+
+    @api.model
+    def str_to_dt(self, string):
+        """
+        Converts String to Datetime
+        """        
+        dt = datetime.strptime(string, self.get_dt_fmt())
+        return dt
 
     @api.model
     def set_utc(self, dt, check_tz=True):

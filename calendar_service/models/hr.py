@@ -41,7 +41,8 @@ class hr_employee(models.Model):
             week_start = week_start.strftime("%Y-%m-%d %H:%M:%S")
             week_end = week_end.strftime("%Y-%m-%d %H:%M:%S")
             works = self.env['calendar.service.work'].search(
-                [('employee_id', '=', self.id), ('start_time', '>=', week_start), ('end_time', '<=', week_end)])
+                [('employee_id', '=', self.id), ('start_time', '>=', week_start), 
+                ('end_time', '<=', week_end), ('work_type', '=', 'open')])
             for work in works:
                 start_time = datetime.strptime(work.start_time, "%Y-%m-%d %H:%M:%S")
                 end_time = datetime.strptime(work.end_time, "%Y-%m-%d %H:%M:%S")
