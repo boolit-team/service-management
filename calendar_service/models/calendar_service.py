@@ -205,6 +205,12 @@ class calendar_service(models.Model):
             work.state = 'cancel'
 
     @api.one
+    def open_state(self):
+        self.state = 'open'
+        for work in self.work_ids:
+            work.state = 'open'
+
+    @api.one
     @api.constrains('work_ids')
     def _check_works(self):
         if not self.work_ids:

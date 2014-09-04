@@ -135,12 +135,16 @@
                     <header>
                         <button name="close_state" string="Done" type="object"
                             help="Finish Service" class="oe_highlight"
-                            attrs="{'invisible': [('state', '=', 'done')]}"
+                            attrs="{'invisible': [('state', '!=', 'open')]}"
                         /> 
                         <button name="cancel_state" string="Cancel" type="object"
                             help="Cancel Service" class="oe_highlight"
-                            attrs="{'invisible': [('state', '=', 'cancel')]}"
-                        /> 
+                            attrs="{'invisible': [('state', '!=', 'open')]}"
+                        />
+                        <button name="open_state" string="Open" type="object"
+                            help="Open Service" class="oe_highlight"
+                            attrs="{'invisible': [('state', '=', 'open')]}"
+                        />                         
                         <field name="state" widget="statusbar"/>                     
                     </header>
                     <sheet>
@@ -150,17 +154,18 @@
                         </div>                        
                         <group>
                             <group>
-                                <field name="start_time"/>
-                                <field name="end_time"/>
-                                <field name="user_id"/>
-                                <field name="opportunity_id"/>
+                                <field name="start_time" attrs="{'readonly': [('state', '!=', 'open')]}"/>
+                                <field name="end_time" attrs="{'readonly': [('state', '!=', 'open')]}"/>
+                                <field name="user_id" attrs="{'readonly': [('state', '!=', 'open')]}"/>
+                                <field name="opportunity_id" attrs="{'readonly': [('state', '!=', 'open')]}"/>
                             </group>
                             <group>
-                                <field name="partner_id"/>
-                                <field name="product_id"/>
-                                <field name="work_type"/>
+                                <field name="partner_id" attrs="{'readonly': [('state', '!=', 'open')]}"/>
+                                <field name="product_id" attrs="{'readonly': [('state', '!=', 'open')]}"/>
+                                <field name="order_id" attrs="{'readonly': True, 'invisible': [('order_id', '=', False)]}"/>
+                                <field name="work_type" attrs="{'readonly': [('state', '!=', 'open')]}"/>
                                 <field name="one_time"
-                                    attrs="{'invisible': [('work_type', '!=', 'one')]}"
+                                    attrs="{'invisible': [('work_type', '!=', 'one')], 'readonly': [('state', '!=', 'open')]}"
                                 />
                             </group>
                         </group>
@@ -169,6 +174,7 @@
                                 <group>                                                   
                                     <field name="work_ids"
                                         context="{'default_service_id': id}"
+                                        attrs="{'readonly': [('state', '!=', 'open')]}"
                                     />
                                 </group>
                             </page>
