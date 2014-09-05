@@ -47,7 +47,7 @@ class recurrent_rule_change_time(models.TransientModel):
     employee_ids = fields.Many2many('hr.employee', 'hr_employee_change_time_rel', 'change_time_id', 'employee_id', 'Employees')
     weeks = fields.Integer('Weeks', help="How many weeks to generate."
         "\n0 means generate only this week starting from now + 1 hour", default=0)
-    rule_id = fields.Many2one('calendar.service.recurrent.rule', 'Rule')   
+    rule_id = fields.Many2one('calendar.service.recurrent.rule', 'Rule')
 
 class recurrent_rule_change(models.TransientModel):
     _name = 'recurrent.rule.change'
@@ -69,11 +69,12 @@ class recurrent_rule_change(models.TransientModel):
         if change_time.weeks < 0:
             raise Warning(_("Weeks can't be negative!"))
         cal_serv_cal = self.env['calendar.service.calendar']
+        cal_rec = None
         if self.change_type == 'permanent':
             employee_ids = []
             for empl in change_time.employee_ids:
                 employee_ids.append(empl.id)            
-            cal_serv_cal.create({
+            cal_rec = cal_serv_cal.create({
                 'weekday': change_time.weekday, 
                 'time_from': change_time.time_from, 
                 'time_to': change_time.time_to, 
@@ -94,22 +95,10 @@ class recurrent_rule_change(models.TransientModel):
                 ref_time, cal_serv_cal.get_weekday(change_time.weekday, name=False), change_time.time_to)
             #filters with interval to only add inside generated calendars events          
             if (start_time >= now1) and (start_time >= date_from) and (end_time <= next_gen_time):
-                serv_vals = {
-                    'start_time': start_time, 'end_time': end_time,
-                    'user_id': self.rule_id.user_id.id, 'work_type': 'recurrent',
-                    'rule_calendar_id': cal_serv_cal.id,'partner_id': self.rule_id.partner_id.id,
-                }
-                service = self.env['calendar.service'].create(serv_vals)
-                service_work = self.env['calendar.service.work']
-                for empl in change_time.employee_ids:                    
-                    service_work.create({
-                    'start_time': start_time, 'end_time': end_time,
-                    'employee_id': empl.id, 'work_type': 'recurrent',
-                    'address_archive_id': current_address.id,
-                    'partner_id': self.rule_id.partner_id.id, 'note': self.rule_id.partner_id.comment, 
-                    'attention': self.rule_id.partner_id.attention, 'service_id': service.id,
-                    'ign_rule_chk': True}) #ign_rule_chk lets prevent istelf constraining.
-
+                service_obj = self.env['calendar.service']
+                service_work_obj = self.env['calendar.service.work']
+                self.rule_id.recurrent_id.create_service(service_obj, service_work_obj, 
+                    start_time, end_time, cal_rec, self.rule_id, current_address, change_time)
 
     @api.one
     def change_rule(self):
@@ -120,7 +109,7 @@ class recurrent_rule_change(models.TransientModel):
         for records that would otherwise be changed into past time.
         """
         if not self.rule_id.recurrent_id.next_gen_time:
-            raise Warning(_("You have to generate Recurrent Calendar first!"))
+            raise Warning(_("Either Recurrent Calendar is not generated \nor Chosen Rule is missing!"))
         if self.date_from and self.rule_id:
             service_domain = []
             if self.date_to:

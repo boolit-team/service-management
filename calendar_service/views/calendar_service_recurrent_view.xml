@@ -39,6 +39,8 @@
                                 <field name="weekday"/>
                                 <field name="time_from" widget="float_time"/>
                                 <field name="time_to" widget="float_time"/>
+                                <field name="second_week"/>
+                                <field name="last_week_gen" attrs="{'invisible': [('second_week', '=', False)]}"/>
                                 <field name="employee_ids" widget="many2many_tags"/>
                             </tree>
                         </field>                    

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <record id="view_order_form_inherit1" model="ir.ui.view">
+            <field name="name">sale.order.form.inherit1</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+                <field name="pricelist_id" position="after">
+                    <field name="calendar_service_id" attrs="{'readonly': True, 'invisible': [('calendar_service_id', '=', False)]}"/>
+                </field>
+            </field>
+        </record>
+    </data>
+</openerp>

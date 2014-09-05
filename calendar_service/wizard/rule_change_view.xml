@@ -75,7 +75,7 @@
         </record>
 
         <record id="act_recurrent_rule_change" model="ir.actions.act_window">
-            <field name="name">Medical Card History</field>
+            <field name="name">Recurrent Rule Change</field>
             <field name="res_model">recurrent.rule.change</field>
             <!--<field name="src_model">calendar.service.recurrent</field>-->
             <field name="type">ir.actions.act_window</field>

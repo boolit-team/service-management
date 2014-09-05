@@ -44,6 +44,7 @@
         'views/hr_contract_view.xml',
         'views/hr_view.xml',
         'views/res_partner_view.xml',
+        'views/sale_view.xml',
         'data/sequences.xml',
         'data/schedulers.xml',        
 

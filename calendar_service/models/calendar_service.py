@@ -117,10 +117,21 @@ class calendar_service_work(models.Model):
             end_min = round(float(end_time.minute) / 60, 2)
             time_to = float(end_h + end_min)
             recurrent = self.env['calendar.service.recurrent'].search([('active', '=', True)])
+            if recurrent and not recurrent.next_gen_time:
+                raise Warning(_("You need to Initially generate Recurrent Calendar\n"
+                    "before creating any services or works!"))
+            next_gen_time = cal_serv_cal.set_tz(cal_serv_cal.str_to_dt(recurrent.next_gen_time))
             cal_recs = cal_serv_cal.search([('employee_ids', 'in', [self.employee_id.id]), 
                 ('rule_id.recurrent_id', '=', recurrent.id), ('weekday', '=', weekday), 
                 ('time_from', '<', time_to), ('time_to', '>', time_from)])
             for cal_rec in cal_recs:
+                if cal_rec.second_week and start_time >= next_gen_time:
+                    next_gen_time_m = next_gen_time - timedelta(days=next_gen_time.weekday())
+                    start_time_m = start_time - timedelta(days=start_time.weekday())
+                    week_diff = (start_time_m - next_gen_time_m).days / 7 #get difference in weeks
+                    #check if week is reserved or not
+                    if (week_diff % 2 == 0 and cal_rec.last_week_gen) or (week_diff % 2 != 0 and not cal_rec.last_week_gen):
+                        continue
                 raise Warning(_("There is rule already defined for \n"
                     "%s to work at %s from %s to %s !" % (self.employee_id.name, 
                     cal_serv_cal.get_weekday(weekday), cal_rec.time_from, cal_rec.time_to)))
@@ -173,6 +184,10 @@ class calendar_service(models.Model):
 
     @api.one
     def close_state(self):
+        """
+        When closing service, it also creates/updates Sale Order
+        if product_id is set on service.
+        """
         if self.product_id:
             cal_serv_cal = self.env['calendar.service.calendar']
             order_obj = self.env['sale.order']                      
@@ -183,7 +198,7 @@ class calendar_service(models.Model):
             start_time = cal_serv_cal.str_to_dt(self.start_time)
             end_time = cal_serv_cal.str_to_dt(self.end_time)  
             time_diff = end_time - start_time
-            qty = round(time_diff.total_seconds() / 3600, 3)            
+            qty = round(time_diff.total_seconds() / 3600, 3) #converting duration as qty in hours            
             line_vals = {'product_id': self.product_id.id, 'product_uom_qty': qty,}                      
             if not self.order_id or (self.order_id and self.order_id.state == 'cancel'):
                 order = order_obj.create(vals)
@@ -200,6 +215,8 @@ class calendar_service(models.Model):
 
     @api.one
     def cancel_state(self):
+        if not self.state == 'open':
+            raise Warning(_("You can't cancel Service that is not in 'open' state!"))
         self.state = 'cancel'
         for work in self.work_ids:
             work.state = 'cancel'
@@ -236,6 +253,8 @@ class calendar_service_calendar(models.Model):
     time_to = fields.Float('To', required=True)
     employee_ids = fields.Many2many('hr.employee', 'hr_employee_calendar_rel', 'calendar_id', 'employee_id', 'Employees')
     rule_id = fields.Many2one('calendar.service.recurrent.rule', 'Rule')
+    second_week = fields.Boolean('Every Second Week')
+    last_week_gen = fields.Boolean('Last Week Generated')
 
     @api.multi
     def name_get(self):
@@ -340,7 +359,8 @@ class calendar_service_calendar(models.Model):
             raise Warning(_("End time can\'t be lower than Start!"))
 
     @api.one
-    @api.constrains('weekday', 'time_from', 'time_to', 'employee_ids')
+    @api.constrains('weekday', 'time_from', 'time_to', 'employee_ids', 'second_week', 
+        'last_week_gen', 'rule_id.recurrent_id.ign_second_week')
     def _check_resource(self):
         for empl in self.employee_ids:
             items = self.search(
@@ -348,6 +368,9 @@ class calendar_service_calendar(models.Model):
                 ('weekday', '=', self.weekday), ('time_from', '<', self.time_to), 
                 ('time_to', '>', self.time_from)])
             for item in items:
+                if self.second_week and item.second_week and (self.last_week_gen != item.last_week_gen) or \
+                    self.rule_id.recurrent_id.ign_second_week:
+                    continue               
                 raise Warning(_("%s is already assigned to work at '%s %s - %s' for %s!\n"
                     "You tried to assign %s to work at '%s %s - %s' for %s'.") % 
                     (empl.name, self.get_weekday(item.weekday), 
@@ -368,6 +391,13 @@ class calendar_service_recurrent(models.Model):
     weeks = fields.Integer('Weeks', default=1)
     next_gen_time = fields.Datetime('Next Generate Time', readonly=False)
     init = fields.Boolean('Init')
+    ign_second_week = fields.Boolean('Ignore Second Week Check') #used to second week constrain when generating calendar
+    @api.model
+    def create(self, vals):
+        recurrents = self.search([])
+        if recurrents:
+            raise Warning(_("Only one Recurrent Calendar Configuration\ncan be active at a time!"))
+        return super(calendar_service_recurrent, self).create(vals)
 
     @api.model
     def _get_week_range(self):
@@ -378,16 +408,38 @@ class calendar_service_recurrent(models.Model):
 
     @api.one
     def set_next_gen_time(self):
+        cal_serv_cal = self.env['calendar.service.calendar']
         if self.init:
-            cal_serv_cal = self.env['calendar.service.calendar']
             weeks = self.init_weeks + 1 # we need to jump to the next week after the last one generated (+1).
             next_gen_time = datetime.today() + timedelta(weeks=weeks)
             next_gen_time = next_gen_time - timedelta(days=next_gen_time.weekday()) #Set it to monday
             next_gen_time = next_gen_time.replace(hour=0, minute=0, second=0, microsecond=0)
             next_gen_time = cal_serv_cal.set_utc(next_gen_time) #set time back to UTC
         else:
-            next_gen_time = datetime.strptime(self.next_gen_time, "%Y-%m-%d %H:%M:%S") + timedelta(weeks=self.weeks)
-        self.next_gen_time = next_gen_time        
+            next_gen_time = cal_serv_cal.str_to_dt(self.next_gen_time) + timedelta(weeks=self.weeks, days=1) #+1 day to be sure to jump to another week
+            next_gen_time = next_gen_time - timedelta(days=next_gen_time.weekday())
+            next_gen_time = cal_serv_cal.set_utc(next_gen_time.replace(hour=0, minute=0, second=0, microsecond=0))
+        self.next_gen_time = next_gen_time     
+
+    @api.one
+    def create_service(self,service_obj, service_work_obj, start_time, end_time, 
+        cal_rec, rule, current_address, change_time=None):
+        service = service_obj.create({
+            'start_time': start_time, 'end_time': end_time,
+            'user_id': rule.user_id.id, 'work_type': 'recurrent',
+            'rule_calendar_id': cal_rec.id,'partner_id': rule.partner_id.id,
+        })
+        if change_time:
+            cal_rec = change_time
+        for empl in cal_rec.employee_ids:
+            service_work_obj.create({
+                'start_time': start_time, 'end_time': end_time,
+                'employee_id': empl.id, 'work_type': 'recurrent',
+                'address_archive_id': current_address.id,
+                'partner_id': rule.partner_id.id, 'note': rule.partner_id.comment, 
+                'attention': rule.partner_id.attention, 'service_id': service.id,
+                'ign_rule_chk': True, #ign_rule_chk lets prevent istelf constraining.                                
+            })          
 
     @api.one
     def generate_recurrent(self):
@@ -396,6 +448,7 @@ class calendar_service_recurrent(models.Model):
             now1 = cal_serv_cal.set_utc(datetime.today() + timedelta(hours=1), check_tz=False)
             service_obj = self.env['calendar.service']
             service_work_obj = self.env['calendar.service.work']
+            self.ign_second_week = True #to let interchanging last_week_gen value
             for rule in self.rule_ids:
                 current_address = self.env['res.partner.address_archive'].search(
                     [('partner_id', '=', rule.partner_id.id), ('current', '=', True)])
@@ -411,24 +464,19 @@ class calendar_service_recurrent(models.Model):
                         end_time = cal_rec.relative_date(ref_time, 
                             cal_rec.get_weekday(cal_rec.weekday, name=False), cal_rec.time_to)
                         if start_time >= now1:
-                            service = service_obj.create({
-                                'start_time': start_time, 'end_time': end_time,
-                                'user_id': rule.user_id.id, 'work_type': 'recurrent',
-                                'rule_calendar_id': cal_rec.id,'partner_id': rule.partner_id.id,
-                            })
-                            for empl in cal_rec.employee_ids:
-                                service_work_obj.create({
-                                    'start_time': start_time, 'end_time': end_time,
-                                    'employee_id': empl.id, 'work_type': 'recurrent',
-                                    'address_archive_id': current_address.id,
-                                    'partner_id': rule.partner_id.id, 'note': rule.partner_id.comment, 
-                                    'attention': rule.partner_id.attention, 'service_id': service.id,
-                                    'ign_rule_chk': True, #ign_rule_chk lets prevent istelf constraining.                                
-                                })                              
+                            if cal_rec.second_week: #checking if need to generate every or second week
+                                if not cal_rec.last_week_gen:
+                                    self.create_service(service_obj, service_work_obj, start_time, end_time, 
+                                        cal_rec, rule, current_address)
+                                cal_rec.last_week_gen = not cal_rec.last_week_gen    
+                            else:
+                                self.create_service(service_obj, service_work_obj, start_time, end_time, 
+                                    cal_rec, rule, current_address)                                
             # Set next generate time
             self.set_next_gen_time()
             if self.init:
                 self.init = False
+            self.ign_second_week = False #Stop ignoring second_week
 
         else:
             raise Warning(_("Inactive Recurrent Calendar can\'t be generated!"))

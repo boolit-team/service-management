@@ -12,6 +12,7 @@
                 <tree string="Service Work">
                     <field name="name"/>
                     <field name="employee_id"/>
+                    <field name="address_archive_id"/>
                     <field name="start_time"/>
                     <field name="end_time"/>
                     <field name="state"/>
@@ -49,22 +50,21 @@
                                 <field name="end_time" attrs="{'readonly': [('state', '!=', 'open')]}"/> 
                                 <field name="employee_id" attrs="{'readonly': [('state', '!=', 'open')]}"/>                                
                                 <field name="duration" invisible="1"/>                                                               
-                                <field name="work_type" attrs="{'readonly': [('state', '!=', 'open')]}"/>
+                                <field name="work_type" attrs="{'readonly': True}"/>
                             </group>
                             <group>
                                 <field name="service_id"
                                     context="{'default_partner_id': partner_id}"
                                     onchange="onchange_service_id()"
-                                    attrs="{'readonly': [('state', '!=', 'open')]}"
+                                    attrs="{'required': True, 'readonly': [('state', '!=', 'open')]}"
                                 />
                                 <field name="partner_id"
                                     onchange="onchange_partner_id()"
-                                    attrs="{'readonly': [('state', '!=', 'open')]}"
+                                    attrs="{'readonly': True}"
                                 />
                                 <field name="address_archive_id"
-                                    attrs="{'readonly': [('state', '!=', 'open')]}"
+                                    attrs="{'readonly': True}"
                                 />
-
                             </group>
                         </group>
                         <notebook>
@@ -175,7 +175,7 @@
                                 <field name="opportunity_id" attrs="{'readonly': [('state', '!=', 'open')]}"/>
                             </group>
                             <group>
-                                <field name="partner_id" attrs="{'readonly': [('state', '!=', 'open')]}"/>
+                                <field name="partner_id" attrs="{'required': True, 'readonly': [('state', '!=', 'open')]}"/>
                                 <field name="product_id" attrs="{'readonly': [('state', '!=', 'open')]}"/>
                                 <field name="order_id" attrs="{'readonly': True, 'invisible': [('order_id', '=', False)]}"/>
                                 <field name="work_type" attrs="{'readonly': [('state', '!=', 'open')]}"/>
