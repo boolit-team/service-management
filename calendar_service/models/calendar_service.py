@@ -61,7 +61,7 @@ class calendar_service_work(models.Model):
     partner_id = fields.Many2one('res.partner', 'Customer', domain=[('customer', '=', True)])
     address_archive_id = fields.Many2one('res.partner.address_archive', 'Current Address')
     service_id = fields.Many2one('calendar.service', 'Service', ondelete='cascade')
-    work_type = fields.Selection(WORK_TYPE, 'Type', required=True)
+    work_type = fields.Selection(WORK_TYPE, 'Type')
     state = fields.Selection(STATE, 'State', readonly=True, default='open', track_visibility='onchange')
     ign_rule_chk = fields.Boolean('Ignore Rule Check')
 
