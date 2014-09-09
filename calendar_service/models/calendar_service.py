@@ -213,6 +213,17 @@ class calendar_service(models.Model):
         for work in self.work_ids:
             work.state = 'done'
 
+    @api.cr_uid
+    def _auto_close_service(self, cr, uid, context=None):
+        #TODO - Finish It!
+        today_start = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+        today_start = today_start.strftime("%Y-%m-%d %H:%M:%S")
+        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        service_ids = self.search(cr, uid, [('state', '=', 'open'), ('work_type', '!=', 'wait'),
+            ('start_time', '>=', today_start), ('end_time', '<=', now)], context=context)
+        for service in self.browse(cr, uid, service_ids, context=context):
+            self.close_state(cr, uid, service.id, context=context)
+
     @api.one
     def cancel_state(self):
         if not self.state == 'open':
@@ -228,7 +239,7 @@ class calendar_service(models.Model):
         self.state = 'open'
         for work in self.work_ids:
             work.state = 'open'
-
+        
     @api.one
     @api.constrains('work_ids')
     def _check_works(self):

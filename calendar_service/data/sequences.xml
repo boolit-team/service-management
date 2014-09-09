@@ -2,7 +2,7 @@
 <openerp>
     <data noupdate="1">
 
-        <!-- Sequences for medical.card.segment.res -->
+        <!-- calendar.service -->
         <record id="seq_type_calendar_service" model="ir.sequence.type">
             <field name="name">Calendar Service</field>
             <field name="code">calendar.service</field>
