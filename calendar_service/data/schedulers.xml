@@ -12,7 +12,7 @@
             <field name="function" eval="'_auto_generate_recurrent'"/>
             <field name="args" eval="'()'"/>
         </record>
-        <record model="ir.cron" id="ir_cron_scheduler_auto_close_service" forcecreate="True">
+        <record model="ir.cron" id="ir_cron_scheduler_auto_close_state" forcecreate="True">
             <field name="name">Close Calendar Service</field>
             <field name="active" eval="True"/>
             <field name="interval_number">1</field>
@@ -20,7 +20,7 @@
             <field name="numbercall">-1</field>
             <field name="doall" eval="True"/>
             <field name="model" eval="'calendar.service'"/>
-            <field name="function" eval="'_auto_close_service'"/>
+            <field name="function" eval="'_auto_close_state'"/>
             <field name="args" eval="'()'"/>
         </record>        
     </data>

@@ -90,6 +90,31 @@ class calendar_service_work(models.Model):
             self.work_type = self.service_id.work_type
             self.partner_id = self.service_id.partner_id and self.service_id.partner_id.id or False
 
+    @api.model
+    def _get_week_dur(self, employee_id, week_nmb=0, recurrent=False):
+        """
+        Returns planned duration in hours for chosen week
+        """
+        cal_serv_cal = self.env['calendar.service.calendar']
+        duration = 0.0
+        dt = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(weeks=week_nmb)
+        week_start = dt - timedelta(days=dt.weekday())
+        week_end = week_start + timedelta(days=6)
+        week_start = week_start.strftime("%Y-%m-%d %H:%M:%S")
+        week_end = week_end.strftime("%Y-%m-%d %H:%M:%S")
+        work_filter = [('employee_id', '=', employee_id), ('start_time', '>=', week_start), 
+            ('end_time', '<=', week_end)]
+        if recurrent:
+            work_filter.append(('work_type', '=', 'recurrent'))
+        works = self.search(work_filter)
+        for work in works:
+            start_time = cal_serv_cal.str_to_dt(work.start_time)
+            end_time = cal_serv_cal.str_to_dt(work.end_time)
+            dif = end_time - start_time
+            hours = dif.total_seconds() / 3600
+            duration += hours
+        return duration        
+
     @api.one
     @api.constrains('start_time', 'end_time', 'employee_id', 'state', 'work_type')
     def _check_resource(self):
@@ -135,7 +160,6 @@ class calendar_service_work(models.Model):
                 raise Warning(_("There is rule already defined for \n"
                     "%s to work at %s from %s to %s !" % (self.employee_id.name, 
                     cal_serv_cal.get_weekday(weekday), cal_rec.time_from, cal_rec.time_to)))
-            
 
 class calendar_service(models.Model):
     _name = 'calendar.service'
@@ -214,8 +238,11 @@ class calendar_service(models.Model):
             work.state = 'done'
 
     @api.cr_uid
-    def _auto_close_service(self, cr, uid, context=None):
-        #TODO - Finish It!
+    def _auto_close_state(self, cr, uid, context=None):
+        """
+        Used only for cron job. Automatically checks and closes passed services
+        that were still open and not in Waiting type.
+        """
         today_start = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
         today_start = today_start.strftime("%Y-%m-%d %H:%M:%S")
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")

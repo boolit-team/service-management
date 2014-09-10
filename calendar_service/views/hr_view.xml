@@ -9,7 +9,12 @@
                 <page string="HR Settings" position="before">
                     <page string="Resources">
                         <group>
-                            <field name="week_busyness" style="width: 30%%"/>
+                            <group>
+                                <field name="week_busyness"/>
+                            </group>
+                            <group>
+                                <field name="week_work_avg"/>
+                            </group>
                         </group>
                     </page>
                 </page>                                               

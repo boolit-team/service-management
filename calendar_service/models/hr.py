@@ -26,28 +26,18 @@ class hr_employee(models.Model):
     _name = 'hr.employee'
     _inherit = 'hr.employee'
     
-    week_busyness = fields.Float(string='Week Busyness (Hours)', compute="_compute_busyness")
+    week_busyness = fields.Float(string='Planned Week Hrs', compute="_compute_busyness")
+    week_work_avg = fields.Float(string="Average Planned Hrs", compute="_compute_busyness", help="Between two weeks")
 
     @api.one
     @api.depends('contract_id')
     def _compute_busyness(self):
         self.week_busyness = 0.0
+        self.week_work_avg = 0.0
         if self.contract_id and self.contract_id.track_calendar:
-            busyness = 0.0
-            dt = datetime.now()
-            dt = dt.replace(hour=0, minute=0, second=0, microsecond=0)
-            week_start = dt - timedelta(days=dt.weekday())
-            week_end = week_start + timedelta(days=6)
-            week_start = week_start.strftime("%Y-%m-%d %H:%M:%S")
-            week_end = week_end.strftime("%Y-%m-%d %H:%M:%S")
-            works = self.env['calendar.service.work'].search(
-                [('employee_id', '=', self.id), ('start_time', '>=', week_start), 
-                ('end_time', '<=', week_end), ('work_type', '=', 'open')])
-            for work in works:
-                start_time = datetime.strptime(work.start_time, "%Y-%m-%d %H:%M:%S")
-                end_time = datetime.strptime(work.end_time, "%Y-%m-%d %H:%M:%S")
-                dif = end_time - start_time
-                hours = dif.total_seconds() / 3600
-                busyness += hours
-            self.week_busyness = round(busyness, 2)
-             
+            service_work = self.env['calendar.service.work']
+            busyness = round(service_work._get_week_dur(self.id), 2)
+            busy_week1 = service_work._get_week_dur(self.id, recurrent=True)
+            busy_week2 = service_work._get_week_dur(self.id, week_nmb=1, recurrent=True)
+            self.week_busyness = busyness
+            self.week_work_avg = round((busy_week1 + busy_week2) / 2, 2)
