@@ -34,13 +34,12 @@
     'website': 'www.oerp.eu',
     'depends': [
         'calendar_service',
-        'hr_timesheet',
+        'hr_timesheet_employee',
         'hr_payroll',      
     ],
     'data': [
         #'security/ir.model.access.csv',
         'views/calendar_service_view.xml',
-        'views/hr_timesheet_view.xml',
         #'data/,        
 
     ],

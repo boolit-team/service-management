@@ -37,8 +37,11 @@ class hr_analytic_timesheet(models.Model):
     def _getEmployeeProduct(self):
         if self.env.context is None:
             self.env.context = {}        
-        emp_obj = self.env['hr.employee']
-        emp = emp_obj.search([('user_id', '=', self.env.context.get('user_id') or self.env.uid)], limit=1)
+        if not self.officer:
+            emp_obj = self.env['hr.employee']
+            emp = emp_obj.search([('user_id', '=', self.env.context.get('user_id') or self.env.uid)], limit=1)
+        else:
+            emp = self.employee_id
         if emp:
             if emp.product_id:
                 return emp.product_id.id
@@ -46,10 +49,13 @@ class hr_analytic_timesheet(models.Model):
 
     @api.model
     def _getEmployeeUnit(self):
-        emp_obj = self.env['hr.employee']
         if self.env.context is None:
-            self.env.context = {}
-        emp = emp_obj.search([('user_id', '=', self.env.context.get('user_id') or self.env.uid)], limit=1)
+            self.env.context = {}        
+        if not self.officer:
+            emp_obj = self.env['hr.employee']
+            emp = emp_obj.search([('user_id', '=', self.env.context.get('user_id') or self.env.uid)], limit=1)
+        else:
+            emp = self.employee_id
         if emp:
             if emp.product_id:
                 return emp.product_id.uom_id.id
@@ -57,10 +63,13 @@ class hr_analytic_timesheet(models.Model):
 
     @api.model
     def _getGeneralAccount(self):
-        emp_obj = self.env['hr.employee']
         if self.env.context is None:
-            self.env.context = {}
-        emp = emp_obj.search([('user_id', '=', self.env.context.get('user_id') or self.env.uid)], limit=1)
+            self.env.context = {}        
+        if not self.officer:
+            emp_obj = self.env['hr.employee']
+            emp = emp_obj.search([('user_id', '=', self.env.context.get('user_id') or self.env.uid)], limit=1)
+        else:
+            emp = self.employee_id
         if emp:
             if bool(emp.product_id):
                 a = emp.product_id.property_account_expense.id
@@ -72,13 +81,16 @@ class hr_analytic_timesheet(models.Model):
 
     @api.model
     def _getAnalyticJournal(self):
-        emp_obj = self.env['hr.employee']
         if self.env.context is None:
             self.env.context = {}
-        if self.env.context.get('employee_id'):
-            emp = emp_obj.search([('id', '=', context.get('employee_id'))])
+        if not self.officer:
+            emp_obj = self.env['hr.employee']
+            if self.env.context.get('employee_id'):
+                emp = emp_obj.search([('id', '=', context.get('employee_id'))])
+            else:
+                emp = emp_obj.search([('user_id','=', self.env.context.get('user_id') or self.env.uid)], limit=1)
         else:
-            emp = emp_obj.search([('user_id','=', self.env.context.get('user_id') or self.env.uid)], limit=1)
+            emp = self.employee_id
         if not emp:
             model, action_id = self.env['ir.model.data'].get_object_reference('hr', 'open_view_employee_list_my')
             msg = _("Employee is not created for this user. Please create one from configuration panel.")
@@ -87,14 +99,25 @@ class hr_analytic_timesheet(models.Model):
             return emp.journal_id.id
         else :
             raise Warning(_('No analytic journal defined for \'%s\'.\n'
-                'You should assign an analytic journal on the employee form.') % (emp.name))    
+                'You should assign an analytic journal on the employee form.') % (emp.name)) 
+
+    @api.onchange('employee_id')
+    def onchange_employee_id(self):
+        if self.employee_id:
+            self.product_id = self._getEmployeeProduct()
+            self.product_uom_id = self._getEmployeeUnit()
+            self.general_account_id = self._getGeneralAccount()
+            self.journal_id = self._getAnalyticJournal() 
 
     @api.model
     def create(self, vals):
-        emp_obj = self.env['hr.employee']
         if self.env.context is None:
             self.env.context = {}
-        emp = emp_obj.search([('user_id', '=', self.env.context.get('user_id') or self.env.uid)], limit=1)
+        if not vals.get('officer'):
+            emp_obj = self.env['hr.employee']        
+            emp = emp_obj.search([('user_id', '=', self.env.context.get('user_id') or self.env.uid)], limit=1)
+        else:
+            emp = self.employee_id
         ename = ''
         if emp:
             ename = emp.name
