@@ -32,12 +32,22 @@ class calendar_service_work(models.Model):
 
     @api.one
     def create_timesheet_activity(self):
-        #TODO - FINISH IT!
-        if self.account_id:
+        """
+        Creates Timesheet activity using Service Work data
+        """
+        if self.account_id and self.service_id:
             cal_serv_cal = self.env['calendar.service.calendar']
             start_time = cal_serv_cal.str_to_dt(self.start_time)
             end_time = cal_serv_cal.str_to_dt(self.end_time)
             duration = cal_serv_cal.get_duration(start_time, end_time)
-            vals = {'date': date.today(),  }
-            pass
+            name = "%s Work for %s" % (self.service_id.name, self.service_id.partner_id.name)
+            if self.service_id.user_id:
+                user_id = self.service_id.user_id.id
+            else:
+                user_id = self.env.uid
+            vals = {'date': date.today(),  'officer': True, 'unit_amount': duration,
+                'user_id': user_id, 'employee_id': self.employee_id.id, 
+                'account_id': self.account_id, 'name': name,
+            }
+            self.env['hr.analytic.timesheet'].create(vals)
 
