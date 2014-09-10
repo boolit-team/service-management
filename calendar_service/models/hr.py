@@ -37,7 +37,7 @@ class hr_employee(models.Model):
         if self.contract_id and self.contract_id.track_calendar:
             service_work = self.env['calendar.service.work']
             busyness = round(service_work._get_week_dur(self.id), 2)
-            busy_week1 = service_work._get_week_dur(self.id, recurrent=True)
-            busy_week2 = service_work._get_week_dur(self.id, week_nmb=1, recurrent=True)
+            busy_week1 = service_work._get_week_dur(self.id, week_nmb=-1, recurrent=True)
+            busy_week2 = service_work._get_week_dur(self.id, recurrent=True)
             self.week_busyness = busyness
             self.week_work_avg = round((busy_week1 + busy_week2) / 2, 2)

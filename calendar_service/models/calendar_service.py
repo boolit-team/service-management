@@ -110,8 +110,7 @@ class calendar_service_work(models.Model):
         for work in works:
             start_time = cal_serv_cal.str_to_dt(work.start_time)
             end_time = cal_serv_cal.str_to_dt(work.end_time)
-            dif = end_time - start_time
-            hours = dif.total_seconds() / 3600
+            hours = cal_serv_cal.get_duration(start_time, end_time)
             duration += hours
         return duration        
 
@@ -389,6 +388,18 @@ class calendar_service_calendar(models.Model):
         dt = dt.replace(tzinfo=pytz.utc)
         dt = dt.astimezone(local_tz)
         return dt
+
+    @api.model
+    def get_duration(self, start_dt, end_dt):
+        """
+        Returns duration in hours between two dates. 
+        """
+        if end_dt < start_dt:
+            raise Warning(_("end_dt can't be lower than start_dt!"))
+        diff = end_dt - start_dt
+        dur = diff.total_seconds() / 3600
+        return dur  
+
 
     @api.one
     @api.constrains('time_to', 'time_from')

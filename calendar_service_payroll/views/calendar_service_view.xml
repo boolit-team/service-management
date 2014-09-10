@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>      
+         <!--
+        calendar.service.work
+        -->
+        <record id="view_calendar_service_work_form_inherit" model="ir.ui.view">
+            <field name="name">calendar.service.work.form.inherit</field>
+            <field name="model">calendar.service.work</field>
+            <field name="inherit_id" ref="calendar_service.view_calendar_service_work_form"/>
+            <field name="arch" type="xml">
+                <field name="address_archive_id" position="after">
+                    <field name="account_id"/>
+                </field>    
+            </field>
+        </record>
+    </data>
+</openerp>
