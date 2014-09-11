@@ -219,9 +219,8 @@ class calendar_service(models.Model):
                 'user_id': self.user_id.id, 'calendar_service_id': self.id,
             }  
             start_time = cal_serv_cal.str_to_dt(self.start_time)
-            end_time = cal_serv_cal.str_to_dt(self.end_time)  
-            time_diff = end_time - start_time
-            qty = round(time_diff.total_seconds() / 3600, 3) #converting duration as qty in hours            
+            end_time = cal_serv_cal.str_to_dt(self.end_time)
+            qty = round(cal_serv_cal.get_duration(start_time, end_time), 3) #converting duration as qty in hours              
             line_vals = {'product_id': self.product_id.id, 'product_uom_qty': qty,}                      
             if not self.order_id or (self.order_id and self.order_id.state == 'cancel'):
                 order = order_obj.create(vals)

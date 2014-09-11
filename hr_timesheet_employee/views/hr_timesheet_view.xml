@@ -10,7 +10,7 @@
                 <field name="user_id" position="after">
                     <field name="officer"/>
                     <field name="employee_id" 
-                        attrs="{'invisible': [('officer', '=', False)], 'required': [('officer', '=', True)]}"
+                        attrs="{'readonly': [('officer', '=', False)], 'required': [('officer', '=', True)]}"
                         onchange="onchange_employee_id()"
                     />
                 </field>

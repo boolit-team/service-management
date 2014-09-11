@@ -25,6 +25,5 @@ class hr_contract(models.Model):
     _inherit = 'hr.contract'
 
     #fields
-    arrive_to_uk = fields.Date('Arrive to UK')
-    start_work_uk = fields.Date('Start Work in UK')
-    end_work_uk = fields.Date('End Work in UK')
+    salary_per_h = fields.Float(string="Salary per Hour")
+    fixed_salary = fields.Boolean('Fixed Salary?')

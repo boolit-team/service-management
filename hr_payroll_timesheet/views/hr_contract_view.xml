@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="hr_contract_view_form_inherit1" model="ir.ui.view">
+            <field name="name">HR Contract Inherit 1</field>
+            <field name="model">hr.contract</field>
+            <field name="inherit_id" ref="hr_contract.hr_contract_view_form"/>
+            <field name="arch" type="xml">                
+                <field name="wage" position="replace">
+                    <field name="fixed_salary"/>
+                    <field name="wage"
+                        attrs="{'invisible': [('fixed_salary', '=', False)]}"
+                    />
+                    <field name="salary_per_h"
+                        attrs="{'invisible': [('fixed_salary', '=', True)], 'required': [('fixed_salary', '=', False)]}"
+                    />                    
+                </field>                                 
+            </field>
+        </record>     
+    </data>
+</openerp>        

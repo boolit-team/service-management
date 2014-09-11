@@ -3,7 +3,7 @@
 #    
 #    Odoo, Open Source Management Solution
 #
-#    Author: Andrius Laukavičius. Copyright: JSC NOD Baltic
+#    Author: Andrius Laukavičius. Copyright: Andrius Laukavičius
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as
@@ -19,12 +19,37 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.     
 #
 ##############################################################################
-from openerp import models, fields
-class hr_contract(models.Model):
-    _name = 'hr.contract'
-    _inherit = 'hr.contract'
 
-    #fields
-    arrive_to_uk = fields.Date('Arrive to UK')
-    start_work_uk = fields.Date('Start Work in UK')
-    end_work_uk = fields.Date('End Work in UK')
+
+{
+    'name': 'Name',
+    'version': '1.0',
+    'category': 'Base',
+    'sequence': 2,
+    'summary': 'Summary',
+    'description': """
+	Description
+	""",
+    'author': 'Andrius Laukavičius',
+    'website': '',
+    'depends': [
+        'hr_payroll',
+        'hr_timesheet_employee',      
+    ],
+    'data': [
+        #'security/ir.model.access.csv',
+        #'views/,
+        #'data/,        
+
+    ],
+    'demo': [
+    ],
+    'test': [
+
+    ],
+    'installable': True,
+    'application': True,
+    'auto_install': False,
+    'images': [],
+}
+# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
