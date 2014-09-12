@@ -89,15 +89,6 @@ class res_partner(models.Model):
     house_name = fields.Char('House Name')
     address_description = fields.Char('Description')
     address_archive_ids = fields.One2many('res.partner.address_archive', 'partner_id', 'Addresses Archive')
-    #HS Info
-    have_key = fields.Boolean('We Have It')
-    key_numb = fields.Char('Key ID')
-    key_left = fields.Boolean('Is Left')
-    where_key = fields.Char('Where?')
-    house_alarm_on = fields.Char('House Alarm On')
-    house_alarm_off = fields.Char('House Alarm Off')
-    gate_alarm_on = fields.Char('Gate Alarm On')
-    gate_alarm_off = fields.Char('Gate Alarm Off')
 
     #methods
     @api.one

@@ -19,12 +19,19 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.     
 #
 ##############################################################################
-from openerp import models, fields
+from openerp import models, fields, api
+from openerp import tools
 
-class crm_lead_cleaning_calendar(models.Model):
-    _inherit = 'crm.lead.cleaning_calendar'
-
-    service_id = fields.Many2one('calendar.service', 'Calendar Service')
-        
-
-
+class crm_lead(models.Model):
+    _name = 'crm.lead'
+    _inherit = 'crm.lead'
+    #fields
+    nmb_bathrooms = fields.Integer('Number of Bathrooms')
+    nmb_bedrooms = fields.Integer('Number of Bedrooms')
+    nmb_other_rooms = fields.Integer('Number of Other Rooms')
+    nmb_residents = fields.Integer('Number of Residents')
+    pets_info = fields.Text('Pets')
+    cleaning_note = fields.Text('Notes')    
+    desirable_duration = fields.Float('Cleaning Time', help="Desirable Cleaning Time")
+ 
+   

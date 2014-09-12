@@ -3,7 +3,7 @@
 #    
 #    Odoo, Open Source Management Solution
 #
-#    Author: Andrius Laukavičius. Copyright: JSC NOD Baltic
+#    Author: Andrius Laukavičius. Copyright: Andrius Laukavičius
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as
@@ -22,26 +22,23 @@
 
 
 {
-    'name': 'CRM - Domestic Cleaning',
+    'name': 'Name',
     'version': '1.0',
     'category': 'Base',
     'sequence': 2,
-    'summary': 'CRM Extension for Domestic Cleaning',
+    'summary': 'Summary',
     'description': """
 	Description
 	""",
-    'author': 'OERP',
-    'website': 'www.oerp.eu',
+    'author': 'Andrius Laukavičius',
+    'website': '',
     'depends': [
-        'crm_location_extension', 
-        'sale',              
+        'base_location_extension',      
     ],
     'data': [
-        'security/ir.model.access.csv',
+        #'security/ir.model.access.csv',
         'views/res_partner_view.xml',
-        'views/crm_lead_view.xml',
-        'views/analytic_view.xml',
-        #'data/',        
+        #'data/,        
 
     ],
     'demo': [

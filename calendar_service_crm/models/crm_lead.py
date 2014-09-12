@@ -19,47 +19,25 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.     
 #
 ##############################################################################
-from openerp import models, fields
+from openerp import models, fields, api
 from openerp import tools
-from openerp import api
-WEEK_DAYS = [
-    ('saturday', 'Saturday'),
-    ('monday', 'Monday'),
-    ('tuesday', 'Tuesday'),
-    ('wednesday', 'Wednesday'),
-    ('thursday', 'Thursday'),
-    ('friday', 'Friday'),
-]
-class crm_lead_cleaning_calendar(models.Model):
-    _name = 'crm.lead.cleaning_calendar'
-    _description = 'Lead/Opp. Cleaning Calendar'
-    #fields
-    cleaning_day = fields.Selection(WEEK_DAYS, 'Week Day', required=True)
-    clean_time_from = fields.Float('From', required=True)
-    clean_time_to = fields.Float('To', required=True)
-    lead_id = fields.Many2one('crm.lead', 'Lead/Opportunity')    
 
+class calendar_service_desired_time(models.Model):
+    _inherit = 'calendar.service.desired.time'
+
+    lead_id = fields.Many2one('crm.lead', 'Lead/Opportunity') 
 
 class crm_lead(models.Model):
     _name = 'crm.lead'
     _inherit = 'crm.lead'
-    #fields
-    product_id = fields.Many2one('product.product', 'Type of Service', domain=[('type', '=', 'service')])
-    nmb_bathrooms = fields.Integer('Number of Bathrooms')
-    nmb_bedrooms = fields.Integer('Number of Bedrooms')
-    nmb_other_rooms = fields.Integer('Number of Other Rooms')
-    nbm_residents = fields.Integer('Number of Residents')
-    pets_info = fields.Text('Pets')
-    cleaning_note = fields.Text('Notes')    
-    cleaning_calendar_ids = fields.One2many('crm.lead.cleaning_calendar', 'lead_id', 'Cleaning Time')
-    desirable_duration = fields.Float('Cleaning Time', help="Desirable Cleanng Time")
+
+    product_id = fields.Many2one('product.product', 'Type of Service', domain=[('type', '=', 'service')])    
+    desired_time_ids = fields.One2many('calendar.service.desired.time', 'lead_id', 'Service Time')
     eyre = fields.Char('Eyre')
     apartment_complex = fields.Char('Apart. Complex')
     house_name = fields.Char('House Name')
     address_description = fields.Char('Address Description')
     nationality_id = fields.Many2one('res.country', 'Nationality') 
-
-    #methods
     
     def _lead_create_contact(self, cr, uid, lead, name, is_company, parent_id=False, context=None):
         """

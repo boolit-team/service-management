@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>   
+        <record id="crm_case_form_view_leads_inherit" model="ir.ui.view">
+            <field name="name">CRM Lead Form - Inherit</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="calendar_service_crm.crm_case_form_view_leads_inherit"/>
+            <field name="arch" type="xml">                                            
+                <page string="Service Time" position="replace">
+                    <page string="Cleaning Info">
+                        <group>
+                            <group>
+                                <field name="product_id"/>                            
+                            </group>
+                            <group>
+                                <field name="desirable_duration" widget="float_time"/>
+                            </group>
+                        </group>
+                        <group>
+                            <field name="desired_time_ids">
+                                <tree string="Cleaning Time" editable="bottom">
+                                    <field name="day"/>
+                                    <field name="time_from" widget="float_time"/>
+                                    <field name="time_to" widget="float_time"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </page>
+                </page>
+            </field>
+        </record> 
+
+        <record id="crm_case_form_view_oppor_inherit" model="ir.ui.view">
+            <field name="name">CRM Opportunity Form - Inherit</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="calendar_service_crm.crm_case_form_view_oppor_inherit"/>
+            <field name="arch" type="xml">                       
+                <page string="Service Time" position="replace">
+                    <page string="Cleaning Info">
+                        <group>
+                            <group>
+                                <field name="product_id"/>
+                                <field name="nmb_bathrooms"/>
+                                <field name="nmb_bedrooms"/>
+                                <field name="pets_info"/>                            
+                            </group>
+                            <group>
+                                <field name="desirable_duration" widget="float_time"/>
+                                <field name="nmb_other_rooms"/>
+                                <field name="nmb_residents"/>
+                                <field name="cleaning_note"/>
+                            </group>
+                        </group>
+                        <group>
+                            <field name="desired_time_ids">
+                                <tree string="Cleaning Time" editable="bottom">
+                                    <field name="day"/>
+                                    <field name="time_from" widget="float_time"/>
+                                    <field name="time_to" widget="float_time"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </page>
+                </page>
+            </field>
+        </record>           
+
+    </data>
+</openerp>        

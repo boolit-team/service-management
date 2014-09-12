@@ -104,27 +104,7 @@
                         <field name="attention"/>
                     </span>
                 </field>                
-                <page string="Accounting" position="before">
-                    <page string="House Info">
-                        <group>
-                            <group string="Keys">
-                                <field name="have_key"/>
-                                <field name="key_numb"
-                                    attrs="{'invisible': [('have_key', '=', False)]}"
-                                />
-                                <field name="key_left"/>
-                                <field name="where_key"
-                                    attrs="{'invisible': [('key_left', '=', False)]}"
-                                />
-                            </group>
-                            <group string="Alarm">
-                                <field name="house_alarm_on"/>
-                                <field name="house_alarm_off"/>
-                                <field name="gate_alarm_on"/>
-                                <field name="gate_alarm_off"/>
-                            </group>
-                        </group>
-                    </page>
+                <page string="Internal Notes" position="before">
                     <page String="Addresses Archive">
                         <button name="init_archive" string="Init Archive" 
                             type="object" class="oe_highlight"

@@ -130,7 +130,6 @@ class hr_payslip(orm.Model):
                 tsheet_add_ids = tsheet_obj.search(cr, uid, [('user_id', '=', employee.user_id.id), 
                 ('date', '>=', payslip_obj.date_from), ('date', '<=', payslip_obj.date_to), ('officer', '=', False)])
                 timesheet_ids += tsheet_add_ids
-
             for tsheet in tsheet_obj.browse(cr, uid, timesheet_ids): #counting duration from timesheets
                 duration += tsheet.unit_amount                        
             localdict = dict(baselocaldict, employee=employee, contract=contract, duration=duration)

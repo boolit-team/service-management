@@ -36,15 +36,15 @@ WEEK_DAYS = [
 ]
 WORK_TYPE = [('recurrent', 'Recurrent'), ('one', 'One Time'), ('wait', 'Waiting')]
 STATE = [('open', 'Open'), ('done', 'Done'), ('cancel', 'Canceled')]
-ONE_TIME = [('out', 'Move Out'), ('in', 'Move In'), ('built', 'After Building'),
-    ('spring', 'Spring Cleaning'), ('alternate', 'Alternates Cleaners')]
 
-CANCEL_REASON = [('no_reason', 'Last min. Without Reason'), ('reason', 'Last min. Without Reason'), 
-    ('prior_notify', 'Prior Notification'), ('no_notify', 'Did not Notify'), 
-    ('holiday', 'Holiday'), ('change_time', 'Change Cleaning Time')]
-REASON = [('illness', 'Illness'), ('unexpect', 'Unexpected Problems'), ('else', 'Else')]
-PRIOR_NOTIFY = ([('repair', 'Repair'), ('vacation', 'Vacation'), ('illness', 'Illness'), ('else', 'Else')])
-NO_NOTIFY = [('nobody_home', 'Nobody was at Home'), ('cant_enter', 'Couldn\'t Enter'), ('else', 'Else')]
+class calendar_service_desired_time(models.Model):
+    _name = 'calendar.service.desired.time'
+    _description = 'Service Desired Time'
+
+    day = fields.Selection(WEEK_DAYS, 'Week Day', required=True)
+    time_from = fields.Float('From', required=True)
+    time_to = fields.Float('To', required=True)
+    service_id = fields.Many2one('calendar.service', 'Calendar Service')    
 
 class calendar_service_work(models.Model):
     _name = 'calendar.service.work'
@@ -170,26 +170,14 @@ class calendar_service(models.Model):
     start_time = fields.Datetime('Starting at', required=True)
     end_time = fields.Datetime('Ending at', required=True)
     work_type = fields.Selection(WORK_TYPE, 'Type', required=True)
-    one_time = fields.Selection(ONE_TIME, 'One Time Type')
     work_ids = fields.One2many('calendar.service.work', 'service_id', 'Works')
     state = fields.Selection(STATE, 'State', readonly=True, default='open', track_visibility='onchange')
-    cancel_reason = fields.Selection(CANCEL_REASON, 'Cancel Reason')
-    no_reason_specify = fields.Char('Specify')
-    reason = fields.Selection(REASON, 'Reason')
-    reason_unexpected_specify = fields.Char('Specify')
-    reason_specify = fields.Char('Specify')
-    prior_notify = fields.Selection(PRIOR_NOTIFY, 'Notification')
-    prior_notify_specify = fields.Char('Specify')
-    no_notify = fields.Selection(NO_NOTIFY, 'No Notification')
-    no_notify_speficy = fields.Char('Specify')
-    cleaning_calendar_ids = fields.One2many('crm.lead.cleaning_calendar', 'service_id', 'Work Time')
-    canceled_until = fields.Date('Canceled Until')
-    opportunity_id = fields.Many2one('crm.lead', 'Related Opportunity', domain=[('type', '=', 'opportunity')])
     user_id = fields.Many2one('res.users', 'Salesman')
     rule_calendar_id = fields.Many2one('calendar.service.calendar', 'Rule Calendar Item')
     product_id = fields.Many2one('product.product', 'Service', domain=[('type', '=', 'service')])
     order_id = fields.Many2one('sale.order', 'Sale Order')
-
+    desired_time_ids = fields.One2many('calendar.service.desired.time', 'service_id', 'Service Time')
+    canceled_until = fields.Date('Canceled Until')
 
     @api.model
     def create(self, vals):
@@ -211,6 +199,8 @@ class calendar_service(models.Model):
         When closing service, it also creates/updates Sale Order
         if product_id is set on service.
         """
+        if self.work_type == 'wait':
+            raise Warning(_("Service with Waiting type can't be closed!"))
         if self.product_id:
             cal_serv_cal = self.env['calendar.service.calendar']
             order_obj = self.env['sale.order']                      
@@ -440,6 +430,7 @@ class calendar_service_recurrent(models.Model):
     next_gen_time = fields.Datetime('Next Generate Time', readonly=False)
     init = fields.Boolean('Init')
     ign_second_week = fields.Boolean('Ignore Second Week Check') #used to second week constrain when generating calendar
+
     @api.model
     def create(self, vals):
         recurrents = self.search([])
@@ -572,7 +563,7 @@ class calendar_service_recurrent_rule(models.Model):
     name = fields.Char('Rule Name')
     recurrent_id = fields.Many2one('calendar.service.recurrent', 'Recurrent Calendar')
     partner_id = fields.Many2one('res.partner', 'Customer', domain=[('customer', '=', True)], required=True)
-    calendar_ids = fields.One2many('calendar.service.calendar', 'rule_id', 'Cleaning Time')
+    calendar_ids = fields.One2many('calendar.service.calendar', 'rule_id', 'Service Time')
 
     @api.multi
     def name_get(self):

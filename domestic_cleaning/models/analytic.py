@@ -84,8 +84,8 @@ SUSPICIOUS_REASON = [
 ]
 
 class account_analytic_termination(models.Model):
-    _name = 'account.analytic.termination'
-    _description = 'Contract Termination Reasons'
+    _name = 'account.analytic.cleaning.termination'
+    _description = 'Contract Cleaning Termination Reasons'
 
     term_reason = fields.Selection(TERMINATION_REASON, 'Reason')
     moved = fields.Selection(MOVED_REASON, 'Moved')
@@ -111,7 +111,7 @@ class account_analytic_termination(models.Model):
 class account_analytic_account(models.Model):
     _inherit = 'account.analytic.account'
 
-    termination_ids = fields.One2many('account.analytic.termination', 'analytic_id', 'Termination Reasons')
+    termination_ids = fields.One2many('account.analytic.cleaning.termination', 'analytic_id', 'Termination Reasons')
 
 
 

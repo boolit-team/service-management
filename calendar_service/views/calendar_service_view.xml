@@ -172,16 +172,12 @@
                                 <field name="start_time" attrs="{'readonly': [('state', '!=', 'open')]}"/>
                                 <field name="end_time" attrs="{'readonly': [('state', '!=', 'open')]}"/>
                                 <field name="user_id" attrs="{'readonly': [('state', '!=', 'open')]}"/>
-                                <field name="opportunity_id" attrs="{'readonly': [('state', '!=', 'open')]}"/>
                             </group>
                             <group>
                                 <field name="partner_id" attrs="{'required': True, 'readonly': [('state', '!=', 'open')]}"/>
                                 <field name="product_id" attrs="{'readonly': [('state', '!=', 'open')]}"/>
                                 <field name="order_id" attrs="{'readonly': True, 'invisible': [('order_id', '=', False)]}"/>
                                 <field name="work_type" attrs="{'readonly': [('state', '!=', 'open')]}"/>
-                                <field name="one_time"
-                                    attrs="{'invisible': [('work_type', '!=', 'one')], 'readonly': [('state', '!=', 'open')]}"
-                                />
                             </group>
                         </group>
                         <notebook>
@@ -193,54 +189,18 @@
                                     />
                                 </group>
                             </page>
-                            <page string="Cancellation Reason" attrs="{'invisible': [('state', '!=', 'cancel')]}">
+                            <page string="Cancellation Management" attrs="{'invisible': [('state', '!=', 'cancel')]}">
                                 <group>
-                                    <label for="cancel_reason"/>
-                                    <div class="oe_inline">
-                                        <field name="cancel_reason" style="width: 37%%"/>
-                                        <field name="no_reason_specify"
-                                            style="width: 20%%"
-                                            attrs="{'invisible': [('cancel_reason', '!=', 'no_reason')]}"
-                                        />
-                                        <field name="reason"
-                                            style="width: 37%%"
-                                            attrs="{'invisible': [('cancel_reason', '!=', 'reason')]}"
-                                        />                                        
-                                        <field name="reason_unexpected_specify"
-                                            style="width: 20%%"
-                                            attrs="{'invisible': [('reason', '!=', 'unexpect')]}"
-                                        />                                        
-                                        <field name="reason_specify"
-                                            style="width: 20%%"
-                                            attrs="{'invisible': [('reason', '!=', 'else')]}"
-                                        />                                        
-                                        <field name="prior_notify"
-                                            style="width: 37%%"
-                                            attrs="{'invisible': [('cancel_reason', '!=', 'prior_notify')]}"
-                                        />
-                                        <field name="prior_notify_specify"
-                                            style="width: 20%%"
-                                            attrs="{'invisible': [('prior_notify', '!=', 'else')]}"
-                                        />                                                                   
-                                        <field name="no_notify"
-                                            style="width: 37%%"
-                                            attrs="{'invisible': [('cancel_reason', '!=', 'no_notify')]}"
-                                        />                                                     
-                                        <field name="no_notify_speficy"
-                                            style="width: 20%%"
-                                            attrs="{'invisible': [('no_notify', '!=', 'else')]}"
-                                        />                                        
-                                    </div>
-                                    <field name="cleaning_calendar_ids" attrs="{'invisible': [('cancel_reason', '!=', 'change_time')]}">
+                                    <field name="desired_time_ids">
                                         <tree string="Cleaning Time" editable="bottom">
-                                            <field name="cleaning_day"/>
-                                            <field name="clean_time_from" widget="float_time"/>
-                                            <field name="clean_time_to" widget="float_time"/>
+                                            <field name="day"/>
+                                            <field name="time_from" widget="float_time"/>
+                                            <field name="time_to" widget="float_time"/>
                                         </tree>
                                     </field>
                                     <field name="canceled_until"/>                                    
                                 </group>
-                            </page>
+                            </page>                            
                         </notebook>                    
                     </sheet>
                     <div class="oe_chatter">

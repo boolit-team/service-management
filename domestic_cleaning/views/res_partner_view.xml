@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>  
+
+        <!-- res.partner --> 
+
+        <record id="view_partner_form_inherit" model="ir.ui.view">
+            <field name="name">Partner Form - Inherit</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">               
+                <page string="Internal Notes" position="before">
+                    <page string="House Info">
+                        <group>
+                            <group string="Keys">
+                                <field name="have_key"/>
+                                <field name="key_numb"
+                                    attrs="{'invisible': [('have_key', '=', False)]}"
+                                />
+                                <field name="key_left"/>
+                                <field name="where_key"
+                                    attrs="{'invisible': [('key_left', '=', False)]}"
+                                />
+                            </group>
+                            <group string="Alarm">
+                                <field name="house_alarm_on"/>
+                                <field name="house_alarm_off"/>
+                                <field name="gate_alarm_on"/>
+                                <field name="gate_alarm_off"/>
+                            </group>
+                        </group>
+                    </page>
+                </page>                                              
+            </field>
+        </record>          
+    </data>
+</openerp>        

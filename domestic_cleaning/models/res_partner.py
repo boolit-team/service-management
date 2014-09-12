@@ -19,42 +19,17 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.     
 #
 ##############################################################################
+from openerp import models, fields, api
 
-
-{
-    'name': 'Calendar Domestic Cleaning',
-    'version': '1.0',
-    'category': 'Base',
-    'sequence': 2,
-    'summary': 'Calendar Domestic Cleaning',
-    'description': """
-	This module manages domestic cleaning specific events.
-	""",
-    'author': 'OERP',
-    'website': 'www.oerp.eu',
-    'depends': [
-        'base_address_management',
-        'sale',     
-    ],
-    'data': [
-        'security/ir.model.access.csv',
-        'wizard/rule_change_view.xml',
-        'views/calendar_service_view.xml',
-        'views/calendar_service_recurrent_view.xml',
-        'views/res_partner_view.xml',
-        'views/sale_view.xml',
-        'data/sequences.xml',
-        'data/schedulers.xml',        
-
-    ],
-    'demo': [
-    ],
-    'test': [
-
-    ],
-    'installable': True,
-    'application': True,
-    'auto_install': False,
-    'images': [],
-}
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
+class res_partner(models.Model):
+    _inherit = 'res.partner'
+    
+    #HS Info
+    have_key = fields.Boolean('We Have It')
+    key_numb = fields.Char('Key ID')
+    key_left = fields.Boolean('Is Left')
+    where_key = fields.Char('Where?')
+    house_alarm_on = fields.Char('House Alarm On')
+    house_alarm_off = fields.Char('House Alarm Off')
+    gate_alarm_on = fields.Char('Gate Alarm On')
+    gate_alarm_off = fields.Char('Gate Alarm Off')

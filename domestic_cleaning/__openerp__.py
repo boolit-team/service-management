@@ -3,7 +3,7 @@
 #    
 #    Odoo, Open Source Management Solution
 #
-#    Author: Andrius Laukavičius. Copyright: JSC NOD Baltic
+#    Author: Andrius Laukavičius. Copyright: Andrius Laukavičius
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as
@@ -22,29 +22,27 @@
 
 
 {
-    'name': 'Calendar Domestic Cleaning',
+    'name': 'Name',
     'version': '1.0',
     'category': 'Base',
     'sequence': 2,
-    'summary': 'Calendar Domestic Cleaning',
+    'summary': 'Summary',
     'description': """
-	This module manages domestic cleaning specific events.
+	Description
 	""",
-    'author': 'OERP',
-    'website': 'www.oerp.eu',
+    'author': 'Andrius Laukavičius',
+    'website': '',
     'depends': [
-        'base_address_management',
-        'sale',     
+        'calendar_service_crm',
+
     ],
     'data': [
-        'security/ir.model.access.csv',
-        'wizard/rule_change_view.xml',
-        'views/calendar_service_view.xml',
-        'views/calendar_service_recurrent_view.xml',
+        #'security/ir.model.access.csv',
         'views/res_partner_view.xml',
-        'views/sale_view.xml',
-        'data/sequences.xml',
-        'data/schedulers.xml',        
+        'views/crm_lead_view.xml',
+        'views/calendar_service_view.xml',
+        'views/analytic_view.xml'
+        #'data/,        
 
     ],
     'demo': [

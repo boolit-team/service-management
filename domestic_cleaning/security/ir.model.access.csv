@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_account_analytic_cleaning_termination_user,account.analytic.cleaning.termination user,model_account_analytic_cleaning_termination,base.group_sale_salesman,1,0,0,0
+access_account_analytic_cleaning_termination_manager,account.analytic.cleaning.termination manager,model_account_analytic_cleaning_termination,base.group_sale_salesman,1,1,1,1

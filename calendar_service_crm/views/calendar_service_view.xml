@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>      
+        <record id="view_calendar_service_form" model="ir.ui.view">
+            <field name="name">calendar.service.form</field>
+            <field name="model">calendar.service</field>
+            <field name="inherit_id" ref="calendar_service.view_calendar_service_form"/>
+            <field name="arch" type="xml">
+                    <field name="user_id" position="after">
+                        <field name="opportunity_id" attrs="{'readonly': [('state', '!=', 'open')]}"/>
+                    </field>
+            </field>
+        </record>                                              
+    </data>
+</openerp>

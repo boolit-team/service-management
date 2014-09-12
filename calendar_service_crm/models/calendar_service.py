@@ -20,41 +20,10 @@
 #
 ##############################################################################
 
+from openerp import models, fields, api
 
-{
-    'name': 'Calendar Domestic Cleaning',
-    'version': '1.0',
-    'category': 'Base',
-    'sequence': 2,
-    'summary': 'Calendar Domestic Cleaning',
-    'description': """
-	This module manages domestic cleaning specific events.
-	""",
-    'author': 'OERP',
-    'website': 'www.oerp.eu',
-    'depends': [
-        'base_address_management',
-        'sale',     
-    ],
-    'data': [
-        'security/ir.model.access.csv',
-        'wizard/rule_change_view.xml',
-        'views/calendar_service_view.xml',
-        'views/calendar_service_recurrent_view.xml',
-        'views/res_partner_view.xml',
-        'views/sale_view.xml',
-        'data/sequences.xml',
-        'data/schedulers.xml',        
-
-    ],
-    'demo': [
-    ],
-    'test': [
-
-    ],
-    'installable': True,
-    'application': True,
-    'auto_install': False,
-    'images': [],
-}
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
+class calendar_service(models.Model):
+    _inherit = 'calendar.service'
+    
+    opportunity_id = fields.Many2one('crm.lead', 'Related Opportunity', domain=[('type', '=', 'opportunity')])
+ 

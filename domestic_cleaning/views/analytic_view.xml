@@ -2,9 +2,9 @@
 <openerp>
     <data>
 
-        <record id="view_account_analytic_termination_tree" model="ir.ui.view">
-            <field name="name">account.analytic.termination.tree</field>
-            <field name="model">account.analytic.termination</field>
+        <record id="view_account_analytic_cleaning_termination_tree" model="ir.ui.view">
+            <field name="name">account.analytic.cleaning.termination.tree</field>
+            <field name="model">account.analytic.cleaning.termination</field>
             <field name="arch" type="xml">
                 <tree string="Termination Reasons">
                     <field name="term_reason"/>
@@ -12,9 +12,9 @@
             </field>
         </record>  
 
-        <record id="view_account_analytic_termination_form" model="ir.ui.view">
-            <field name="name">account.analytic.termination.form</field>
-            <field name="model">account.analytic.termination</field>
+        <record id="view_account_analytic_cleaning_termination_form" model="ir.ui.view">
+            <field name="name">account.analytic.cleaning.termination.form</field>
+            <field name="model">account.analytic.cleaning.termination</field>
             <field name="arch" type="xml">
                 <form string="Termination Reason">                    
                     <group>
@@ -100,7 +100,7 @@
         </record>              
 
         <record id="view_account_analytic_account_form_inherit" model="ir.ui.view">
-            <field name="name">analytic.analytic.account.form.inherit</field>
+            <field name="name">analytic.analytic.cleaning.account.form.inherit</field>
             <field name="model">account.analytic.account</field>
             <field name="inherit_id" ref="analytic.view_account_analytic_account_form"/>
             <field name="arch" type="xml">
