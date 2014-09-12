@@ -22,13 +22,15 @@
 
 
 {
-    'name': 'Name',
+    'name': 'Calendar Service Timesheet',
     'version': '1.0',
-    'category': 'Base',
+    'category': 'Timesheet',
     'sequence': 2,
-    'summary': 'Summary',
+    'summary': 'Timesheet management for calendar service works',
     'description': """
-	Description
+	Creates timesheet activities from completed calendar service works.
+    Can also be used for recurrent calendar services, to assign analytic
+    accounts for specific rules.
 	""",
     'author': 'OERP',
     'website': 'www.oerp.eu',

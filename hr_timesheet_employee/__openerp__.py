@@ -22,13 +22,18 @@
 
 
 {
-    'name': 'Name',
+    'name': 'Timesheet Employee',
     'version': '1.0',
-    'category': 'Base',
+    'category': 'Timesheet',
     'sequence': 2,
-    'summary': 'Summary',
+    'summary': 'Direct Employee integration in Timesheet',
     'description': """
-	Description
+	Modifies Timesheet functionality, so you can directly
+    choose timesheet activity for employee without only
+    choosing user. When you select 'User if Officer', it
+    means selected user will be just for information purposes.
+    And then you can directly select employee for which timesheet
+    activity must be created.
 	""",
     'author': 'OERP',
     'website': 'www.oerp.eu',

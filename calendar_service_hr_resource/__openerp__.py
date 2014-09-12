@@ -22,16 +22,17 @@
 
 
 {
-    'name': 'Name',
+    'name': 'Calendar Service HR Resource',
     'version': '1.0',
-    'category': 'Base',
+    'category': 'Resource',
     'sequence': 2,
-    'summary': 'Summary',
+    'summary': 'Employees planned time for services',
     'description': """
-	Description
+	Calculates weekly planned time for employees that are assigned
+    for calendar services works.
 	""",
-    'author': 'Andrius Laukavičius',
-    'website': '',
+    'author': 'OERP',
+    'website': 'www.oerp.eu',
     'depends': [
         'calendar_service',
         'hr_contract',      

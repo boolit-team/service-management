@@ -22,13 +22,13 @@
 
 
 {
-    'name': 'HR - Extension',
+    'name': 'HR Domestic Cleaning Extension',
     'version': '1.0',
-    'category': 'Base',
+    'category': 'Cleaning',
     'sequence': 2,
-    'summary': 'Summary',
+    'summary': 'Specifics for Domestic Cleaning',
     'description': """
-	Description
+	Specific fields for UK Domestic Cleaning business needs.
 	""",
     'author': 'OERP',
     'website': 'www.oerp.eu',

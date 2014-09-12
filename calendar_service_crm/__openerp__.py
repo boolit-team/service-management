@@ -22,13 +22,15 @@
 
 
 {
-    'name': 'CRM - Domestic Cleaning',
+    'name': 'Calendar Service CRM',
     'version': '1.0',
-    'category': 'Base',
+    'category': 'CRM',
     'sequence': 2,
-    'summary': 'CRM Extension for Domestic Cleaning',
+    'summary': 'CSM and CRM integration',
     'description': """
-	Description
+	Integrates Calendar Service and CRM. You can manage your opportunities
+    for calendar services, assign client desired times for service and then
+    relate it with specific calendar service.
 	""",
     'author': 'OERP',
     'website': 'www.oerp.eu',

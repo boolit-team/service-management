@@ -22,16 +22,25 @@
 
 
 {
-    'name': 'Name',
+    'name': 'Payroll Timesheet',
     'version': '1.0',
-    'category': 'Base',
+    'category': 'payroll',
     'sequence': 2,
-    'summary': 'Summary',
+    'summary': 'Timesheet integration for Payroll',
     'description': """
-	Description
+    	Lets calculate payroll using timesheet activities. 
+        Implements new keyword 'duration' that can be used in payroll rules. 
+        This keyword returns total duration of hours from timesheet activities for 
+        specific employee per payslip. It filters duration according to 
+        payslip 'date_from' and 'date_to'. Also implements new field 'salary_per_h' in 
+        employee contracts that can be used to calculate salary for worked hours. 
+        Salary Rule example:
+            'contract.salary_per_h * duration'
+
+
 	""",
-    'author': 'Andrius Laukavičius',
-    'website': '',
+    'author': 'OERP',
+    'website': 'www.oerp.eu',
     'depends': [
         'hr_payroll',
         'hr_timesheet_employee',      

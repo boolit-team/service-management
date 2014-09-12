@@ -22,7 +22,7 @@
 
 
 {
-    'name': 'Base Localization',
+    'name': 'Base Location',
     'version': '1.0',
     'category': 'Base',
     'sequence': 2,

@@ -22,13 +22,15 @@
 
 
 {
-    'name': 'Name',
+    'name': 'CRM Location Extension',
     'version': '1.0',
-    'category': 'Base',
+    'category': 'Location',
     'sequence': 2,
-    'summary': 'Summary',
+    'summary': 'CRM Location Extension',
     'description': """
-	Description
+	Extends base_location_extension module providing
+    similar functionality in leads and opportunities
+    on top of partner form.
 	""",
     'author': 'OERP',
     'website': 'www.oerp.eu',

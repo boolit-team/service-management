@@ -3,7 +3,7 @@
 #    
 #    Odoo, Open Source Management Solution
 #
-#    Author: Andrius Laukavičius. Copyright: Andrius Laukavičius
+#    Author: Andrius Laukavičius. Copyright: JSC NOD Baltic
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as
@@ -22,16 +22,19 @@
 
 
 {
-    'name': 'Name',
+    'name': 'Addresses Management',
     'version': '1.0',
     'category': 'Base',
     'sequence': 2,
-    'summary': 'Summary',
+    'summary': 'Partners addresses management',
     'description': """
-	Description
+	Extends address with additional fields like house and apartment
+    number. Also you can archive old addresses that any partner had.
+    You can see history of all addreses and the current one that is being used.
+    There are buttons to help arvhive and update address easier.
 	""",
-    'author': 'Andrius Laukavičius',
-    'website': '',
+    'author': 'OERP',
+    'website': 'www.oerp.eu',
     'depends': [
         'base_location_extension',      
     ],

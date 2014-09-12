@@ -22,13 +22,16 @@
 
 
 {
-    'name': 'Calendar Domestic Cleaning',
+    'name': 'Calendar Service Management',
     'version': '1.0',
-    'category': 'Base',
+    'category': 'Calendar',
     'sequence': 2,
-    'summary': 'Calendar Domestic Cleaning',
+    'summary': 'Manage recurrent or one time services that need resources and planning',
     'description': """
-	This module manages domestic cleaning specific events.
+	Plan and automatically generate recurrent events that repeat weekly or every second week.
+    Assign resources to complete service works. Every service is on one calendar where you can
+    plan accordingly. Change recurrent events when needed, put one time non repeating services
+    in empty time intervals with free resources. 
 	""",
     'author': 'OERP',
     'website': 'www.oerp.eu',
