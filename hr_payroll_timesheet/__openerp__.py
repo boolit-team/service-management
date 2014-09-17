@@ -47,7 +47,7 @@
     ],
     'data': [
         #'security/ir.model.access.csv',
-        #'views/,
+        'views/hr_contract_view.xml',
         #'data/,        
 
     ],

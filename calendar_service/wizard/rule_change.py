@@ -38,7 +38,7 @@ class recurrent_rule_change_time(models.TransientModel):
     _name = 'recurrent.rule.change.time'
     _description = 'Recurrent Rule Change Time'
 
-    calendar_id = fields.Many2one('calendar.service.calendar', 'Cleaning Time')
+    calendar_id = fields.Many2one('calendar.service.calendar', 'Service Time')
     action = fields.Selection([('delete', 'Delete'), ('update', 'Update'), ('add', 'Add')], 'Action', required=True)
     weekday = fields.Selection(WEEK_DAYS, 'Week Day')
     time_from = fields.Float('Change From')

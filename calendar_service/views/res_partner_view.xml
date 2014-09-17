@@ -1,13 +1,13 @@
 <?xml version="1.0"?>
 <openerp>
     <data>
-        <record id="view_partners_form_service1" model="ir.ui.view">
+        <record id="res_partner_view_buttons" model="ir.ui.view">
             <field name="name">view.res.partner.form.crm.inherited1</field>
             <field name="model">res.partner</field>
-            <field name="inherit_id" ref="crm.view_partners_form_crm1"/>
+            <field name="inherit_id" ref="sale.res_partner_view_buttons"/>
             <field eval="18" name="priority"/>
             <field name="arch" type="xml">
-                    <button name="schedule_meeting" position="after">
+                    <button name="%(sale.act_res_partner_2_sale_order)d" position="after">
                         <button
                             class="oe_inline oe_stat_button"
                             attrs="{'invisible': [('customer', '=', False)]}"

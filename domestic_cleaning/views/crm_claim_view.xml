@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+
+        <record model="ir.ui.view" id="crm_case_claims_form_view">
+            <field name="name">CRM - Claims Form</field>
+            <field name="model">crm.claim</field>
+            <field name="inherit_id" ref="crm_claim.crm_case_claims_form_view"/>
+            <field name="arch" type="xml">
+                <field name="user_fault" position="replace">
+                    <field name="employee_id" style="width: 37%%"/>
+                </field>
+                <field name="categ_id" position="after">
+                    <label for="cleaning_claim"/>
+                    <div class="oe_inline">
+                        <field name="cleaning_claim" style="width: 37%%"/>
+                        <field name="quality_specify" attrs="{'invisible': [('cleaning_claim', '!=', 'quality')]}"
+                            style="width: 20%%"
+                        />
+                        <field name="danger_claim" attrs="{'invisible': [('cleaning_claim', '!=', 'danger')]}"
+                            style="width: 37%%"
+                        />
+                        <field name="danger_specify" attrs="{'invisible': [('danger_claim', '!=', 'else')]}"
+                            style="width: 20%%"
+                        />
+                        <field name="commun_claim" attrs="{'invisible': [('cleaning_claim', '!=', 'commun')]}"
+                            style="width: 37%%"
+                        />
+                        <field name="commun_specify" attrs="{'invisible': [('commun_claim', '!=', 'else')]}"
+                            style="width: 20%%"
+                        />
+                        <field name="cheating_specify" attrs="{'invisible': [('cleaning_claim', '!=', 'cheating')]}"
+                            style="width: 20%%"
+                        />
+                        <field name="schedule_claim" attrs="{'invisible': [('cleaning_claim', '!=', 'schedule')]}"
+                            style="width: 37%%"
+                        />
+                        <field name="shcedule_specify" attrs="{'invisible': [('schedule_claim', '!=', 'else')]}"
+                            style="width: 20%%"
+                        />
+                        <field name="resp_claim" attrs="{'invisible': [('cleaning_claim', '!=', 'resp')]}"
+                            style="width: 37%%"
+                        />
+                        <field name="resp_specify" attrs="{'invisible': [('resp_claim', '!=', 'else')]}"
+                            style="width: 20%%"
+                        />
+                        <field name="colleaugue_claim" attrs="{'invisible': [('cleaning_claim', '!=', 'colleaugue')]}"
+                            style="width: 37%%"
+                        />
+                        <field name="colleaugue_specify" attrs="{'invisible': [('colleaugue_claim', '!=', 'else')]}"
+                            style="width: 20%%"
+                        />
+                        <field name="head_claim" attrs="{'invisible': [('cleaning_claim', '!=', 'head')]}"
+                            style="width: 37%%"
+                        />
+                        <field name="head_specify" attrs="{'invisible': [('head_claim', '!=', 'else')]}"
+                            style="width: 20%%"
+                        />
+                        <field name="assessment_claim" attrs="{'invisible': [('cleaning_claim', '!=', 'assessment')]}"
+                            style="width: 37%%"
+                        />
+                        <field name="assessment_specify" attrs="{'invisible': [('assessment_claim', '!=', 'else')]}"
+                            style="width: 20%%"
+                        />
+                    </div>
+                </field>
+            </field>
+        </record>
+
+     </data>
+</openerp>

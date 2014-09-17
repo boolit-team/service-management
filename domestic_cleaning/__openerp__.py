@@ -43,7 +43,8 @@
         'views/res_partner_view.xml',
         'views/crm_lead_view.xml',
         'views/calendar_service_view.xml',
-        'views/analytic_view.xml'
+        'views/analytic_view.xml',
+        'views/crm_claim_view.xml',
         #'data/,        
 
     ],

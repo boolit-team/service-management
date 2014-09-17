@@ -27,7 +27,7 @@ class hr_employee(models.Model):
     _inherit = 'hr.employee'
     
     week_busyness = fields.Float(string='Planned Week Hrs', compute="_compute_busyness")
-    week_work_avg = fields.Float(string="Average Planned Hrs", compute="_compute_busyness", help="Between two weeks")
+    week_work_avg = fields.Float(string="Average Planned Hrs", compute="_compute_busyness", help="Between two weeks (Recurrent)")
 
     @api.one
     @api.depends('contract_id')

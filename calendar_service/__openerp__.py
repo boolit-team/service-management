@@ -37,7 +37,8 @@
     'website': 'www.oerp.eu',
     'depends': [
         'base_address_management',
-        'sale',     
+        'sale',
+        'hr',     
     ],
     'data': [
         'security/ir.model.access.csv',

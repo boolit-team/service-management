@@ -398,7 +398,7 @@ class calendar_service_calendar(models.Model):
 
     @api.one
     @api.constrains('weekday', 'time_from', 'time_to', 'employee_ids', 'second_week', 
-        'last_week_gen', 'rule_id.recurrent_id.ign_second_week')
+        'last_week_gen')
     def _check_resource(self):
         for empl in self.employee_ids:
             items = self.search(
