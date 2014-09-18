@@ -558,7 +558,6 @@ class calendar_service_recurrent(models.Model):
         if not self.rule_ids:
             raise Warning(_("You should enter at least one Rule!"))
 
-
 class calendar_service_recurrent_rule(models.Model):
     _name = 'calendar.service.recurrent.rule'
     _description = 'Recurrent Calendar Services Rules'

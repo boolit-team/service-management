@@ -11,7 +11,9 @@
             <field name="inherit_id" ref="calendar_service.view_calendar_service_recurrent_rule_form"/>
             <field name="arch" type="xml">
                 <field name="employee_ids" position="after">
-                    <field name="account_id"/>
+                    <field name="account_id"
+                        onchange="onchange_employee_ids()"
+                    /> <!-- Adds inside calendar_ids editable tree-->
                 </field>
             </field>
         </record>

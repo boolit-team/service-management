@@ -74,7 +74,12 @@ class calendar_service_calendar(models.Model):
     _inherit = 'calendar.service.calendar'
 
     account_id = fields.Many2one('account.analytic.account', 'Timesheet Account', domain=[('type', '=', 'normal'), 
-        ('use_timesheets', '=', True)])    
+        ('use_timesheets', '=', True)])
+
+    @api.onchange('employee_ids')    
+    def onchange_employee_ids(self):
+        if self.employee_ids:
+            self.account_id = self.employee_ids[0].default_account_id.id #defaults to first employee timesheet account
 
 class calendar_service_recurrent(models.Model):
     _inherit = 'calendar.service.recurrent'
