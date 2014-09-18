@@ -106,7 +106,8 @@ class hr_analytic_timesheet(models.Model):
             self.product_id = self._getEmployeeProduct()
             self.product_uom_id = self._getEmployeeUnit()
             self.general_account_id = self._getGeneralAccount()
-            self.journal_id = self._getAnalyticJournal() 
+            self.journal_id = self._getAnalyticJournal()
+            self.account_id = self.employee_id.default_account_id.id 
 
     @api.model
     def create(self, vals):
