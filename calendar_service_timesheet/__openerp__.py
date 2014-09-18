@@ -36,8 +36,7 @@
     'website': 'www.oerp.eu',
     'depends': [
         'calendar_service',
-        'hr_timesheet_employee',
-        'hr_payroll',      
+        'hr_timesheet_employee',     
     ],
     'data': [
         #'security/ir.model.access.csv',

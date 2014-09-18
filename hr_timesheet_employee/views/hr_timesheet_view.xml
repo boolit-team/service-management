@@ -45,5 +45,16 @@
             </field>
         </record>
 
+        <record id="hr_timesheet_employee_extd_form" model="ir.ui.view">
+            <field name="name">hr.timesheet.employee.extd_form</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr_timesheet.hr_timesheet_employee_extd_form"/>
+            <field name="arch" type="xml">
+                        <field name="journal_id" position="after">
+                            <field name="default_account_id"/>
+                        </field>
+            </field>
+        </record>        
+
     </data>
 </openerp>

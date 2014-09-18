@@ -19,8 +19,7 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.     
 #
 ##############################################################################
-from openerp import models, fields
-from openerp import api
+from openerp import models, fields, api
 from openerp.exceptions import Warning, RedirectWarning
 from openerp.tools.translate import _
 
@@ -127,4 +126,10 @@ class hr_analytic_timesheet(models.Model):
         if not vals.get('account_id',False):
            raise Warning(_('No analytic account is defined on the project.\n'
             'Please set one or we cannot automatically fill the timesheet.'))
-        return super(hr_analytic_timesheet, self).create(vals)            
+        return super(hr_analytic_timesheet, self).create(vals)         
+
+class hr_employee(models.Model):
+    _inherit = 'hr.employee'
+
+    default_account_id = fields.Many2one('account.analytic.account', 'Default Timesheet Account', domain=[('type', '=', 'normal'), 
+        ('use_timesheets', '=', True)])   
