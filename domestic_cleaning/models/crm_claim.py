@@ -63,4 +63,5 @@ class crm_claim(models.Model):
     head_specify = fields.Char('Specify')
     assessment_claim = fields.Selection(ASSESSMENT_CLAIM, 'Overall Negative Assessment')
     assessment_specify = fields.Char('Specify')
+    damage_amount = fields.Float('Damage amount, %')
 

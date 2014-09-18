@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data> 
+        <!-- recurrent.rule.change.time-->
+        <record id="view_recurrent_rule_change_time_form" model="ir.ui.view">
+            <field name="name">recurrent.rule.change.time.form</field>
+            <field name="model">recurrent.rule.change.time</field>
+            <field name="inherit_id" ref="calendar_service.view_recurrent_rule_change_time_form"/>
+            <field name="arch" type="xml">
+                <field name="employee_ids" position="after"> 
+                    <field name="account_id" attrs="{'invisible': [('action', '!=', 'add')]}" />   
+                </field>
+            </field>
+        </record>        
+
+    </data>
+</openerp>

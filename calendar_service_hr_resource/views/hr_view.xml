@@ -10,10 +10,10 @@
                     <page string="Resources">
                         <group>
                             <group>
-                                <field name="week_busyness"/>
+                                <field name="week_busyness" widget="float_time"/>
                             </group>
                             <group>
-                                <field name="week_work_avg"/>
+                                <field name="week_work_avg" widget="float_time"/>
                             </group>
                         </group>
                     </page>

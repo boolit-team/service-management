@@ -44,6 +44,7 @@ class recurrent_rule_change_time(models.TransientModel):
     time_from = fields.Float('Change From')
     time_to = fields.Float('Change To')
     change_id = fields.Many2one('recurrent.rule.change', 'Rule Change')
+    product_id = fields.Many2one('product.product', 'Product Service', domain=[('type', '=', 'service')])
     employee_ids = fields.Many2many('hr.employee', 'hr_employee_change_time_rel', 'change_time_id', 'employee_id', 'Employees')
     weeks = fields.Integer('Weeks', help="How many weeks to generate."
         "\n0 means generate only this week starting from now + 1 hour", default=0)
@@ -60,7 +61,7 @@ class recurrent_rule_change(models.TransientModel):
     change_type = fields.Selection([('permanent', 'Permanent'), ('once', 'One Time')], 
         'Change Type', required=True, help="Choosing 'One Time', it only modifies calendar.\nChoosing 'Permanent', it also updates rules")
 
-    @api.one
+    @api.model
     def _add_rule_item(self, change_time):
         """
         Adds rule item in specified rule if type is 'permanent'. 
@@ -77,7 +78,8 @@ class recurrent_rule_change(models.TransientModel):
             cal_rec = cal_serv_cal.create({
                 'weekday': change_time.weekday, 
                 'time_from': change_time.time_from, 
-                'time_to': change_time.time_to, 
+                'time_to': change_time.time_to,
+                'product_id': change_time.product_id.id, 
                 'employee_ids': [(6, 0, employee_ids)],
                 'rule_id': self.rule_id.id,
             })
@@ -99,6 +101,7 @@ class recurrent_rule_change(models.TransientModel):
                 service_work_obj = self.env['calendar.service.work']
                 self.rule_id.recurrent_id.create_service(service_obj, service_work_obj, 
                     start_time, end_time, cal_rec, self.rule_id, current_address, change_time)
+        return cal_rec
 
     @api.one
     def change_rule(self):

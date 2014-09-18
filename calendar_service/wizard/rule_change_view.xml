@@ -26,6 +26,7 @@
                                     attrs="{'invisible': [('action', '=', 'delete')], 'required': [('action', 'in', ('update', 'add'))]}"/>
                                 <field name="time_to" widget="float_time" 
                                     attrs="{'invisible': [('action', '=', 'delete')], 'required': [('action', 'in', ('update', 'add'))]}"/>
+                                <field name="product_id" attrs="{'invisible': [('action', '!=', 'add')]}"/>
                                 <field name="employee_ids" widget="many2many_tags"
                                     attrs="{'invisible': [('action', 'in', ('delete', 'update'))], 'required': [('action', '=', 'add')]}"/>     
 

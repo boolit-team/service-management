@@ -20,42 +20,19 @@
 #
 ##############################################################################
 
+from openerp import models, fields, api
 
-{
-    'name': 'Domestic Cleaning',
-    'version': '1.0',
-    'category': 'Cleaning',
-    'sequence': 2,
-    'summary': 'Domestic Cleaning Specifics',
-    'description': """
-	   Implements specific fields related with Domestic
-       Cleaning business. Used with Calendar Service and other
-       dependant modules.
-	""",
-    'author': 'OERP',
-    'website': 'www.oerp.eu',
-    'depends': [
-        'calendar_service_crm',
+class recurrent_rule_change_time(models.TransientModel):
+    _inherit = 'recurrent.rule.change.time'
 
-    ],
-    'data': [
-        'security/ir.model.access.csv',
-        'views/res_partner_view.xml',
-        'views/crm_lead_view.xml',
-        'views/calendar_service_view.xml',
-        'views/analytic_view.xml',
-        'views/crm_claim_view.xml',
-        #'data/,        
+    account_id = fields.Many2one('account.analytic.account', 'Timesheet Account', domain=[('type', '=', 'normal'), 
+        ('use_timesheets', '=', True)]) 
 
-    ],
-    'demo': [
-    ],
-    'test': [
+class recurrent_rule_change(models.TransientModel):
+    _inherit = 'recurrent.rule.change'
 
-    ],
-    'installable': True,
-    'application': True,
-    'auto_install': False,
-    'images': [],
-}
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
+    @api.model
+    def _add_rule_item(self, change_time):
+        cal_rec = super(recurrent_rule_change, self)._add_rule_item(change_time)
+        if self.change_type == 'permanent' and cal_rec:
+            cal_rec.account_id = change_time.account_id.id

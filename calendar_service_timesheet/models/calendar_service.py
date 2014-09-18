@@ -82,10 +82,16 @@ class calendar_service_recurrent(models.Model):
     @api.one
     def create_service(self,service_obj, service_work_obj, start_time, end_time, 
         cal_rec, rule, current_address, change_time=None):
+        """
+        Creates Calendar service and its works. 
+        Only use change_time when creating it from rule change wizard!
+        """
         service = service_obj.create({
             'start_time': start_time, 'end_time': end_time,
             'user_id': rule.user_id.id, 'work_type': 'recurrent',
-            'rule_calendar_id': cal_rec.id,'partner_id': rule.partner_id.id,
+            'rule_calendar_id': cal_rec.id, 
+            'product_id': change_time.product_id.id if change_time else cal_rec.product_id.id, #exception for early change_time use
+            'partner_id': rule.partner_id.id,
         })
         if change_time:
             cal_rec = change_time

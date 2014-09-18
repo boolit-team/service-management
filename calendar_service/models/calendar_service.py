@@ -174,7 +174,7 @@ class calendar_service(models.Model):
     state = fields.Selection(STATE, 'State', readonly=True, default='open', track_visibility='onchange')
     user_id = fields.Many2one('res.users', 'Salesman')
     rule_calendar_id = fields.Many2one('calendar.service.calendar', 'Rule Calendar Item')
-    product_id = fields.Many2one('product.product', 'Service', domain=[('type', '=', 'service')])
+    product_id = fields.Many2one('product.product', 'Product Service', domain=[('type', '=', 'service')])
     order_id = fields.Many2one('sale.order', 'Sale Order')
     desired_time_ids = fields.One2many('calendar.service.desired.time', 'service_id', 'Service Time')
     canceled_until = fields.Date('Canceled Until')
@@ -281,6 +281,7 @@ class calendar_service_calendar(models.Model):
     rule_id = fields.Many2one('calendar.service.recurrent.rule', 'Rule')
     second_week = fields.Boolean('Every Second Week')
     last_week_gen = fields.Boolean('Last Week Generated')
+    product_id = fields.Many2one('product.product', 'Product Service', domain=[('type', '=', 'service')])
 
     @api.multi
     def name_get(self):
@@ -466,7 +467,9 @@ class calendar_service_recurrent(models.Model):
         service = service_obj.create({
             'start_time': start_time, 'end_time': end_time,
             'user_id': rule.user_id.id, 'work_type': 'recurrent',
-            'rule_calendar_id': cal_rec.id,'partner_id': rule.partner_id.id,
+            'rule_calendar_id': cal_rec.id, 
+            'product_id': change_time.product_id.id if change_time else cal_rec.product_id.id, #exception for early change_time use
+            'partner_id': rule.partner_id.id,
         })
         if change_time:
             cal_rec = change_time

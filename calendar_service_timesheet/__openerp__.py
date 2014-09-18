@@ -43,6 +43,7 @@
         #'security/ir.model.access.csv',
         'views/calendar_service_view.xml',
         'views/calendar_service_recurrent_view.xml',
+        'wizard/rule_change_view.xml',
         #'data/,        
 
     ],

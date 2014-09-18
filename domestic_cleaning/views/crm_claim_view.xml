@@ -18,10 +18,10 @@
                             style="width: 20%%"
                         />
                         <field name="danger_claim" attrs="{'invisible': [('cleaning_claim', '!=', 'danger')]}"
-                            style="width: 37%%"
+                            style="width: 37%%" 
                         />
                         <field name="danger_specify" attrs="{'invisible': [('danger_claim', '!=', 'else')]}"
-                            style="width: 20%%"
+                            style="width: 20%%" 
                         />
                         <field name="commun_claim" attrs="{'invisible': [('cleaning_claim', '!=', 'commun')]}"
                             style="width: 37%%"
@@ -63,6 +63,7 @@
                             style="width: 20%%"
                         />
                     </div>
+                    <field name="damage_amount"/>
                 </field>
             </field>
         </record>
