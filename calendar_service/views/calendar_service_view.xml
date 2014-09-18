@@ -127,7 +127,6 @@
         <record id="view_calendar_service_tree" model="ir.ui.view">
             <field name="name">calendar.service.tree</field>
             <field name="model">calendar.service</field>
-            <field name="priority">2</field>
             <field name="arch" type="xml">
                 <tree string="Service">
                     <field name="name"/>
@@ -144,7 +143,6 @@
         <record id="view_calendar_service_form" model="ir.ui.view">
             <field name="name">calendar.service.form</field>
             <field name="model">calendar.service</field>
-            <field name="priority">5</field>
             <field name="arch" type="xml">
                 <form string="Service">
                     <header>
@@ -214,7 +212,6 @@
         <record model="ir.ui.view" id="view_calendar_service_calendar">
             <field name="name">Service Calendar</field>
             <field name="model">calendar.service</field>
-            <field name="priority" eval="1"/>
             <field name="arch" type="xml">
                 <calendar string="Services" date_start="start_time" color="work_type"
                     date_stop="end_time" mode="week">
@@ -230,6 +227,7 @@
             <field name="arch" type="xml">
                 <search string="Search Services">
                     <field name="name" string="Service / Customer" filter_domain="['|',('partner_id','ilike',self),('name','ilike',self)]"/>
+                    <field name="partner_id" filter_domain="[('partner_id','child_of',self)]"/>
                     <separator/>
                     <filter string="My Services"
                             domain="[('user_id','=',uid)]"
@@ -254,7 +252,6 @@
             <field name="view_mode">tree,calendar,form</field>
             <field name="view_id" ref="view_calendar_service_tree"/>
             <field name="search_view_id" ref="view_calendar_service_search"/>
-            <field name="context">{'res_id': active_id}</field>
             <field name="help" type="html">
               <p class="oe_view_nocontent_create">
                 Click to create new service.

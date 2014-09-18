@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <openerp>
     <data>
+
         <record id="res_partner_view_buttons" model="ir.ui.view">
             <field name="name">view.res.partner.form.crm.inherited1</field>
             <field name="model">res.partner</field>
@@ -13,14 +14,18 @@
                             attrs="{'invisible': [('customer', '=', False)]}"
                             name="%(calendar_service.action_calendar_service)d"
                             icon="fa-home"
-                            type="action"
-                            context="{'search_default_partner_id': active_id}">
+                            context="{'search_default_partner_id': active_id}"
+                            type="action">
                             <field name="service_count" string="Services" widget="statinfo"/>
                         </button>
                     </button>
             </field>
-        </record>
+        </record>       
 
     </data>
 </openerp>
+
+<!-- 
+
+-->
 
