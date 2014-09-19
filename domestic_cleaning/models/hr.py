@@ -20,44 +20,12 @@
 #
 ##############################################################################
 
+from openerp import models, fields, api
 
-{
-    'name': 'Domestic Cleaning',
-    'version': '1.0',
-    'category': 'Cleaning',
-    'sequence': 2,
-    'summary': 'Domestic Cleaning Specifics',
-    'description': """
-	   Implements specific fields related with Domestic
-       Cleaning business. Used with Calendar Service and other
-       dependant modules.
-	""",
-    'author': 'OERP',
-    'website': 'www.oerp.eu',
-    'depends': [
-        'calendar_service_crm',
-        'crm_claim',
+class hr_employee(models.Model):
+    _inherit = 'hr.employee'
 
-    ],
-    'data': [
-        'security/ir.model.access.csv',
-        'views/res_partner_view.xml',
-        'views/crm_lead_view.xml',
-        'views/calendar_service_view.xml',
-        'views/analytic_view.xml',
-        'views/crm_claim_view.xml',
-        'views/hr_view.xml',
-        #'data/,        
-
-    ],
-    'demo': [
-    ],
-    'test': [
-
-    ],
-    'installable': True,
-    'application': True,
-    'auto_install': False,
-    'images': [],
-}
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
+    claim_ids = fields.One2many('crm.claim', 'employee_id', 'Claims')
+    damage_amount = fields.Float('Damage Amount, %')
+    employee_assessment = fields.Float('Employee Assessment, %')
+    assessment_date = fields.Date('Assessment Date')

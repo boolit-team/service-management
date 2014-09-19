@@ -68,7 +68,7 @@ class calendar_service(models.Model):
     def close_state(self):
         super(calendar_service, self).close_state()
         for work in self.work_ids:
-          work.set_timesheet_activity()
+            work.set_timesheet_activity()
 
 class calendar_service_calendar(models.Model):
     _inherit = 'calendar.service.calendar'

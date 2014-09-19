@@ -199,6 +199,7 @@ class calendar_service(models.Model):
         When closing service, it also creates/updates Sale Order
         if product_id is set on service.
         """
+        print self.env.context
         if self.work_type == 'wait':
             raise Warning(_("Service with Waiting type can't be closed!"))
         if self.product_id:
@@ -206,12 +207,12 @@ class calendar_service(models.Model):
             order_obj = self.env['sale.order']                      
             vals = {'partner_id': self.partner_id.id, 'date_order': self.end_time,
                 'pricelist_id': self.partner_id.property_product_pricelist.id,
-                'user_id': self.user_id.id, 'calendar_service_id': self.id,
+                'user_id': self.user_id.id, 'calendar_service_id': self.id, 'state': 'draft',
             }  
             start_time = cal_serv_cal.str_to_dt(self.start_time)
             end_time = cal_serv_cal.str_to_dt(self.end_time)
             qty = round(cal_serv_cal.get_duration(start_time, end_time), 3) #converting duration as qty in hours              
-            line_vals = {'product_id': self.product_id.id, 'product_uom_qty': qty,}                      
+            line_vals = {'product_id': self.product_id.id, 'product_uom_qty': qty, 'state': 'draft',}                      
             if not self.order_id or (self.order_id and self.order_id.state == 'cancel'):
                 order = order_obj.create(vals)
                 self.order_id = order.id

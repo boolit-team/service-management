@@ -14,7 +14,7 @@
                             attrs="{'invisible': [('customer', '=', False)]}"
                             name="%(calendar_service.action_calendar_service)d"
                             icon="fa-home"
-                            context="{'search_default_partner_id': active_id}"
+                            context="{'search_default_partner_id': active_id, 'search_default_state': 'open'}"
                             type="action">
                             <field name="service_count" string="Services" widget="statinfo"/>
                         </button>
