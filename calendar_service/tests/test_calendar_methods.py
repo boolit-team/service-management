@@ -25,6 +25,7 @@ class TestCalendarMethods(TransactionCase):
         dt_test2 = dt.replace(tzinfo=pytz.utc)
         self.assertEquals(self.calendar.set_utc(cr, uid, dt, check_tz=False), dt_test2, "UTC set incorrectly when check_tz=False")
         dt_test3 = dt_test2.astimezone(local_tz)
+        self.assertEquals(self.calendar.set_tz(cr, uid, dt), dt_test3, "Incorrect TZ set")
 
     def test_getters(self):
         cr, uid = self.cr, self.uid
@@ -34,3 +35,6 @@ class TestCalendarMethods(TransactionCase):
         end_dt = datetime.now().replace(year=2014, month=9, hour=2, minute=30, second=0, microsecond=0)
         start_dt = end_dt.replace(minute=15)
         self.assertEquals(self.calendar.get_duration(cr, uid, start_dt, end_dt), 0.25, "Incorrect duration")
+        dt_test1 = datetime.now().replace(year=2014, month=9, day=20, hour=8, minute=30, second=0, microsecond=0)
+        dt_test1 = self.calendar.set_utc(cr, uid, dt_test1)
+        self.assertEquals(self.calendar.relative_date(cr, uid, end_dt, 5, 8.5), dt_test1, "Wrong relative date returned")
