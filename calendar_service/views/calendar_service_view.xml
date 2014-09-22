@@ -13,6 +13,7 @@
                     <field name="name"/>
                     <field name="employee_id"/>
                     <field name="address_archive_id"/>
+                    <field name="details"/>
                     <field name="start_time"/>
                     <field name="end_time"/>
                     <field name="state"/>

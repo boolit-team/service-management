@@ -64,6 +64,7 @@ class calendar_service_work(models.Model):
     work_type = fields.Selection(WORK_TYPE, 'Type')
     state = fields.Selection(STATE, 'State', readonly=True, default='open', track_visibility='onchange')
     ign_rule_chk = fields.Boolean('Ignore Rule Check')
+    details = fields.Char('Details', compute='_compute_details')
 
     @api.one
     def close_state(self):
@@ -72,6 +73,15 @@ class calendar_service_work(models.Model):
     @api.one
     def cancel_state(self):
         self.state = 'cancel'    
+
+    @api.one
+    @api.depends('description', 'attention')
+    def _compute_details(self):
+        self.details = ''
+        if self.description:
+            self.details = 'Description'
+        if self.attention:
+            self.details = "%s%s" % ("Description + " if self.details else '', 'Attention')
 
     @api.onchange('partner_id')
     def onhange_partner_id(self):
