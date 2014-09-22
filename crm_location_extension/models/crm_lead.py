@@ -19,8 +19,7 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.     
 #
 ##############################################################################
-from openerp import models, fields
-from openerp.api import onchange, one
+from openerp import models, fields, api
 from openerp import tools
 
 class crm_lead(models.Model):
@@ -32,7 +31,7 @@ class crm_lead(models.Model):
     apartment_no = fields.Char('Apartment No.', size=64, help="Apartment No.")
 
     #methods
-    @onchange('zip_id')
+    @api.onchange('zip_id')
     def onchange_zip_id(self):
         if self.zip_id:
             self.street = self.zip_id.street_id and self.zip_id.street_id.name or False
@@ -42,11 +41,12 @@ class crm_lead(models.Model):
             self.house_no = self.zip_id.house_no or False
             self.apartment_no = self.zip_id.apartment_no or False
 
-    def _lead_create_contact(self, cr, uid, lead, name, is_company, parent_id=False, context=None):
+    @api.model
+    def _lead_create_contact(self, lead, name, is_company, parent_id=False):
         """
         Extends original method to also add house_no and apartment_no fields data
         """
-        partner = self.pool.get('res.partner')
+        partner = self.env['res.partner']
         vals = {'name': name,
             'user_id': lead.user_id.id,
             'comment': lead.description,
@@ -69,6 +69,6 @@ class crm_lead(models.Model):
             'house_no': lead.house_no,
             'apartment_no': lead.apartment_no,
         }
-        partner = partner.create(cr, uid, vals, context=context)
-        return partner    
+        partner = partner.create(vals)
+        return partner.id    
            

@@ -1,2 +1,2 @@
-import hr_payroll
+import hr
 import hr_contract

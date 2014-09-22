@@ -32,6 +32,11 @@ class hr_employee(models.Model):
     @api.one
     @api.depends('contract_id')
     def _compute_busyness(self):
+        """
+        Computes planned hours for employee for current week total.
+        And averagely for two weeks - this and last one, but only
+        taking in considaration recurrent records.
+        """
         self.week_busyness = 0.0
         self.week_work_avg = 0.0
         if self.contract_id and self.contract_id.track_calendar:

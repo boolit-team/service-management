@@ -39,13 +39,14 @@ class crm_lead(models.Model):
     address_description = fields.Char('Address Description')
     nationality_id = fields.Many2one('res.country', 'Nationality') 
     
-    def _lead_create_contact(self, cr, uid, lead, name, is_company, parent_id=False, context=None):
+    @api.model
+    def _lead_create_contact(self, lead, name, is_company, parent_id=False):
         """
         Extends original method to also add:
           house_no, apartment_no, eyre, house_name, apartment_complex, address_description, nationality_id 
           fields data
         """
-        partner = self.pool.get('res.partner')
+        partner = self.env['res.partner']
         vals = {'name': name,
             'user_id': lead.user_id.id,
             'comment': lead.description,
@@ -74,5 +75,5 @@ class crm_lead(models.Model):
             'nationality_id': not is_company and lead.nationality_id and lead.nationality_id.id or False
         }
 
-        partner = partner.create(cr, uid, vals, context=context)
-        return partner    
+        partner = partner.create(vals)
+        return partner.id    

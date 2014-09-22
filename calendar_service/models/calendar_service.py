@@ -77,6 +77,10 @@ class calendar_service_work(models.Model):
     @api.one
     @api.depends('description', 'attention')
     def _compute_details(self):
+        """
+        Checks if description and/or attention fields are filled,
+        when in tree view
+        """
         self.details = ''
         if self.description:
             self.details = 'Description'
@@ -127,6 +131,9 @@ class calendar_service_work(models.Model):
     @api.one
     @api.constrains('start_time', 'end_time', 'service_id')
     def _check_time(self):
+        """
+        Lets to set works time only in service time constraints
+        """
         cal_serv_cal = self.env['calendar.service.calendar']
         start_time = cal_serv_cal.str_to_dt(self.start_time)
         end_time = cal_serv_cal.str_to_dt(self.end_time)
@@ -138,6 +145,12 @@ class calendar_service_work(models.Model):
     @api.one
     @api.constrains('start_time', 'end_time', 'employee_id', 'state', 'work_type')
     def _check_resource(self):
+        """
+        Does double resource checking to see if resource (employee)
+        is already taken for specific time. First check is to see between
+        already created records. Second check is to see if recurrent rule
+        is set for that time, the record is being created for.
+        """
         cal_serv_cal = self.env['calendar.service.calendar']
         recs = self.search([('id', '!=', self.id), 
             ('employee_id', '=', self.employee_id.id), ('state', '=', 'open'), ('work_type', '!=', 'wait'), 
@@ -325,6 +338,14 @@ class calendar_service_calendar(models.Model):
 
     @api.model
     def relative_date(self, reference, weekday, timevalue):
+        """
+        Constructs datetime from weekday, time in
+        float format and reference datetime. Reference
+        datetime means datetime for specific week. It
+        can be any datetime in wanted week interval.
+        Also sets utc timezone for datetime for 
+        comparing purposes.
+        """
         hour, minute = divmod(timevalue, 1)
         minute *= 60
         days = reference.weekday() - weekday
@@ -335,6 +356,10 @@ class calendar_service_calendar(models.Model):
 
     @api.model
     def get_weekday(self, key, name=True):
+        """
+        Returns weekday name from weekday keyword
+        or its value.
+        """
         if name:
             weekdays = {
                 'M': 'Monday', 'T': 'Tuesday', 'W': 'Wednesday',
@@ -469,6 +494,13 @@ class calendar_service_recurrent(models.Model):
 
     @api.one
     def set_next_gen_time(self):
+        """
+        Sets datetime for next recurrent calendar 
+        generation time 'constraint'. If it is initial generation,
+        then datetime will be next weeks monday from last generated
+        week. If non initial, then it extends the number of weeks
+        it was specified to extend generation (usually 1 week)
+        """
         cal_serv_cal = self.env['calendar.service.calendar']
         if self.init:
             weeks = self.init_weeks + 1 # we need to jump to the next week after the last one generated (+1).
@@ -485,6 +517,10 @@ class calendar_service_recurrent(models.Model):
     @api.one
     def create_service(self,service_obj, service_work_obj, start_time, end_time, 
         cal_rec, rule, current_address, change_time=None):
+        """
+        Helper method for creating services and its works 
+        for generation methods.
+        """
         service = service_obj.create({
             'start_time': start_time, 'end_time': end_time,
             'user_id': rule.user_id.id, 'work_type': 'recurrent',
@@ -506,6 +542,12 @@ class calendar_service_recurrent(models.Model):
 
     @api.one
     def generate_recurrent(self):
+        """
+        Generates recurrent services from specified 
+        recurrent calendar rules. Can generate weekly,
+        or every second week repeating calendar services
+        with their works. 
+        """
         if self.active:
             cal_serv_cal = self.env['calendar.service.calendar']
             now1 = cal_serv_cal.set_utc(datetime.today() + timedelta(hours=1), check_tz=False)

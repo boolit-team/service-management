@@ -29,13 +29,13 @@
     'summary': 'Timesheet integration for Payroll',
     'description': """
     	Lets calculate payroll using timesheet activities. 
-        Implements new keyword 'duration' that can be used in payroll rules. 
-        This keyword returns total duration of hours from timesheet activities for 
+        Implements new method getDuration() that can be used in payroll rules. 
+        This method returns total duration of hours from timesheet activities for 
         specific employee per payslip. It filters duration according to 
         payslip 'date_from' and 'date_to'. Also implements new field 'salary_per_h' in 
         employee contracts that can be used to calculate salary for worked hours. 
         Salary Rule example:
-            'contract.salary_per_h * duration'
+            'contract.salary_per_h * employee.getDuration(payslip)'
 
 
 	""",

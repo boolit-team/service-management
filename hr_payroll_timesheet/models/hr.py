@@ -19,10 +19,21 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.     
 #
 ##############################################################################
-from openerp import models, fields
-class hr_contract(models.Model):
-    _name = 'hr.contract'
-    _inherit = 'hr.contract'
+from openerp import models, api
 
-    #fields
-    salary_per_h = fields.Float(string="Salary per Hour")
+class hr_employee(models.Model):
+    _inherit = 'hr.employee'
+
+    @api.model
+    def getDuration(self, payslip):
+        duration = 0.0
+        tsheet_obj = self.env['hr.analytic.timesheet']
+        timesheets = tsheet_obj.search([('employee_id', '=', self.id), 
+            ('date', '>=', payslip.date_from), ('date', '<=', payslip.date_to), ('officer', '=', True)])
+        if self.user_id: #also add timesheets if only user is selected 
+            tsheet_add = tsheet_obj.search([('user_id', '=', self.user_id.id), 
+            ('date', '>=', payslip.date_from), ('date', '<=', payslip.date_to), ('officer', '=', False)])
+            timesheets += tsheet_add
+        for tsheet in timesheets: #counting duration from timesheets
+            duration += tsheet.unit_amount   
+        return duration

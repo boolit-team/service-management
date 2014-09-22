@@ -19,8 +19,8 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.     
 #
 ##############################################################################
-from openerp import models, fields
-from openerp import api
+from openerp import models, fields, api
+
 class res_partner_address_archive(models.Model):
     _name = 'res.partner.address_archive'
     _description = 'Partner Addresses Archive'
@@ -93,6 +93,10 @@ class res_partner(models.Model):
     #methods
     @api.one
     def init_archive(self):
+        """
+        Creates address to archive from address
+        in res.partner
+        """
         vals = {
             'country_id': self.country_id and self.country_id.id or False,
             'state_id': self.state_id and self.state_id.id or False,            
@@ -119,6 +123,10 @@ class res_partner(models.Model):
 
     @api.one
     def update_address(self, context=None):
+        """
+        Updates res.partner address from current address
+        from archive.
+        """
         address = self.env['res.partner.address_archive'].search(
             [('partner_id', '=', self.id), ('current', '=', True)])
         if address:
