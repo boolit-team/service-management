@@ -115,6 +115,17 @@ class calendar_service_work(models.Model):
         return duration        
 
     @api.one
+    @api.constrains('start_time', 'end_time', 'service_id')
+    def _check_time(self):
+        cal_serv_cal = self.env['calendar.service.calendar']
+        start_time = cal_serv_cal.str_to_dt(self.start_time)
+        end_time = cal_serv_cal.str_to_dt(self.end_time)
+        serv_start_time = cal_serv_cal.str_to_dt(self.service_id.start_time)
+        serv_end_time = cal_serv_cal.str_to_dt(self.service_id.end_time)
+        if start_time < serv_start_time or end_time > serv_end_time:
+            raise Warning(_("Work start/end time can't go out of service time constraints!")) 
+
+    @api.one
     @api.constrains('start_time', 'end_time', 'employee_id', 'state', 'work_type')
     def _check_resource(self):
         cal_serv_cal = self.env['calendar.service.calendar']
@@ -199,7 +210,6 @@ class calendar_service(models.Model):
         When closing service, it also creates/updates Sale Order
         if product_id is set on service.
         """
-        print self.env.context
         if self.work_type == 'wait':
             raise Warning(_("Service with Waiting type can't be closed!"))
         if self.product_id:

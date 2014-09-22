@@ -52,6 +52,7 @@
 
     ],
     'demo': [
+        'demo/calendar_service_demo.xml'
     ],
     'test': [
 

@@ -1,5 +1,4 @@
 from openerp.tests.common import TransactionCase
-from openerp import api
 from datetime import datetime
 import pytz
 class TestCalendarMethods(TransactionCase):
@@ -32,7 +31,7 @@ class TestCalendarMethods(TransactionCase):
         self.assertEquals(self.calendar.get_weekday(cr, uid, 'F'), 'Friday', "Wrong Weekday Returned")
         self.assertEquals(self.calendar.get_weekday(cr, uid, 'F', name=False), 4, "Wrong weekday number returned")
         self.assertEquals(self.calendar.get_rev_weekday(cr, uid, 4), 'F', "Wrong weekday letter returned")
-        end_dt = datetime.now().replace(year=2014, month=9, hour=2, minute=30, second=0, microsecond=0)
+        end_dt = datetime.now().replace(year=2014, month=9, day=20, hour=2, minute=30, second=0, microsecond=0)
         start_dt = end_dt.replace(minute=15)
         self.assertEquals(self.calendar.get_duration(cr, uid, start_dt, end_dt), 0.25, "Incorrect duration")
         dt_test1 = datetime.now().replace(year=2014, month=9, day=20, hour=8, minute=30, second=0, microsecond=0)
