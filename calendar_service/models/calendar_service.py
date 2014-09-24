@@ -236,11 +236,21 @@ class calendar_service(models.Model):
         if self.work_type == 'wait':
             raise Warning(_("Service with Waiting type can't be closed!"))
         if self.product_id:
-            cal_serv_cal = self.env['calendar.service.calendar']
-            order_obj = self.env['sale.order']                      
+            cal_serv_cal = self.env['calendar.service.calendar']   
+            # avoid forcing default_state values when creating sale orders
+            order_obj = self.env['sale.order'].with_context({
+                key: val
+                for key, val in self.env.context.iteritems()
+                if not (isinstance(key, basestring) and key == 'default_state')
+            })
+            line_obj = self.env['sale.order.line'].with_context({
+                key: val
+                for key, val in self.env.context.iteritems()
+                if not (isinstance(key, basestring) and key == 'default_state')                
+            })
             vals = {'partner_id': self.partner_id.id, 'date_order': self.end_time,
                 'pricelist_id': self.partner_id.property_product_pricelist.id,
-                'user_id': self.user_id.id, 'calendar_service_id': self.id, 'state': 'draft',
+                'user_id': self.user_id.id, 'calendar_service_id': self.id,
             }  
             start_time = cal_serv_cal.str_to_dt(self.start_time)
             end_time = cal_serv_cal.str_to_dt(self.end_time)
@@ -250,7 +260,7 @@ class calendar_service(models.Model):
                 order = order_obj.create(vals)
                 self.order_id = order.id
                 line_vals['order_id'] = order.id
-                self.env['sale.order.line'].create(line_vals)
+                line_obj.create(line_vals)
             elif self.order_id.state == 'draft':
                 order = self.order_id.write(vals)
                 for line in self.order_id.order_line:

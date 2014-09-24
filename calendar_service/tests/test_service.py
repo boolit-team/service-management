@@ -5,12 +5,12 @@ class TestService(TransactionCase):
     def setUp(self):
         super(TestService, self).setUp()
         cr, uid = self.cr, self.uid   
-        imd = 'ir.model.data'
-        partner_id = self.registry(imd).get_object_reference(cr, uid, 'base', 'res_partner_2')[1]
-        product_id = self.registry(imd).get_object_reference(cr, uid, 'product', 'product_product_consultant')[1]
-        user_id = self.registry(imd).get_object_reference(cr, uid, 'base', 'user_root')[1]
-        emp1_id = self.registry(imd).get_object_reference(cr, uid, 'hr', 'employee_al')[1]
-        emp2_id = self.registry(imd).get_object_reference(cr, uid, 'hr', 'employee_mit')[1]
+        imd = self.registry('ir.model.data')
+        partner_id = imd.get_object_reference(cr, uid, 'base', 'res_partner_2')[1]
+        product_id = imd.get_object_reference(cr, uid, 'product', 'product_product_consultant')[1]
+        user_id = imd.get_object_reference(cr, uid, 'base', 'user_root')[1]
+        emp1_id = imd.get_object_reference(cr, uid, 'hr', 'employee_al')[1]
+        emp2_id = imd.get_object_reference(cr, uid, 'hr', 'employee_mit')[1]
         serv_model = self.registry('calendar.service')
         work_model = self.registry('calendar.service.work')
         vals = {
