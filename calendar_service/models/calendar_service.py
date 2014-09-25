@@ -88,7 +88,7 @@ class calendar_service_work(models.Model):
             self.details = "%s%s" % ("Description + " if self.details else '', 'Attention')
 
     @api.onchange('partner_id')
-    def onhange_partner_id(self):
+    def onchange_partner_id(self):
         if self.partner_id:
             for address in self.partner_id.address_archive_ids:
                 if address.current:
@@ -103,6 +103,12 @@ class calendar_service_work(models.Model):
             self.end_time = self.service_id.end_time
             self.work_type = self.service_id.work_type
             self.partner_id = self.service_id.partner_id and self.service_id.partner_id.id or False
+            if self.partner_id:
+                for address in self.partner_id.address_archive_ids:
+                    if address.current:
+                        self.address_archive_id = address.id
+                self.note = self.partner_id.comment
+                self.attention = self.partner_id.attention            
 
     @api.model
     def _get_week_dur(self, employee_id, week_nmb=0, recurrent=False):
