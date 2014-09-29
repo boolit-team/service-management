@@ -328,7 +328,7 @@ class calendar_service_calendar(models.Model):
     time_from = fields.Float('From', required=True)
     time_to = fields.Float('To', required=True)
     employee_ids = fields.Many2many('hr.employee', 'hr_employee_calendar_rel', 'calendar_id', 'employee_id', 'Employees')
-    rule_id = fields.Many2one('calendar.service.recurrent.rule', 'Rule')
+    rule_id = fields.Many2one('calendar.service.recurrent.rule', 'Rule', ondelete='cascade')
     second_week = fields.Boolean('Every Second Week')
     last_week_gen = fields.Boolean('Last Week Generated')
     product_id = fields.Many2one('product.product', 'Product Service', domain=[('type', '=', 'service')])
@@ -642,7 +642,7 @@ class calendar_service_recurrent_rule(models.Model):
     _description = 'Recurrent Calendar Services Rules'
     user_id = fields.Many2one('res.users', 'Salesman')
     name = fields.Char('Rule Name')
-    recurrent_id = fields.Many2one('calendar.service.recurrent', 'Recurrent Calendar')
+    recurrent_id = fields.Many2one('calendar.service.recurrent', 'Recurrent Calendar', ondelete='cascade')
     partner_id = fields.Many2one('res.partner', 'Customer', domain=[('customer', '=', True)], required=True)
     calendar_ids = fields.One2many('calendar.service.calendar', 'rule_id', 'Service Time')
 
