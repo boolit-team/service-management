@@ -671,9 +671,11 @@ class calendar_service_recurrent_rule(models.Model):
             if rule.partner_id.id == self.partner_id.id:
                 raise Warning(_('Partner per Rule must be Unique!'))
 
+    '''
     @api.one
     @api.constrains('calendar_ids')
     def _check_calendar_ids(self):
         if not self.calendar_ids:
             raise Warning(_("You should enter at least one Calendar Item!"))
+    '''
 
