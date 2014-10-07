@@ -120,7 +120,7 @@ class recurrent_rule_change(models.TransientModel):
                 date_to = datetime.strptime(self.date_to, '%Y-%m-%d %H:%M:%S')
                 if date_to < date_from:
                     raise Warning(_('Date To can\'t be lower than Date From!'))
-                service_domain.append(('date_to', '<=', self.date_to))
+                service_domain.append(('end_time', '<=', self.date_to))
             partner = self.rule_id.partner_id
             if not self.change_time_ids:
                 raise Warning(_('You must enter at least one change time!'))
