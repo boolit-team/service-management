@@ -257,10 +257,12 @@ class calendar_service(models.Model):
             vals = {'partner_id': self.partner_id.id, 'date_order': self.end_time,
                 'pricelist_id': self.partner_id.property_product_pricelist.id,
                 'user_id': self.user_id.id, 'calendar_service_id': self.id,
-            }  
-            start_time = cal_serv_cal.str_to_dt(self.start_time)
-            end_time = cal_serv_cal.str_to_dt(self.end_time)
-            qty = round(cal_serv_cal.get_duration(start_time, end_time), 3) #converting duration as qty in hours              
+            }
+            qty = 0.0
+            for work in self.work_ids:  
+                start_time = cal_serv_cal.str_to_dt(work.start_time)
+                end_time = cal_serv_cal.str_to_dt(work.end_time)
+                qty += round(cal_serv_cal.get_duration(start_time, end_time), 3) #converting duration as qty in hours              
             line_vals = {'product_id': self.product_id.id, 'product_uom_qty': qty, 'state': 'draft',}                      
             if not self.order_id or (self.order_id and self.order_id.state == 'cancel'):
                 order = order_obj.create(vals)
