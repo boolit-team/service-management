@@ -19,20 +19,19 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ##############################################################################
-from openerp.osv import orm, fields
+#from openerp.osv import orm, fields
+from openerp import fields, models
 
-class BetterZip(orm.Model):
+class BetterZip(models.Model):
 
     _inherit = 'res.better.zip'
-    _columns = {
-        'city_id': fields.many2one('res.country.state.city', 'City'),
-        'street_id': fields.many2one('res.country.state.city.street', 'Street'),
-        'city': fields.char('City', required=False, deprecated=True),
-        'code': fields.related('city_id', 'code', string='City Code', type="char", size=64, help="The official code for the city"),
-        'house_no': fields.char('House No.', size=32),
-        'apartment_no': fields.char('Appartment No.', size=32),
-                    
-    }
+
+    city_id = fields.Many2one('res.country.state.city', 'City')
+    street_id = fields.Many2one('res.country.state.city.street', 'Street')
+    city = fields.Char('City', required=False, deprecated=True)
+    code = fields.Char('City Code', related='city_id.code', size=64, help="The official code for the city")
+    house_no = fields.Char('House No.', size=32)
+    apartment_no = fields.Char('Appartment No.', size=32)
     
     _defaults = {'priority': None}    
     #_order = 'name'
