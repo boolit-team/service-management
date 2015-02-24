@@ -11,17 +11,19 @@
             <field name="work_type">one</field>
             <field name="state">open</field>
         </record>
-        
+<!--  
         <record model="calendar.service.work" id="calendar_service_work_1">
             <field name="name">Demo Work 1</field>
             <field name="start_time">2014-08-25 16:30:00</field>
             <field name="end_time">2014-08-25 17:30:00</field>
+
             <field name="employee_id" ref="hr.employee_al"/>
             <field name="partner_id" ref="base.res_partner_2"/>
             <field name="work_type">one</field>
             <field name="service_id" ref="calendar_service.calendar_service_1"/>
             <field name="state">open</field>
         </record> 
+
          <record model="calendar.service.work" id="calendar_service_work_2">
             <field name="name">Demo Work 2</field>
             <field name="start_time">2014-08-25 16:30:00</field>
@@ -32,6 +34,6 @@
             <field name="service_id" ref="calendar_service.calendar_service_1"/>
             <field name="state">open</field>
         </record>  
-    
+-->
     </data>
 </openerp>
