@@ -320,6 +320,8 @@ class calendar_service(models.Model):
         end_time = datetime.strptime(self.end_time, "%Y-%m-%d %H:%M:%S")
         if end_time < start_time:
             raise Warning(_("End Time can't be lower than Start Time!"))
+        if end_time == start_time:
+            raise Warning(_("End Time and Start Time can't be the same!"))
 
 class calendar_service_calendar(models.Model):
     _name = 'calendar.service.calendar'
