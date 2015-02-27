@@ -357,6 +357,16 @@ class calendar_service_calendar(models.Model):
         return result
 
     @api.model
+    def _resolve_week_skip(self, weeks, init_skip):
+        """
+        Looks first or second week should be skipped
+        """
+        if weeks % 2 == 0:
+            return init_skip
+        else:
+            return not init_skip
+
+    @api.model
     def relative_date(self, reference, weekday, timevalue):
         """
         Constructs datetime from weekday, time in
