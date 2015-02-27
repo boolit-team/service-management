@@ -588,6 +588,9 @@ class calendar_service_recurrent(models.Model):
                 current_address = self.env['res.partner.address_archive'].search(
                     [('partner_id', '=', rule.partner_id.id), ('current', '=', True)])
                 for cal_rec in rule.calendar_ids:
+                    # Assign init skip. Its either True or False.
+                    skip_week = cal_rec.last_week_gen
+                    cal_rec.last_week_gen = cal_serv_cal._resolve_week_skip(self._get_week_range(), skip_week)
                     for week in range(self._get_week_range()):
                         if not self.init:
                             ref_time = datetime.strptime(self.next_gen_time, "%Y-%m-%d %H:%M:%S") + timedelta(weeks=week, days=1) #add day to jump to next week
@@ -600,10 +603,10 @@ class calendar_service_recurrent(models.Model):
                             cal_rec.get_weekday(cal_rec.weekday, name=False), cal_rec.time_to)
                         if start_time >= now1:
                             if cal_rec.second_week: #checking if need to generate every or second week
-                                if not cal_rec.last_week_gen:
+                                if not skip_week:
                                     self.create_service(service_obj, service_work_obj, start_time, end_time, 
-                                        cal_rec, rule, current_address)
-                                cal_rec.last_week_gen = not cal_rec.last_week_gen    
+                                        cal_rec, rule, current_address)   
+                                skip_week = not skip_week
                             else:
                                 self.create_service(service_obj, service_work_obj, start_time, end_time, 
                                     cal_rec, rule, current_address)                                
