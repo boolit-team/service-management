@@ -55,6 +55,8 @@ class recurrent_rule_change_time(models.TransientModel):
 class recurrent_rule_change(models.TransientModel):
     _name = 'recurrent.rule.change'
     _description = 'Recurrent Rule Change Wizard'
+
+    name = fields.Char('Name', compute="_compute_name")
     date_from = fields.Datetime('Change From', required=True, default=datetime.now())
     date_to = fields.Datetime('Change to')
     recurrent_id = fields.Many2one('calendar.service.recurrent', 'Recurrent Calendar')
@@ -63,15 +65,10 @@ class recurrent_rule_change(models.TransientModel):
     change_type = fields.Selection([('permanent', 'Permanent'), ('once', 'One Time')], 
         'Change Type', required=True, help="Choosing 'One Time', it only modifies calendar.\nChoosing 'Permanent', it also updates rules")
 
-    @api.model
-    def _resolve_week_skip(self, weeks, init_skip):
-        """
-        Looks first or second week should be skipped
-        """
-        if weeks % 2 == 0:
-            return init_skip
-        else:
-            return not init_skip
+    @api.one
+    @api.depends('rule_id', 'change_type', 'date_from')
+    def _compute_name(self):
+        self.name = "%s / %s / %s" % (self.rule_id.name, self.change_type, self.date_from)
 
     @api.model
     def _add_rule_item(self, change_time):
