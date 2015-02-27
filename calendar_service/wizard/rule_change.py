@@ -43,6 +43,8 @@ class recurrent_rule_change_time(models.TransientModel):
     weekday = fields.Selection(WEEK_DAYS, 'Week Day')
     time_from = fields.Float('Change From')
     time_to = fields.Float('Change To')
+    second_week = fields.Boolean('Every Second Week')
+    start_next_week = fields.Boolean('Start From Next Week', help="If not set, starts every second week from current week")    
     change_id = fields.Many2one('recurrent.rule.change', 'Rule Change')
     product_id = fields.Many2one('product.product', 'Product Service', domain=[('type', '=', 'service')])
     employee_ids = fields.Many2many('hr.employee', 'hr_employee_change_time_rel', 'change_time_id', 'employee_id', 'Employees')
@@ -62,6 +64,16 @@ class recurrent_rule_change(models.TransientModel):
         'Change Type', required=True, help="Choosing 'One Time', it only modifies calendar.\nChoosing 'Permanent', it also updates rules")
 
     @api.model
+    def _resolve_week_skip(self, weeks, init_skip):
+        """
+        Looks first or second week should be skipped
+        """
+        if weeks % 2 == 0:
+            return init_skip
+        else:
+            return not init_skip
+
+    @api.model
     def _add_rule_item(self, change_time):
         """
         Adds rule item in specified rule if type is 'permanent'. 
@@ -77,6 +89,8 @@ class recurrent_rule_change(models.TransientModel):
                 employee_ids.append(empl.id)            
             cal_rec = cal_serv_cal.create({
                 'weekday': change_time.weekday, 
+                'second_week': change_time.second_week,
+                'last_week_gen': self._resolve_week_skip(change_time.weeks+1, change_time.start_next_week) if change_time.second_week else None,
                 'time_from': change_time.time_from, 
                 'time_to': change_time.time_to,
                 'product_id': change_time.product_id.id, 
@@ -88,7 +102,8 @@ class recurrent_rule_change(models.TransientModel):
         now1 = cal_serv_cal.set_utc(datetime.today() + timedelta(hours=1), check_tz=False) #Setting UTC to now1 and date_from to be able to compare.
         date_from = cal_serv_cal.set_utc(datetime.strptime(self.date_from, "%Y-%m-%d %H:%M:%S"), check_tz=False)
         next_gen_time = self.rule_id.recurrent_id.next_gen_time
-        next_gen_time = cal_serv_cal.set_utc(datetime.strptime(next_gen_time, "%Y-%m-%d %H:%M:%S"))           
+        next_gen_time = cal_serv_cal.set_utc(datetime.strptime(next_gen_time, "%Y-%m-%d %H:%M:%S"))
+        skip_week = change_time.start_next_week           
         for week in range(change_time.weeks+1): 
             ref_time = datetime.today() + timedelta(weeks=week) 
             start_time = change_time.calendar_id.relative_date(
@@ -99,8 +114,14 @@ class recurrent_rule_change(models.TransientModel):
             if (start_time >= now1) and (start_time >= date_from) and (end_time <= next_gen_time):
                 service_obj = self.env['calendar.service']
                 service_work_obj = self.env['calendar.service.work']
-                self.rule_id.recurrent_id.create_service(service_obj, service_work_obj, 
-                    start_time, end_time, cal_rec, self.rule_id, current_address, change_time)
+                if change_time.second_week:
+                    if not skip_week:
+                        self.rule_id.recurrent_id.create_service(service_obj, service_work_obj, 
+                            start_time, end_time, cal_rec, self.rule_id, current_address, change_time)
+                    skip_week = not skip_week                    
+                else:
+                    self.rule_id.recurrent_id.create_service(service_obj, service_work_obj, 
+                        start_time, end_time, cal_rec, self.rule_id, current_address, change_time)
         return cal_rec
 
     @api.one

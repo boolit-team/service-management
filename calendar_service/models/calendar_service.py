@@ -510,6 +510,16 @@ class calendar_service_recurrent(models.Model):
         else:
             return self.weeks
 
+    @api.model
+    def _resolve_week_skip(weeks, init_skip):
+        """
+        Looks first or second week should be skipped
+        """
+        if weeks % 2 == 0:
+            return init_skip
+        else:
+            return not init_skip
+
     @api.one
     def set_next_gen_time(self):
         """

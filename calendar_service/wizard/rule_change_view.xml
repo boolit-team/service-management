@@ -19,7 +19,9 @@
                                 <field name="weekday" 
                                     attrs="{'invisible': [('action', '=', 'delete')], 'required': [('action', 'in', ('update', 'add'))]}"/>                                                                  
                                 <field name="weeks" 
-                                    attrs="{'invisible': [('action', '!=', 'add')], 'required': [('action', '=', 'add')]}"/>                                            
+                                    attrs="{'invisible': [('action', '!=', 'add')], 'required': [('action', '=', 'add')]}"/>
+                                <field name="second_week" attrs="{'invisible': [('action', '!=', 'add')]}"/>
+                                <field name="start_next_week" attrs="{'invisible': [('second_week', '=', False)]}"/>                                            
                             </group>
                             <group>
                                 <field name="time_from" widget="float_time" 
