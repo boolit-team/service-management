@@ -87,7 +87,7 @@ class recurrent_rule_change(models.TransientModel):
             cal_rec = cal_serv_cal.create({
                 'weekday': change_time.weekday, 
                 'second_week': change_time.second_week,
-                'last_week_gen': self._resolve_week_skip(change_time.weeks+1, change_time.start_next_week) if change_time.second_week else None,
+                'last_week_gen': cal_serv_cal._resolve_week_skip(change_time.weeks+1, change_time.start_next_week) if change_time.second_week else None,
                 'time_from': change_time.time_from, 
                 'time_to': change_time.time_to,
                 'product_id': change_time.product_id.id, 
