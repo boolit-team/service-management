@@ -7,7 +7,6 @@
         <field name="model">res.better.zip</field>
         <field name="inherit_id" ref="base_location.better_zip_form"/>
         <field name="arch" type="xml">
-            <field name="priority" position="replace"/>
             <field name="city" position="replace">
                 <field name="city_id" on_change="onchange_city_id(city_id)"/>
                 <field name="house_no"/>
@@ -24,7 +23,6 @@
         <field name="model">res.better.zip</field>
         <field name="inherit_id" ref="base_location.better_zip_tree"/>
         <field name="arch" type="xml">
-            <field name="priority" position="replace"/>
             <field name="city" position="replace">
                 <field name="city_id"/>
                 <field name="street_id"/>

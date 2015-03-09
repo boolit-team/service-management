@@ -32,9 +32,8 @@ class BetterZip(models.Model):
     code = fields.Char('City Code', related='city_id.code', size=64, help="The official code for the city")
     house_no = fields.Char('House No.', size=32)
     apartment_no = fields.Char('Appartment No.', size=32)
-    
-    _defaults = {'priority': None}    
-    #_order = 'name'
+       
+    #_order = 'name asc'
     def name_get(self, cursor, uid, ids, context=None):
         res = []
         for bzip in self.browse(cursor, uid, ids):
