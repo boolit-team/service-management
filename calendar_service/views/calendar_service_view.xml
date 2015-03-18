@@ -183,7 +183,7 @@
                             <page string="Works"> 
                                 <group>                                                   
                                     <field name="work_ids"
-                                        context="{'default_service_id': id}"
+                                        context="{'default_service_id': id, 'default_work_type': work_type, 'default_partner_id': partner_id}"
                                         attrs="{'readonly': [('state', '!=', 'open')]}"
                                     />
                                 </group>

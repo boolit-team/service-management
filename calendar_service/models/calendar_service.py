@@ -22,6 +22,7 @@
 
 from openerp import models, fields, api, SUPERUSER_ID
 from datetime import datetime, timedelta
+import math
 from openerp.exceptions import Warning
 from openerp.tools.translate import _
 import pytz
@@ -158,47 +159,55 @@ class calendar_service_work(models.Model):
         is set for that time, the record is being created for.
         """
         cal_serv_cal = self.env['calendar.service.calendar']
-        recs = self.search([('id', '!=', self.id), 
-            ('employee_id', '=', self.employee_id.id), ('state', '=', 'open'), ('work_type', '!=', 'wait'), 
-            ('start_time', '<', self.end_time), ('end_time', '>', self.start_time)])
-        for rec in recs:
-            start_time = cal_serv_cal.set_tz(datetime.strptime(rec.start_time, "%Y-%m-%d %H:%M:%S"))
-            end_time = cal_serv_cal.set_tz(datetime.strptime(rec.end_time, "%Y-%m-%d %H:%M:%S"))
-            warn_str = "%s Already Assigned from %s to %s in Service %s for %s" % \
-                (rec.employee_id.name, start_time, end_time, rec.service_id.name, rec.partner_id.name)
-            raise Warning(_(warn_str))
-        #Checks Rules if that time is already reserved for any of it
-        if self.state == 'open' and self.work_type != 'wait' and not self.ign_rule_chk:
-            start_time = cal_serv_cal.set_tz(datetime.strptime(self.start_time, 
-                cal_serv_cal.get_dt_fmt()))
-            weekday = cal_serv_cal.get_rev_weekday(start_time.weekday()) #get weekday in calendar.service.calendar
-            start_h = start_time.hour
-            start_min = round(float(start_time.minute) / 60, 2)
-            time_from = float(start_h + start_min)
-            end_time = cal_serv_cal.set_tz(datetime.strptime(self.end_time, 
-                cal_serv_cal.get_dt_fmt()))
-            end_h = end_time.hour
-            end_min = round(float(end_time.minute) / 60, 2)
-            time_to = float(end_h + end_min)
-            recurrent = self.env['calendar.service.recurrent'].search([('active', '=', True)])
-            if recurrent and not recurrent.next_gen_time:
-                raise Warning(_("You need to Initially generate Recurrent Calendar\n"
-                    "before creating any services or works!"))
-            next_gen_time = cal_serv_cal.set_tz(cal_serv_cal.str_to_dt(recurrent.next_gen_time))
-            cal_recs = cal_serv_cal.search([('employee_ids', 'in', [self.employee_id.id]), 
-                ('rule_id.recurrent_id', '=', recurrent.id), ('weekday', '=', weekday), 
-                ('time_from', '<', time_to), ('time_to', '>', time_from)])
-            for cal_rec in cal_recs:
-                if cal_rec.second_week and start_time >= next_gen_time:
-                    next_gen_time_m = next_gen_time - timedelta(days=next_gen_time.weekday())
-                    start_time_m = start_time - timedelta(days=start_time.weekday())
-                    week_diff = (start_time_m - next_gen_time_m).days / 7 #get difference in weeks
-                    #check if week is reserved or not
-                    if (week_diff % 2 == 0 and cal_rec.last_week_gen) or (week_diff % 2 != 0 and not cal_rec.last_week_gen):
-                        continue
-                raise Warning(_("There is rule already defined for \n"
-                    "%s to work at %s from %s to %s !" % (self.employee_id.name, 
-                    cal_serv_cal.get_weekday(weekday), cal_rec.time_from, cal_rec.time_to)))
+        if self.work_type != 'wait':
+            recs = self.search([('id', '!=', self.id), ('employee_id', '=', self.employee_id.id), 
+                ('state', '=', 'open'), ('work_type', '!=', 'wait'), ('start_time', '<', self.end_time), 
+                ('end_time', '>', self.start_time)])
+            for rec in recs:
+                start_time = cal_serv_cal.set_tz(datetime.strptime(rec.start_time, "%Y-%m-%d %H:%M:%S"))
+                end_time = cal_serv_cal.set_tz(datetime.strptime(rec.end_time, "%Y-%m-%d %H:%M:%S"))
+                warn_str = "%s Already Assigned from %s to %s in Service %s for %s" % \
+                    (rec.employee_id.name, start_time, end_time, rec.service_id.name, rec.service_id.partner_id.name)
+                raise Warning(_(warn_str))
+            # Check if there is cancelled record in a place new record is being assigned. Pass it if true
+            cancel_pass = False
+            cancelled_rec = self.search([
+                ('id', '!=', self.id), ('employee_id', '=', self.employee_id.id), ('state', '=', 'cancel'), 
+                ('start_time', '=', self.start_time), ('end_time', '=', self.end_time)])
+            if cancelled_rec:
+                cancel_pass = True
+            #Checks Rules if that time is already reserved for any of it
+            if self.state == 'open' and self.work_type != 'wait' and not cancel_pass and not self.ign_rule_chk:
+                start_time = cal_serv_cal.set_tz(datetime.strptime(self.start_time, 
+                    cal_serv_cal.get_dt_fmt()))
+                weekday = cal_serv_cal.get_rev_weekday(start_time.weekday()) #get weekday in calendar.service.calendar
+                start_h = start_time.hour
+                start_min = round(float(start_time.minute) / 60, 2)
+                time_from = float(start_h + start_min)
+                end_time = cal_serv_cal.set_tz(datetime.strptime(self.end_time, 
+                    cal_serv_cal.get_dt_fmt()))
+                end_h = end_time.hour
+                end_min = round(float(end_time.minute) / 60, 2)
+                time_to = float(end_h + end_min)
+                recurrent = self.env['calendar.service.recurrent'].search([('active', '=', True)])
+                if recurrent and not recurrent.next_gen_time:
+                    raise Warning(_("You need to Initially generate Recurrent Calendar\n"
+                        "before creating any services or works!"))
+                next_gen_time = cal_serv_cal.set_tz(cal_serv_cal.str_to_dt(recurrent.next_gen_time))
+                cal_recs = cal_serv_cal.search([('employee_ids', 'in', [self.employee_id.id]), 
+                    ('rule_id.recurrent_id', '=', recurrent.id), ('weekday', '=', weekday), 
+                    ('time_from', '<', time_to), ('time_to', '>', time_from)])
+                for cal_rec in cal_recs:
+                    if cal_rec.second_week and start_time >= next_gen_time:
+                        next_gen_time_m = next_gen_time - timedelta(days=next_gen_time.weekday())
+                        start_time_m = start_time - timedelta(days=start_time.weekday())
+                        week_diff = (start_time_m - next_gen_time_m).days / 7 #get difference in weeks
+                        #check if week is reserved or not
+                        if (week_diff % 2 == 0 and cal_rec.last_week_gen) or (week_diff % 2 != 0 and not cal_rec.last_week_gen):
+                            continue
+                    raise Warning(_("There is rule named '%s' that have assignet resource \n"
+                        "%s to work at %s from %s to %s !" % (cal_rec.rule_id.name, self.employee_id.name, 
+                        cal_serv_cal.get_weekday(weekday), cal_serv_cal.float_to_time(cal_rec.time_from), cal_serv_cal.float_to_time(cal_rec.time_to))))
 
 class calendar_service(models.Model):
     _name = 'calendar.service'
@@ -223,14 +232,22 @@ class calendar_service(models.Model):
     def create(self, vals):
         if vals.get('name','/')=='/':
             vals['name'] = self.env['ir.sequence'].get('calendar.service') or '/'
-        return super(calendar_service, self).create(vals)
+        rec = super(calendar_service, self).create(vals)
+        for work in rec.work_ids:
+            work_vals = {}
+            if not work.work_type:
+                work_vals['work_type'] = rec.work_type
+            if not work.partner_id:
+                work_vals['partner_id'] = rec.partner_id.id
+            if work_vals:
+                work.write(work_vals)
+        return rec
 
     @api.multi
     def write(self, vals):
         for rec in self:
             if vals.get('work_type'):
-                for work in rec.work_ids:
-                    work.work_type = vals.get('work_type')
+                rec.work_ids.write({'work_type': vals['work_type']})
         return super(calendar_service, self).write(vals)
 
     @api.one
@@ -423,6 +440,20 @@ class calendar_service_calendar(models.Model):
         returns standard datetime format
         """
         return "%Y-%m-%d %H:%M:%S"
+
+    @api.model
+    def float_to_time(self, flt):
+        """
+        Converts float that represent 24 hour format
+        to string equivalent.
+        """
+        time_tpl = math.modf(flt)
+        pre_h = int(time_tpl[1])        
+        hour = '0'+str(pre_h) if pre_h < 10 else str(pre_h)
+        pre_min = int(round(time_tpl[0]*60))
+        minute = '0'+str(pre_min) if pre_min < 10 else str(pre_min)
+        f_time = "%s:%s" % (hour, minute)
+        return f_time        
 
     @api.model
     def str_to_dt(self, string):
