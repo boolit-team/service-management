@@ -100,7 +100,8 @@
             <field name="priority" eval="1"/>
             <field name="arch" type="xml">
                 <calendar string="Service Works" date_start="start_time" color="employee_id" 
-                    date_stop="end_time" mode="week" avatar_model="hr.employee" display="[employee_id], [partner_id]">              
+                    date_stop="end_time" mode="week" avatar_model="hr.employee" display="[calendar_attention][employee_id], [partner_id]">              
+                    <field name="calendar_attention"/>
                     <field name="employee_id"/>
                     <field name="partner_id"/>                                                                                           
                 </calendar>                

@@ -58,6 +58,7 @@ class calendar_service_work(models.Model):
     end_time = fields.Datetime('Ending at', required=True)
     description = fields.Text('Description')
     attention = fields.Text('Attention!')
+    calendar_atention = fields.Char('Calendar Warning', compute="_calendar_warning")
     duration = fields.Float('Duration')
     partner_id = fields.Many2one('res.partner', 'Customer', domain=[('customer', '=', True)])
     address_archive_id = fields.Many2one('res.partner.address_archive', 'Current Address')
@@ -74,6 +75,13 @@ class calendar_service_work(models.Model):
     @api.one
     def cancel_state(self):
         self.state = 'cancel'    
+
+    @api.one
+    @api.depends('attention')
+    def _calendar_warning(self):
+        self.calendar_atention = ''
+        if self.attention:
+            self.calendar_atention = '*'
 
     @api.one
     @api.depends('description', 'attention')
