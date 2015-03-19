@@ -55,6 +55,10 @@ class res_partner_address_archive(models.Model):
                 name.append(address.state_id.name)
             if address.country_id:
                 name.append(address.country_id.name)
+            if address.house_no:
+                name.append(address.house_no)
+            if address.apartment_no:
+                name.append(address.apartment_no)
             res.append((address.id, ", ".join(name)))
         return res    
 
