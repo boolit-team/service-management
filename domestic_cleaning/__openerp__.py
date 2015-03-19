@@ -23,7 +23,7 @@
 
 {
     'name': 'Domestic Cleaning',
-    'version': '1.0',
+    'version': '1.1',
     'category': 'Cleaning',
     'sequence': 2,
     'summary': 'Domestic Cleaning Specifics',

@@ -33,3 +33,25 @@ class res_partner(models.Model):
     house_alarm_off = fields.Char('House Alarm Off')
     gate_alarm_on = fields.Char('Gate Alarm On')
     gate_alarm_off = fields.Char('Gate Alarm Off')
+
+
+class res_partner_address_archive(models.Model):
+    _inherit ='res.partner.address_archive'
+
+    @api.multi
+    def name_get(self):
+        res = []
+        for address in self:
+            name = []
+            if address.name:
+                name.append(address.name)
+            if address.street:
+                name.append(address.street)
+            if address.city:
+                name.append(address.city)
+            if address.house_no:
+                name.append(address.house_no)
+            if address.house_name:
+                name.append(address.house_name)
+            res.append((address.id, ", ".join(name)))
+        return res
