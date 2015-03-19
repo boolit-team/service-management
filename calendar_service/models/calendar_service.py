@@ -88,15 +88,6 @@ class calendar_service_work(models.Model):
         if self.attention:
             self.details = "%s%s" % ("Description + " if self.details else '', 'Attention')
 
-    @api.onchange('partner_id')
-    def onchange_partner_id(self):
-        if self.partner_id:
-            for address in self.partner_id.address_archive_ids:
-                if address.current:
-                    self.address_archive_id = address.id
-            self.note = self.partner_id.comment
-            self.attention = self.partner_id.attention
-
     @api.onchange('service_id')
     def onchange_service_id(self):
         if self.service_id:
@@ -228,6 +219,23 @@ class calendar_service(models.Model):
     desired_time_ids = fields.One2many('calendar.service.desired.time', 'service_id', 'Service Time')
     canceled_until = fields.Date('Canceled Until')
 
+    @api.onchange('partner_id')
+    def onchange_partner_id(self):
+        if self.partner_id:
+            curr_addr = self.partner_id.address_archive_ids.filtered(lambda rec: rec.current == True)
+            for work in self.work_ids:
+                work.partner_id = self.partner_id.id
+                work.address_archive_id = curr_addr.id
+                work.note = self.partner_id.comment
+                work.attention = self.partner_id.attention                
+
+    @api.onchange('work_type')
+    def onchange_work_type(self):
+        if self.work_type:
+            for work in self.work_ids:
+                work.work_type = self.work_type
+
+
     @api.model
     def create(self, vals):
         if vals.get('name','/')=='/':
@@ -242,13 +250,6 @@ class calendar_service(models.Model):
             if work_vals:
                 work.write(work_vals)
         return rec
-
-    @api.multi
-    def write(self, vals):
-        for rec in self:
-            if vals.get('work_type'):
-                rec.work_ids.write({'work_type': vals['work_type']})
-        return super(calendar_service, self).write(vals)
 
     @api.one
     def close_state(self):

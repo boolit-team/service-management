@@ -60,7 +60,6 @@
                                     attrs="{'readonly': True}"
                                 />
                                 <field name="partner_id"
-                                    onchange="onchange_partner_id()"
                                     attrs="{'readonly': True}"
                                 />
                                 <field name="address_archive_id"
@@ -101,7 +100,7 @@
             <field name="priority" eval="1"/>
             <field name="arch" type="xml">
                 <calendar string="Service Works" date_start="start_time" color="employee_id" 
-                    date_stop="end_time" mode="week" avatar_model="hr.employee" display="[employee_id], [partner_id]">                    
+                    date_stop="end_time" mode="week" avatar_model="hr.employee" display="[employee_id], [partner_id]">              
                     <field name="employee_id"/>
                     <field name="partner_id"/>                                                                                           
                 </calendar>                
@@ -173,10 +172,12 @@
                                 <field name="user_id" attrs="{'readonly': [('state', '!=', 'open')]}"/>
                             </group>
                             <group>
-                                <field name="partner_id" attrs="{'required': True, 'readonly': [('state', '!=', 'open')]}"/>
+                                <field name="partner_id" attrs="{'required': True, 'readonly': [('state', '!=', 'open')]}"
+                                    onchange="onchange_partner_id()"/>
                                 <field name="product_id" attrs="{'readonly': [('state', '!=', 'open')]}"/>
                                 <field name="order_id" attrs="{'readonly': True, 'invisible': [('order_id', '=', False)]}"/>
-                                <field name="work_type" attrs="{'readonly': [('state', '!=', 'open')]}"/>
+                                <field name="work_type" attrs="{'readonly': [('state', '!=', 'open')]}"
+                                    onchange="onchange_work_type()"/>
                             </group>
                         </group>
                         <notebook>
