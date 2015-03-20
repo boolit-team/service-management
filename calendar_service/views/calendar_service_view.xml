@@ -217,7 +217,8 @@
             <field name="model">calendar.service</field>
             <field name="arch" type="xml">
                 <calendar string="Services" date_start="start_time" color="work_type"
-                    date_stop="end_time" mode="week">
+                    date_stop="end_time" mode="week" display="[calendar_attention][name], [partner_id]">
+                    <field name="calendar_attention"/>
                     <field name="name"/>
                     <field name="partner_id"/>                                                                                          
                 </calendar>                

@@ -58,7 +58,7 @@ class calendar_service_work(models.Model):
     end_time = fields.Datetime('Ending at', required=True)
     description = fields.Text('Description')
     attention = fields.Text('Attention!')
-    calendar_atention = fields.Char('Calendar Warning', compute="_calendar_warning")
+    calendar_attention = fields.Char('Calendar Warning', compute="_calendar_warning")
     duration = fields.Float('Duration')
     partner_id = fields.Many2one('res.partner', 'Customer', domain=[('customer', '=', True)])
     address_archive_id = fields.Many2one('res.partner.address_archive', 'Current Address')
@@ -79,9 +79,9 @@ class calendar_service_work(models.Model):
     @api.one
     @api.depends('attention')
     def _calendar_warning(self):
-        self.calendar_atention = ''
+        self.calendar_attention = ''
         if self.attention:
-            self.calendar_atention = '*'
+            self.calendar_attention = '*'
 
     @api.one
     @api.depends('description', 'attention')
@@ -215,6 +215,7 @@ class calendar_service(models.Model):
 
     name = fields.Char('Service No.', default='/', readonly=True)
     partner_id = fields.Many2one('res.partner', 'Customer', domain=[('customer', '=', True)])
+    calendar_attention = fields.Char('Calendar Warning', compute="_calendar_warning")
     start_time = fields.Datetime('Starting at', required=True)
     end_time = fields.Datetime('Ending at', required=True)
     work_type = fields.Selection(WORK_TYPE, 'Type', required=True)
@@ -226,6 +227,13 @@ class calendar_service(models.Model):
     order_id = fields.Many2one('sale.order', 'Sale Order')
     desired_time_ids = fields.One2many('calendar.service.desired.time', 'service_id', 'Service Time')
     canceled_until = fields.Date('Canceled Until')
+
+    @api.one
+    @api.depends('partner_id', 'partner_id.attention')
+    def _calendar_warning(self):
+        self.calendar_attention = ''
+        if self.partner_id.attention:
+            self.calendar_attention = '*'
 
     @api.onchange('partner_id')
     def onchange_partner_id(self):
