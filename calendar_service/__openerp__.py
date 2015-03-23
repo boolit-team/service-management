@@ -38,7 +38,8 @@
     'depends': [
         'base_address_management',
         'sale',
-        'hr',     
+        'hr',
+        #'web_calendar',     
     ],
     'data': [
         'security/ir.model.access.csv',
@@ -48,14 +49,14 @@
         'views/res_partner_view.xml',
         'views/sale_view.xml',
         'data/sequences.xml',
-        'data/schedulers.xml',        
+        'data/schedulers.xml',
+        #'views/calendar_service.xml',        
 
     ],
     'demo': [
         'demo/calendar_service_demo.xml'
     ],
     'test': [
-
     ],
     'installable': True,
     'application': True,
