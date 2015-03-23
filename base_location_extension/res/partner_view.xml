@@ -17,8 +17,8 @@
                 <field name="street" placeholder="Street..." position="replace">
                     <div class="address_format">
                         <field name="street" placeholder="Street..." attrs="{'readonly': [('use_parent_address','=',True)]}" style="width: 53%%"/>
-                        <field name="house_no" style="width: 22%%"/>
-                        <field name="apartment_no" style="width: 22%%"/>
+                        <field name="house_no" style="width: 22%%" attrs="{'readonly': [('use_parent_address','=',True)]}"/>
+                        <field name="apartment_no" style="width: 22%%" attrs="{'readonly': [('use_parent_address','=',True)]}"/>
                     </div>
                 </field>                
             </field>
