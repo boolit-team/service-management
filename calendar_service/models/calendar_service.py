@@ -160,7 +160,7 @@ class calendar_service_work(models.Model):
         cal_serv_cal = self.env['calendar.service.calendar']
         if self.work_type != 'wait':
             recs = self.search([('id', '!=', self.id), ('employee_id', '=', self.employee_id.id), 
-                ('state', '=', 'open'), ('work_type', '!=', 'wait'), ('start_time', '<', self.end_time), 
+                ('state', 'in', ('open', 'done')), ('work_type', '!=', 'wait'), ('start_time', '<', self.end_time), 
                 ('end_time', '>', self.start_time)])
             for rec in recs:
                 start_time = cal_serv_cal.set_tz(datetime.strptime(rec.start_time, "%Y-%m-%d %H:%M:%S"))
