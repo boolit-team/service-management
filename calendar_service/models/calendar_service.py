@@ -175,8 +175,12 @@ class calendar_service_work(models.Model):
                 ('start_time', '=', self.start_time), ('end_time', '=', self.end_time)])
             if cancelled_rec:
                 cancel_pass = True
+            recurrent = self.env['calendar.service.recurrent'].search([('active', '=', True)])
+            if recurrent and not recurrent.next_gen_time:
+                raise Warning(_("You need to Initially generate Recurrent Calendar\n"
+                    "before creating any services or works!"))            
             #Checks Rules if that time is already reserved for any of it
-            if self.state == 'open' and self.work_type != 'wait' and not cancel_pass and not self.ign_rule_chk:
+            if self.state == 'open' and self.work_type != 'wait' and self.start_time >= recurrent.next_gen_time and not cancel_pass and not self.ign_rule_chk:
                 start_time = cal_serv_cal.set_tz(datetime.strptime(self.start_time, 
                     cal_serv_cal.get_dt_fmt()))
                 weekday = cal_serv_cal.get_rev_weekday(start_time.weekday()) #get weekday in calendar.service.calendar
@@ -188,16 +192,13 @@ class calendar_service_work(models.Model):
                 end_h = end_time.hour
                 end_min = round(float(end_time.minute) / 60, 2)
                 time_to = float(end_h + end_min)
-                recurrent = self.env['calendar.service.recurrent'].search([('active', '=', True)])
-                if recurrent and not recurrent.next_gen_time:
-                    raise Warning(_("You need to Initially generate Recurrent Calendar\n"
-                        "before creating any services or works!"))
                 next_gen_time = cal_serv_cal.set_tz(cal_serv_cal.str_to_dt(recurrent.next_gen_time))
                 cal_recs = cal_serv_cal.search([('employee_ids', 'in', [self.employee_id.id]), 
                     ('rule_id.recurrent_id', '=', recurrent.id), ('weekday', '=', weekday), 
                     ('time_from', '<', time_to), ('time_to', '>', time_from)])
                 for cal_rec in cal_recs:
                     if cal_rec.second_week and start_time >= next_gen_time:
+                        # Find if 'every second' week matches week that resource is being assigned
                         next_gen_time_m = next_gen_time - timedelta(days=next_gen_time.weekday())
                         start_time_m = start_time - timedelta(days=start_time.weekday())
                         week_diff = (start_time_m - next_gen_time_m).days / 7 #get difference in weeks
