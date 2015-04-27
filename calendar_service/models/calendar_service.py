@@ -602,8 +602,8 @@ class calendar_service_recurrent(models.Model):
         """
         service = service_obj.create({
             'start_time': start_time, 'end_time': end_time,
-            'user_id': rule.user_id.id, 'work_type': 'recurrent',
-            'rule_calendar_id': cal_rec.id, 
+            'user_id': rule.user_id.id, 'work_type': 'recurrent' if cal_rec else 'one',
+            'rule_calendar_id': cal_rec.id if cal_rec else None, 
             'product_id': change_time.product_id.id if change_time else cal_rec.product_id.id, #exception for early change_time use
             'partner_id': rule.partner_id.id,
         })
