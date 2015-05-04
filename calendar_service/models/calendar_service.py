@@ -729,6 +729,7 @@ class calendar_service_recurrent_rule(models.Model):
                 result.append((record.id, "%s,%s" % (record._name, record.id)))
         return result  
 
+    '''
     @api.one
     @api.constrains('partner_id')
     def _check_partner(self):
@@ -737,7 +738,6 @@ class calendar_service_recurrent_rule(models.Model):
             if rule.partner_id.id == self.partner_id.id:
                 raise Warning(_('Partner per Rule must be Unique!'))
 
-    '''
     @api.one
     @api.constrains('calendar_ids')
     def _check_calendar_ids(self):
