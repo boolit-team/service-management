@@ -176,9 +176,14 @@ class calendar_service_work(models.Model):
             if cancelled_rec:
                 cancel_pass = True
             recurrent = self.env['calendar.service.recurrent'].search([('active', '=', True)])
-            if recurrent and not recurrent.next_gen_time:
-                raise Warning(_("You need to Initially generate Recurrent Calendar\n"
-                    "before creating any services or works!"))            
+            if recurrent: 
+                if not recurrent.next_gen_time:
+                    raise Warning(_("You need to Initially generate Recurrent Calendar\n"
+                        "before creating any services or works!")) 
+            else:
+                msg = _("Recurrent Calendar is not created. Create one (Recurrent Services Config).")    
+                raise Warning(msg)
+
             #Checks Rules if that time is already reserved for any of it
             if self.state == 'open' and self.work_type != 'wait' and self.start_time >= recurrent.next_gen_time and not cancel_pass and not self.ign_rule_chk:
                 start_time = cal_serv_cal.set_tz(datetime.strptime(self.start_time, 
