@@ -23,7 +23,7 @@
 
 {
     'name': 'Calendar Service Management',
-    'version': '1.2.5',
+    'version': '1.2.6',
     'category': 'Calendar',
     'sequence': 2,
     'summary': 'Manage recurrent or one time services that need resources and planning',

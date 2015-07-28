@@ -104,7 +104,7 @@
                             <group>
                                 <field name="active"/>
                                 <field name="next_gen_time" attrs="{'readonly': True}"/>
-                                <field name="init"/>
+                                <field name="init" attrs="{'required': [('next_gen_time', '=', False)]}"/>
                             </group>
                         </group>
                         <group>

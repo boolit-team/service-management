@@ -559,7 +559,7 @@ class calendar_service_recurrent(models.Model):
         help="How Initially many weeks to generate. \n0 means generate only this week starting from now + 1 hour", default=8)
     weeks = fields.Integer('Weeks', default=1)
     next_gen_time = fields.Datetime('Next Generate Time', readonly=False)
-    init = fields.Boolean('Init')
+    init = fields.Boolean('Init', help="Initially generates recurrent calendar")
     ign_second_week = fields.Boolean('Ignore Second Week Check') #used to second week constrain when generating calendar
 
     @api.model
@@ -638,6 +638,9 @@ class calendar_service_recurrent(models.Model):
             service_obj = self.env['calendar.service']
             service_work_obj = self.env['calendar.service.work']
             self.ign_second_week = True #to let interchanging last_week_gen value
+            # Set next generate time
+            if not self.next_gen_time:
+                self.set_next_gen_time()            
             for rule in self.rule_ids:
                 current_address = self.env['res.partner.address_archive'].search(
                     [('partner_id', '=', rule.partner_id.id), ('current', '=', True)])
@@ -664,10 +667,10 @@ class calendar_service_recurrent(models.Model):
                             else:
                                 self.create_service(service_obj, service_work_obj, start_time, end_time, 
                                     cal_rec, rule, current_address)                                
-            # Set next generate time
-            self.set_next_gen_time()
             if self.init:
                 self.init = False
+            else:
+                self.set_next_gen_time()
             self.ign_second_week = False #Stop ignoring second_week
 
         else:
