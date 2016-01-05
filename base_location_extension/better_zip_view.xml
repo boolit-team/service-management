@@ -8,12 +8,12 @@
         <field name="inherit_id" ref="base_location.better_zip_form"/>
         <field name="arch" type="xml">
             <field name="city" position="replace">
-                <field name="city_id" on_change="onchange_city_id(city_id)"/>
+                <field name="city_id"/>
                 <field name="house_no"/>
                 <field name="apartment_no"/>
             </field>
             <field name="name" position="after">
-                <field name="street_id" on_change="onchange_street_id(street_id)"/>
+                <field name="street_id"/>
             </field>
         </field>
     </record>
