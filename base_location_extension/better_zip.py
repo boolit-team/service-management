@@ -28,8 +28,11 @@ class BetterZip(models.Model):
 
     city_id = fields.Many2one('res.country.state.city', 'City')
     street_id = fields.Many2one('res.country.state.city.street', 'Street')
+    # reset compute field to default value for display_name
     display_name = fields.Char(compute='_compute_display_name', store=False)
+    # unnecessary field, using res.country.state.city instead
     city = fields.Char('City', required=False, deprecated=True)
+    # fill the code field when filled in creating city
     code = fields.Char('City Code', related='city_id.code', size=64, help="The official code for the city")
     house_no = fields.Char('House No.', size=32)
     apartment_no = fields.Char('Apartment No.', size=32)
@@ -48,6 +51,7 @@ class BetterZip(models.Model):
             name = []
             if bzip.name:
                 name.append(bzip.name)
+            # add address details to name
             if bzip.street_id:
                 name.append(bzip.street_id.name)
             if bzip.city_id:
@@ -61,26 +65,30 @@ class BetterZip(models.Model):
 
     @api.onchange('city_id')
     def onchange_city_id(self):
+        """Cascade the state and city code to match those of the city."""
         if self.city_id:
             self.state_id = self.city_id.state_id.id if self.city_id.state_id else False
             self.code = self.city_id.code
 
     @api.onchange('street_id')
     def onchange_street_id(self):
-
+        """Cascade the city and city code to match those of the street."""
         if self.street_id:
             self.city_id = self.street_id.city_id.id if self.street_id.city_id else False
             self.code = self.street_id.city_id.code
 
     @api.model
     def name_search(self, name='', args=None, operator='ilike', limit=5):
+        """Search in name, city and street in automation lists, instead of just name."""
         if args is None:
             args = []
         ids = []
         if name:
             ids = self.search([('name', operator, name)] + args, limit=limit)
+        # search in city, if no results in name
         if not ids:
             ids = self.search([('city_id.name', operator, name)] + args, limit=limit)
+        # search in street, if no results in city
         if not ids:
             ids = self.search([('street_id.name', operator, name)] + args, limit=limit)
         return ids.name_get()
