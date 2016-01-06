@@ -36,7 +36,7 @@ class BetterZip(models.Model):
     city = fields.Char('City', required=False, deprecated=True)
     code = fields.Char('City Code', related='city_id.code', size=64, help="The official code for the city")
     house_no = fields.Char('House No.', size=32)
-    apartment_no = fields.Char('Appartment No.', size=32)
+    apartment_no = fields.Char('Apartment No.', size=32)
 
     # _order = 'name asc'
     # def name_get(self, cursor, uid, ids, context=None):
@@ -55,28 +55,29 @@ class BetterZip(models.Model):
     #         res.append((bzip.id, ", ".join(name)))
     #     return res
 
-    # @api.one
-    # @api.depends(
-    #     'name',
-    #     'street_id',
-    #     'city_id',
-    #     'state_id',
-    #     'country_id',
-    # )
-    # def _get_display_name(self):
-    #     if self.name:
-    #         name = [self.name, self.city_id]
-    #     else:
-    #         name = [self.city_id]
-    #     if self.street_id:
-    #         name.append(self.city_id)
-    #     if self.city_id:
-    #         name.append(self.city_id)
-    #     if self.state_id:
-    #         name.append(self.state_id)
-    #     if self.country_id:
-    #         name.append(self.country_id)
-    #     self.display_name = ", ".join(name)
+    @api.one
+    @api.depends(
+        'name',
+        'street_id',
+        'city_id',
+        'state_id',
+        'country_id',
+    )
+    def _get_display_name(self):
+        if self.name:
+            name = [self.name, self.city_id.name]
+        else:
+            name = [self.city_id.name]
+        if self.street_id:
+            name.append(self.street_id.name)
+        if self.city_id:
+            name.append(self.city_id.name)
+        if self.state_id:
+            name.append(self.state_id.name)
+        if self.country_id:
+            name.append(self.country_id.name)
+        self.display_name = ", ".join(name)
+    #     Nuspręsti, koks bus name "ZIP, Gatvė, Miestas, Rajonas, Šalis"
 
     @api.onchange('city_id')
     # def onchange_city_id(self, cr, uid, ids, city_id=False, context=None):
