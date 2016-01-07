@@ -19,14 +19,12 @@
 #
 ##############################################################################
 
-from openerp.osv import fields, orm
-    
-class Street(orm.Model):
+from openerp import fields, models
+
+
+class Street(models.Model):
     _name = 'res.country.state.city.street'
     _description = 'Street'
     _inherit = 'base.localization'
-    _columns = {
-        'city_id': fields.many2one('res.country.state.city', 'City', require=True),
-    }
-    
 
+    city_id = fields.Many2one('res.country.state.city', 'City', require=True)
