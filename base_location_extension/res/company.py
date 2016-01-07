@@ -19,30 +19,23 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ##############################################################################
-from openerp.osv import orm, fields
+from openerp import api, fields, models
 
 
-class ResCompany(orm.Model):
-
+class ResCompany(models.Model):
     _inherit = 'res.company'
 
-    def on_change_zip_id(self, cr, uid, ids, zip_id, context=None):
-        result = {}
-        if context is None:
-            context = {}
-        if zip_id:
-            bzip = self.pool['res.better.zip'].browse(cr, uid, zip_id, context=context)
-            result = {'value': {'zip': bzip.name,
-                                'country_id': bzip.country_id.id if bzip.country_id else False,
-                                'street': bzip.street_id.name if bzip.street_id else False,
-                                'city': bzip.city_id.name if bzip.city_id else False,
-                                'state_id': bzip.state_id.id if bzip.state_id else False
-                                }
-                      }
-        return result
+    better_zip_id = fields.Many2one('res.better.zip', 'Location', select=1,
+                                    help=('Use the city name, street or the zip code'
+                                          ' to search the location'))
 
-    _columns = {
-        'better_zip_id': fields.many2one('res.better.zip', 'Location', select=1,
-                                         help=('Use the city name or the zip code'
-                                         ' to search the location')),
-    }
+    @api.onchange('better_zip_id')
+    def onchange_zip_id(self):
+        """Cascade address info into fields when the address completion is filled"""
+        self.ensure_one()
+        if self.better_zip_id:
+            self.zip = self.better_zip_id.name
+            self.country_id = self.better_zip_id.country_id
+            self.street = self.better_zip_id.street_id.name if self.better_zip_id.street_id else False
+            self.city = self.better_zip_id.city_id.name if self.better_zip_id.city_id else False
+            self.state_id = self.better_zip_id.state_id if self.better_zip_id.state_id else False
