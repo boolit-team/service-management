@@ -19,29 +19,16 @@
 #
 ##############################################################################
 
-from openerp.osv import fields, orm
+from openerp import api, fields, models
 
-def location_name_search(self, cr, uid, name, args=None, operator='ilike', context=None, limit=100):
-        if args is None:
-            args = []
-        if context is None:
-            context = {}
-        ids = []
-        if name:
-            ids = self.search(cr, uid, [('code', operator, name)] + args, limit=limit)
-        if not ids:
-            ids = self.search(cr, uid, [('name', operator, name)] + args, limit=limit)
-       
-        return self.name_get(cr, uid, ids, context=context)                 
-    
-class BaseLocalization(orm.Model):
+
+class BaseLocalization(models.Model):
     _name = 'base.localization'
     _description = 'Base class for localization classes'
-    _columns = {
-        'name': fields.char('Name', size=256, required=True),
-
-    }
     _order = 'name'
+
+    name = fields.Char(size=256, required=True)
+
     """
     def create(self, cursor, user, vals, context=None):
         if vals.get('name'):
@@ -54,30 +41,39 @@ class BaseLocalization(orm.Model):
             vals['name'] = vals['name'].capitalize()
         return super(BaseLocalization, self).write(cursor, user, ids, vals,
                 context=context)
-    """                   
-    
-class City(orm.Model):
+    """
+
+
+class City(models.Model):
     _name = 'res.country.state.city'
     _description = 'City'
     _inherit = 'base.localization'
-    _columns = {
-        'code': fields.char('Code', size=64, help="The official code for the city"),
-        'state_id': fields.many2one('res.country.state', 'State', required=True),
-    }
-    
-    def create(self, cursor, user, vals, context=None):
-        #Make code value with capital letters
+
+    code = fields.Char(size=64, help="The official code for the city")
+    state_id = fields.Many2one('res.country.state', 'State', required=True)
+
+    @api.model
+    def create(self, vals):
+        # Make code value with capital letters
         if vals.get('code'):
             vals['code'] = vals['code'].upper()
-        return super(City, self).create(cursor, user, vals,
-                context=context)
+        return super(City, self).create(vals)
 
-    def write(self, cursor, user, ids, vals, context=None):
+    @api.model
+    def write(self, vals):
         if 'code' in vals and vals['code'] != False:
             vals['code'] = vals['code'].upper()
-        return super(City, self).write(cursor, user, ids, vals,
-                context=context)
-    
-    name_search = location_name_search   
-    
+        return super(City, self).write(vals)
 
+    @api.model
+    def name_search(self, name='', args=None, operator='ilike', limit=100):
+        """Search for code and name, instead of just name, when entering city in"""
+        if args is None:
+            args = []
+        ids = []
+        if name:
+            ids = self.search([('code', operator, name)] + args, limit=limit)
+        if not ids:
+            ids = self.search([('name', operator, name)] + args, limit=limit)
+
+        return ids.name_get()
