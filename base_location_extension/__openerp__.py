@@ -23,7 +23,7 @@
 
 {
     'name': 'Base Location',
-    'version': '1.1',
+    'version': '1.2.0',
     'category': 'Base',
     'sequence': 2,
     'summary': 'Cities, Streets management',
